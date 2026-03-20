@@ -2,6 +2,7 @@ import { useRef, useEffect } from "react";
 import { SCENES } from "../../renderer/scenes";
 import { ParticleSystem } from "../../renderer/particles";
 import type { SceneId } from "../../engine/types";
+import { useLocaleStore, getT } from "../../i18n";
 
 interface Props {
   scene: SceneId;
@@ -11,6 +12,7 @@ interface Props {
 }
 
 export function GameCanvas({ scene, curse = 0, day = 0, enemyType }: Props) {
+  const locale = useLocaleStore(s => s.locale);
   const ref = useRef<HTMLCanvasElement>(null);
   const frameRef = useRef(0);
   const particlesRef = useRef(new ParticleSystem());
@@ -38,7 +40,8 @@ export function GameCanvas({ scene, curse = 0, day = 0, enemyType }: Props) {
       // HUD overlay
       ctx.fillStyle = "#f0c040";
       ctx.font = "bold 10px 'Press Start 2P', monospace";
-      ctx.fillText(`ДЕНЬ ${day}`, 8, 14);
+      const t = getT(locale);
+      ctx.fillText(`${t("day")} ${day}`, 8, 14);
 
       const cr = Math.min(curse / 15, 1);
       if (cr > 0) {
@@ -51,7 +54,7 @@ export function GameCanvas({ scene, curse = 0, day = 0, enemyType }: Props) {
 
     draw();
     return () => cancelAnimationFrame(id);
-  }, [scene, curse, day, enemyType]);
+  }, [scene, curse, day, enemyType, locale]);
 
   return (
     <canvas
