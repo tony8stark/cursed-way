@@ -190,7 +190,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       flags: new Set(state.flags),
       gold: Math.max(0, state.gold + gd),
       crew: Math.max(0, state.crew + cd),
-      karma: state.karma + (choice.eff.karma || 0),
+      karma: Math.round((state.karma + (choice.eff.karma || 0)) * 10) / 10,
       curse: Math.max(0, state.curse + (choice.eff.curse || 0)),
       log: [...state.log],
       inventory: [...state.inventory],

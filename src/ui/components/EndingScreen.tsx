@@ -69,7 +69,7 @@ export function EndingScreen() {
         <StatBox label={t("crew")} value={state.crew} color="#40c0f0" />
         <StatBox
           label={t("karma")}
-          value={state.karma > 0 ? `+${state.karma}` : state.karma}
+          value={state.karma > 0 ? `+${Math.round(state.karma * 10) / 10}` : Math.round(state.karma * 10) / 10}
           color={state.karma >= 0 ? "#40f8a0" : "#c02020"}
         />
         <StatBox label={t("curse")} value={state.curse} color="#8020c0" />
