@@ -39,7 +39,7 @@ export function EncounterScreen() {
   }, [makeChoice]);
 
   const handleContinue = useCallback(() => {
-    audioManager.playSFX("wave");
+    audioManager.playSFX("splash");
     continueSailing();
   }, [continueSailing]);
 

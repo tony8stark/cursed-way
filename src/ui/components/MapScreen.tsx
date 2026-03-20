@@ -47,12 +47,12 @@ export function MapScreen() {
   const cr = Math.min(state.curse / 15, 1);
 
   const handleSail = () => {
-    audioManager.playSFX("wave");
+    audioManager.playSFX("splash");
     sail();
   };
 
   const handleSetDestination = (pos: [number, number]) => {
-    audioManager.playSFX("wave");
+    audioManager.playSFX("splash");
     setDestination(pos);
   };
 

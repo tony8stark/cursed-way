@@ -1,12 +1,13 @@
 import type { SceneId } from "../engine/types";
 
-type SFXType = "click" | "coin" | "curse" | "wave" | "thunder" | "crewLoss" | "encounter";
+type SFXType = "click" | "coin" | "curse" | "wave" | "splash" | "thunder" | "crewLoss" | "encounter";
 
 const SFX_CONFIG: Record<SFXType, { frequency: number; duration: number; type: OscillatorType; gain: number; sweep?: number }> = {
   click: { frequency: 800, duration: 0.05, type: "square", gain: 0.15 },
   coin: { frequency: 1200, duration: 0.12, type: "sine", gain: 0.2, sweep: 2400 },
   curse: { frequency: 180, duration: 0.4, type: "sawtooth", gain: 0.1, sweep: 60 },
   wave: { frequency: 200, duration: 0.3, type: "sine", gain: 0.08 },
+  splash: { frequency: 0, duration: 0, type: "sine", gain: 0 }, // handled by playSplash()
   thunder: { frequency: 80, duration: 0.5, type: "sawtooth", gain: 0.25, sweep: 30 },
   crewLoss: { frequency: 400, duration: 0.25, type: "triangle", gain: 0.12, sweep: 150 },
   encounter: { frequency: 600, duration: 0.08, type: "square", gain: 0.1, sweep: 900 },
@@ -119,6 +120,10 @@ class AudioManager {
 
   playSFX(type: SFXType) {
     if (this.muted) return;
+    if (type === "splash") {
+      this.playSplash();
+      return;
+    }
     try {
       const ctx = this.getContext();
       const config = SFX_CONFIG[type];
@@ -139,6 +144,78 @@ class AudioManager {
       gain.connect(ctx.destination);
       osc.start(ctx.currentTime);
       osc.stop(ctx.currentTime + config.duration);
+    } catch {
+      // Audio not available
+    }
+  }
+
+  // Realistic wave splash: filtered white noise burst + low rumble
+  private playSplash() {
+    try {
+      const ctx = this.getContext();
+      const t = ctx.currentTime;
+      const vol = this.sfxVolume;
+
+      // Layer 1: noise burst through bandpass (splash)
+      const noiseBuf = ctx.createBuffer(1, ctx.sampleRate * 0.8, ctx.sampleRate);
+      const noiseData = noiseBuf.getChannelData(0);
+      for (let i = 0; i < noiseData.length; i++) {
+        noiseData[i] = Math.random() * 2 - 1;
+      }
+      const noise = ctx.createBufferSource();
+      noise.buffer = noiseBuf;
+
+      const bandpass = ctx.createBiquadFilter();
+      bandpass.type = "bandpass";
+      bandpass.frequency.setValueAtTime(1500, t);
+      bandpass.frequency.exponentialRampToValueAtTime(400, t + 0.6);
+      bandpass.Q.setValueAtTime(0.8, t);
+
+      const noiseGain = ctx.createGain();
+      noiseGain.gain.setValueAtTime(0, t);
+      noiseGain.gain.linearRampToValueAtTime(0.18 * vol, t + 0.02);
+      noiseGain.gain.linearRampToValueAtTime(0.12 * vol, t + 0.15);
+      noiseGain.gain.exponentialRampToValueAtTime(0.001, t + 0.7);
+
+      noise.connect(bandpass);
+      bandpass.connect(noiseGain);
+      noiseGain.connect(ctx.destination);
+      noise.start(t);
+      noise.stop(t + 0.8);
+
+      // Layer 2: low rumble (hull meeting water)
+      const rumble = ctx.createOscillator();
+      rumble.type = "sine";
+      rumble.frequency.setValueAtTime(65, t);
+      rumble.frequency.exponentialRampToValueAtTime(40, t + 0.5);
+
+      const rumbleGain = ctx.createGain();
+      rumbleGain.gain.setValueAtTime(0.06 * vol, t);
+      rumbleGain.gain.exponentialRampToValueAtTime(0.001, t + 0.5);
+
+      rumble.connect(rumbleGain);
+      rumbleGain.connect(ctx.destination);
+      rumble.start(t);
+      rumble.stop(t + 0.5);
+
+      // Layer 3: high fizz (foam/spray)
+      const fizz = ctx.createBufferSource();
+      fizz.buffer = noiseBuf;
+      const highpass = ctx.createBiquadFilter();
+      highpass.type = "highpass";
+      highpass.frequency.setValueAtTime(3000, t);
+      highpass.Q.setValueAtTime(0.5, t);
+
+      const fizzGain = ctx.createGain();
+      fizzGain.gain.setValueAtTime(0, t);
+      fizzGain.gain.linearRampToValueAtTime(0.05 * vol, t + 0.08);
+      fizzGain.gain.exponentialRampToValueAtTime(0.001, t + 0.4);
+
+      fizz.connect(highpass);
+      highpass.connect(fizzGain);
+      fizzGain.connect(ctx.destination);
+      fizz.start(t + 0.05);
+      fizz.stop(t + 0.5);
     } catch {
       // Audio not available
     }
