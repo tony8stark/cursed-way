@@ -60,7 +60,6 @@ export function MapScreen() {
   const isEnRoute = !!(mapState?.currentRoute && mapState.routeProgress < mapState.currentRoute.length);
   const destinations = (!isEnRoute && mapState)
     ? getConnectedLocations(mapState.playerPos)
-        .filter(d => mapState.revealed[d.pos[1]][d.pos[0]])
     : [];
 
   return (
