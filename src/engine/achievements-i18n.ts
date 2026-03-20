@@ -15,8 +15,8 @@ const achievementTexts: Record<string, Record<Locale, AchievementText>> = {
     en: { title: "Cursed", description: "Reach curse level 15" },
   },
   rich: {
-    uk: { title: "Король Карибів", description: "Накопичити 200+ золота" },
-    en: { title: "King of the Caribbean", description: "Accumulate 200+ gold" },
+    uk: { title: "Король Карибів", description: "Накопичити 150+ золота" },
+    en: { title: "King of the Caribbean", description: "Accumulate 150+ gold" },
   },
   pacifist: {
     uk: { title: "Дипломат", description: "Жодного абордажу за гру" },
@@ -59,8 +59,8 @@ const achievementTexts: Record<string, Record<Locale, AchievementText>> = {
     en: { title: "Dark Path", description: "Karma below -5" },
   },
   balanced: {
-    uk: { title: "Баланс", description: "Закінчити з кармою рівно 0" },
-    en: { title: "Balance", description: "Finish with exactly 0 karma" },
+    uk: { title: "Баланс", description: "Закінчити з кармою від -1 до 1" },
+    en: { title: "Balance", description: "Finish with karma between -1 and 1" },
   },
 };
 

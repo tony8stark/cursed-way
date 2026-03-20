@@ -372,6 +372,59 @@ export const encountersEn: Encounter[] = [
       { text: "🙏 Apologize", eff: { gold: 0, crew: 0, karma: 2, curse: -1 }, msg: "The whispers quiet. Not forgiveness, but a truce." },
     ],
   },
+  {
+    id: "skeleton_crew", scene: "open_sea", title: "Crew on the Edge",
+    text: "Three remain. Sails hang limp. The helm turns on its own.",
+    requires: s => s.crew <= 3 && s.crew > 0 && s.day >= 5,
+    choices: [
+      { text: "💪 Work together", eff: { gold: 0, crew: 0, karma: 1, curse: 0 }, msg: "Each one does the work of three. Slow, but sailing. Something changed between you.", flag: "crew_bond" },
+      { text: "💰 Promise double shares", eff: { gold: -15, crew: 0, karma: 0, curse: 0 }, msg: "Money motivates. But for how long?" },
+      { text: "☠️ Accept fate", eff: { gold: 0, crew: 0, karma: 0, curse: 2 }, msg: "Shadows appear at the helm. Dead sailors return to their watch.", flag: "ghost_crew" },
+    ],
+  },
+  {
+    id: "crew_triumph", scene: "open_sea", title: "Strong Crew",
+    text: "Full deck. A pirate shanty cuts through the wind. The ship flies.",
+    requires: s => s.crew >= 10 && s.day >= 5,
+    choices: [
+      { text: "🎉 Celebrate", eff: { gold: -10, crew: 1, karma: 1, curse: 0 }, msg: "Rum, dancing, shooting at the sky. Best day at sea." },
+      { text: "⚓ Train the crew", eff: { gold: 0, crew: 0, karma: 0, curse: 0 }, msg: "Cannon drills. Boarding practice. This isn't a gang anymore. It's an army.", flag: "trained_crew" },
+      { text: "🏴 Hunt for prey", eff: { gold: [30, 60], crew: [-1, 0], karma: -2, curse: 0 }, msg: "With a crew like this, convoys flee. Gold flows like a river." },
+    ],
+  },
+  // ── MID-GAME CONSEQUENCES (days 8-14) ──
+  {
+    id: "reputation_precedes", scene: "open_sea", title: "Reputation",
+    text: s => s.karma >= 3
+      ? "A merchant vessel approaches. Peace flag raised. 'You're that captain? We've heard of you.'"
+      : "A merchant ship flees at full sail. They recognized you.",
+    requires: s => s.day >= 8 && s.day <= 14 && (s.karma >= 3 || s.karma <= -2),
+    choices: [
+      { text: "🤝 Peaceful meeting", eff: { gold: [10, 25], crew: 0, karma: 1, curse: 0 }, msg: "Trade without blood. Information as a gift.", flag: "merchant_contact" },
+      { text: "🏴 Exploit their trust", eff: { gold: [30, 50], crew: 0, karma: -3, curse: 1 }, msg: "Unarmed. Easy prey. But reputation travels fast." },
+      { text: "💬 Exchange news", eff: { gold: 0, crew: 0, karma: 0, curse: 0 }, msg: s => s.curse >= 5 ? "The captain pales: 'I see a shadow behind you. Flee these waters.'" : "War between England and Spain. Convoys changing routes." },
+    ],
+  },
+  {
+    id: "cursed_waters", scene: "storm", title: "Cursed Waters",
+    text: "The compass spins. The stars are wrong. The sea smells of sulfur.",
+    requires: s => s.day >= 9 && s.curse >= 4,
+    choices: [
+      { text: "🧭 Trust the instruments", eff: { gold: 0, crew: -1, karma: 0, curse: 1 }, msg: "The instruments lie. One overboard. But you get out." },
+      { text: "⭐ Navigate by stars", eff: { gold: 0, crew: 0, karma: 0, curse: -1 }, msg: s => s.flags?.has("saved_martin") ? "Martin reads the stars. Even through the curse, the path is found." : "The old way works. Slow but true." },
+      { text: "🌀 Surrender to the current", eff: { gold: 0, crew: 0, karma: 0, curse: 2 }, msg: "The current carries you to a place on no map. Something waits there.", flag: "knows_bermuda" },
+    ],
+  },
+  {
+    id: "old_debt", scene: "port", title: "Old Debt",
+    text: "A familiar face in port. 'You owe me, captain.' Hands on hilts.",
+    requires: s => s.day >= 10 && s.day <= 15,
+    choices: [
+      { text: "💰 Pay up (−25)", eff: { gold: -25, crew: 0, karma: 1, curse: 0 }, msg: "Debt settled. A handshake. Maybe even an ally.", flag: "debt_paid" },
+      { text: "⚔️ Fight", eff: { gold: 0, crew: [-2, -1], karma: -1, curse: 0 }, msg: "Blood in the tavern. Victory, but the port won't welcome you again." },
+      { text: "🗣️ Negotiate", eff: { gold: 0, crew: 0, karma: 0, curse: 0 }, msg: s => s.flags?.has("merchant_contact") ? "Your trade contact vouches for you. Debt postponed." : "'No money. But I have information.' It works. For now.", flag: "debt_delayed" },
+    ],
+  },
   // ── DEEP SUPERNATURAL ──
   {
     id: "cursed_treasure", scene: "cave", title: "Treasure Cave",
@@ -689,6 +742,38 @@ export const encountersEn: Encounter[] = [
     ],
   },
 
+  // ── LATE-GAME CLIMAX (days 17-19) ──
+  {
+    id: "final_reckoning", scene: "ethereal", title: "Voice of the Sea",
+    text: s => {
+      if (s.curse >= 10) return "The sea speaks in your voice. 'Time to choose. Stay or return?'";
+      if (s.karma >= 5) return "Golden glow on the horizon. Shore? Or something greater?";
+      if (s.karma <= -3) return "Black clouds form a face. Your face. Time to pay.";
+      return "The last sunset before the end. The crew awaits your word.";
+    },
+    requires: s => s.day >= 17,
+    choices: [
+      { text: "🌅 Set course for home", eff: { gold: 0, crew: 0, karma: 2, curse: -2 }, msg: s => s.flags?.has("crew_bond") ? "The crew cheers. You sail together. Finally, together." : "Full sails. Home awaits. Maybe." },
+      { text: "🌊 Into the unknown", eff: { gold: [20, 50], crew: -1, karma: -1, curse: 2 }, msg: s => s.flags?.has("kraken_pact") ? "The kraken clears the path. Ahead lies what no one has seen." : "One sailor jumps. The rest stay silent. But you don't stop." },
+      { text: "⚖️ Release the crew", eff: { gold: -20, crew: -3, karma: 3, curse: -1 }, msg: "A longboat of volunteers rows away. Lighter soul. Heavier ship." },
+    ],
+  },
+  {
+    id: "sea_judges", scene: "ethereal", title: "Court of the Seas",
+    text: s => {
+      const crimes = [s.flags?.has("village_curse") && "the village", s.flags?.has("arms_dealer_enemy") && "the arms dealer", s.flags?.has("port_royal_enemy") && "Port Royal"].filter(Boolean);
+      return crimes.length > 0
+        ? `Ghosts appear on deck. Each one a face from your past. ${crimes.join(", ")}. They demand answers.`
+        : "Shadows gather on deck. Someone weighs your deeds.";
+    },
+    requires: s => s.day >= 18 && s.curse >= 5,
+    choices: [
+      { text: "🙏 Admit guilt", eff: { gold: -30, crew: 0, karma: 3, curse: -4 }, msg: "Gold for every sin. The ghosts nod and dissolve. Easier to breathe." },
+      { text: "💀 Defy them", eff: { gold: 0, crew: -2, karma: -2, curse: 3 }, msg: "Two fall. But you stand. The sea will remember this defiance." },
+      { text: "🪞 Show your true self", eff: { gold: 0, crew: 0, karma: 0, curse: -2 }, msg: s => s.flags?.has("met_double") ? "The doppelganger stands beside you. Together, the full picture. The court is satisfied." : "The shadows look. They nod. Perhaps you're more honest than you thought.", hidden: true },
+    ],
+  },
+
   // Item-gated encounters
   {
     id: "ghost_fleet_contact", scene: "ethereal", title: "Ghost Fleet",
@@ -813,6 +898,38 @@ export const encountersEn: Encounter[] = [
       { text: "⚔️ Fight through", eff: { gold: 0, crew: [-3, -1], karma: 0, curse: 0 }, msg: "Broke through! But the price is steep. No more 'old friends'." },
       { text: "🏳️ Negotiate", eff: { gold: [-30, -20], crew: 0, karma: 0, curse: 0 }, msg: "He wants money. You pay and sail. Cheaper than it could've been." },
       { text: "🌫️ Escape into the fog", eff: { gold: 0, crew: -1, karma: 0, curse: 1 }, msg: "Fog appears as if on command. One sailor falls overboard in the chaos." },
+    ],
+  },
+
+  // Item-unlocked encounters
+  {
+    id: "siren_sanctuary", scene: "underwater", title: "Siren's Sanctuary",
+    text: "The shell in your pocket pulls downward. Beneath the waves lies a city of pearls. The siren waits.",
+    requires: s => s.inventory.includes("siren_shell") && s.day >= 5,
+    choices: [
+      { text: "🐚 Return the shell", eff: { gold: 0, crew: 0, karma: 3, curse: -3, loseItem: "siren_shell" }, msg: "The siren sings. The curse fades. You hear the ocean differently now.", flag: "siren_bond" },
+      { text: "🎶 Sing together", eff: { gold: 0, crew: 0, karma: 2, curse: -1 }, msg: "Your voices merge. Something shifts in your heart. The shell grows warm.", flag: "siren_bond" },
+      { text: "💎 Ask for treasure", eff: { gold: [60, 100], crew: 0, karma: -2, curse: 2 }, msg: "Pearls rain down, but the siren's eyes go dark. She won't call again." },
+    ],
+  },
+  {
+    id: "kraken_pact", scene: "kraken", title: "Call of the Deep",
+    text: "The kraken's tooth pulses. The sea parts. A great eye peers from below.",
+    requires: s => s.inventory.includes("kraken_tooth") && s.day >= 8,
+    choices: [
+      { text: "🦷 Return the tooth", eff: { gold: 0, crew: 0, karma: 0, curse: -2, loseItem: "kraken_tooth" }, msg: "The kraken takes its tooth. A tentacle brushes the hull. The pact is sealed. The deep will protect you.", flag: "kraken_pact" },
+      { text: "🗡️ Demand tribute", eff: { gold: [80, 130], crew: [-2, 0], karma: -3, curse: 3 }, msg: "The kraken hurls wreckage from sunken ships. Gold and bones. But its anger grows." },
+      { text: "🚢 Flee", eff: { gold: 0, crew: 0, karma: 0, curse: 1 }, msg: "The tooth cracks. You feel disappointment from the deep." },
+    ],
+  },
+  {
+    id: "temple_vault", scene: "cave", title: "Temple of the Forgotten",
+    text: "The key opens a door that wasn't there a moment ago. Inside lies an ancient temple buried in sand.",
+    requires: s => s.inventory.includes("ancient_key") && s.day >= 6,
+    choices: [
+      { text: "🗝️ Open the vault", eff: { gold: [80, 150], crew: 0, karma: 0, curse: 2, loseItem: "ancient_key" }, msg: "Ancient gold. The key crumbles to dust. Something whispers 'thank you' or 'at last'." },
+      { text: "📖 Read the walls", eff: { gold: 0, crew: 0, karma: 2, curse: -1 }, msg: "The story of a lost civilization. Knowledge heavier than gold. You understand the sea better now.", flag: "temple_knowledge" },
+      { text: "🚪 Close the door", eff: { gold: 0, crew: 0, karma: 1, curse: 0 }, msg: "Some things should stay locked. The key vanishes. Peace." },
     ],
   },
 ];

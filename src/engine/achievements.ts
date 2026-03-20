@@ -26,16 +26,16 @@ export const ACHIEVEMENTS: Achievement[] = [
   {
     id: "rich",
     title: "Король Карибів",
-    description: "Накопичити 200+ золота",
+    description: "Накопичити 150+ золота",
     icon: "👑",
-    check: s => s.gold >= 200,
+    check: s => s.gold >= 150,
   },
   {
     id: "pacifist",
     title: "Дипломат",
     description: "Жодного абордажу за гру",
     icon: "🕊️",
-    check: s => s.karma >= 3 && !s.log.some(l => l.summary.includes("-") && l.summary.includes("👥")),
+    check: s => s.karma >= 3 && !s.flags.has("combat_fought"),
   },
   {
     id: "empty",
@@ -103,9 +103,9 @@ export const ACHIEVEMENTS: Achievement[] = [
   {
     id: "balanced",
     title: "Баланс",
-    description: "Закінчити з кармою рівно 0",
+    description: "Закінчити з кармою від -1 до 1",
     icon: "⚖️",
-    check: s => s.karma === 0,
+    check: s => s.karma >= -1 && s.karma <= 1,
   },
 ];
 

@@ -372,6 +372,59 @@ export const encounters: Encounter[] = [
       { text: "🙏 Вибачитись", eff: { gold: 0, crew: 0, karma: 2, curse: -1 }, msg: "Шепіт тихне. Не пробачення — але перемир'я." },
     ],
   },
+  {
+    id: "skeleton_crew", scene: "open_sea", title: "Команда на межі",
+    text: "Троє лишилося. Вітрила провисли. Кермо крутиться саме.",
+    requires: s => s.crew <= 3 && s.crew > 0 && s.day >= 5,
+    choices: [
+      { text: "💪 Працювати разом", eff: { gold: 0, crew: 0, karma: 1, curse: 0 }, msg: "Кожен за трьох. Повільно, але пливете. Щось змінилося між вами.", flag: "crew_bond" },
+      { text: "💰 Обіцяти подвійну частку", eff: { gold: -15, crew: 0, karma: 0, curse: 0 }, msg: "Гроші мотивують. Але надовго?" },
+      { text: "☠️ Прийняти долю", eff: { gold: 0, crew: 0, karma: 0, curse: 2 }, msg: "Тіні з'являються біля штурвалу. Мертві матроси повертаються на вахту.", flag: "ghost_crew" },
+    ],
+  },
+  {
+    id: "crew_triumph", scene: "open_sea", title: "Сильна команда",
+    text: "Повна палуба. Піратська пісня розрізає вітер. Корабель летить.",
+    requires: s => s.crew >= 10 && s.day >= 5,
+    choices: [
+      { text: "🎉 Святкувати", eff: { gold: -10, crew: 1, karma: 1, curse: 0 }, msg: "Ром, танці, стрілянина в небо. Найкращий день на морі." },
+      { text: "⚓ Тренувати команду", eff: { gold: 0, crew: 0, karma: 0, curse: 0 }, msg: "Гарматні вправи. Абордажні навчання. Тепер це не банда. Це армія.", flag: "trained_crew" },
+      { text: "🏴 Полювання на здобич", eff: { gold: [30, 60], crew: [-1, 0], karma: -2, curse: 0 }, msg: "З такою командою конвої тікають. Золото тече рікою." },
+    ],
+  },
+  // ── MID-GAME CONSEQUENCES (days 8-14) ──
+  {
+    id: "reputation_precedes", scene: "open_sea", title: "Репутація",
+    text: s => s.karma >= 3
+      ? "Торговий корабель наближається. Прапор миру. 'Ви той самий капітан? Чули про вас.'"
+      : "Торговий корабель тікає на всіх вітрилах. Вони вас впізнали.",
+    requires: s => s.day >= 8 && s.day <= 14 && (s.karma >= 3 || s.karma <= -2),
+    choices: [
+      { text: "🤝 Мирна зустріч", eff: { gold: [10, 25], crew: 0, karma: 1, curse: 0 }, msg: "Торгівля без крові. Інформація в подарунок.", flag: "merchant_contact" },
+      { text: "🏴 Використати довіру", eff: { gold: [30, 50], crew: 0, karma: -3, curse: 1 }, msg: "Обеззброєні. Легка здобич. Але слава йде попереду." },
+      { text: "💬 Обмінятися новинами", eff: { gold: 0, crew: 0, karma: 0, curse: 0 }, msg: s => s.curse >= 5 ? "Капітан блідне: 'Я бачу тінь за вами. Тікайте з цих вод.'" : "Війна між Англією та Іспанією. Конвої змінюють маршрути." },
+    ],
+  },
+  {
+    id: "cursed_waters", scene: "storm", title: "Прокляті води",
+    text: "Компас крутиться. Зірки не ті. Море пахне сіркою.",
+    requires: s => s.day >= 9 && s.curse >= 4,
+    choices: [
+      { text: "🧭 Довіритися приладам", eff: { gold: 0, crew: -1, karma: 0, curse: 1 }, msg: "Прилади брешуть. Один за бортом. Але ви вибираєтесь." },
+      { text: "⭐ По зірках", eff: { gold: 0, crew: 0, karma: 0, curse: -1 }, msg: s => s.flags?.has("saved_martin") ? "Мартін читає зірки. Навіть крізь прокляття — шлях знайдено." : "Старий спосіб працює. Повільно, але вірно." },
+      { text: "🌀 Здатися течії", eff: { gold: 0, crew: 0, karma: 0, curse: 2 }, msg: "Течія несе до місця, яке не на жодній карті. Щось там чекає.", flag: "knows_bermuda" },
+    ],
+  },
+  {
+    id: "old_debt", scene: "port", title: "Старий борг",
+    text: "В порту — знайоме обличчя. 'Ти мені винен, капітане.' Руки на рукоятках.",
+    requires: s => s.day >= 10 && s.day <= 15,
+    choices: [
+      { text: "💰 Заплатити (−25)", eff: { gold: -25, crew: 0, karma: 1, curse: 0 }, msg: "Борг закрито. Рукостискання. Може, навіть союзник.", flag: "debt_paid" },
+      { text: "⚔️ Бій", eff: { gold: 0, crew: [-2, -1], karma: -1, curse: 0 }, msg: "Кров у таверні. Перемога, але порт вас більше не вітає." },
+      { text: "🗣️ Домовитися", eff: { gold: 0, crew: 0, karma: 0, curse: 0 }, msg: s => s.flags?.has("merchant_contact") ? "Ваш торговий контакт ручається за вас. Борг відкладено." : "'Не маю грошей. Але маю інформацію.' Працює. Поки що.", flag: "debt_delayed" },
+    ],
+  },
   // ── DEEP SUPERNATURAL ──
   {
     id: "cursed_treasure", scene: "cave", title: "Печера скарбів",
@@ -689,6 +742,38 @@ export const encounters: Encounter[] = [
     ],
   },
 
+  // ── LATE-GAME CLIMAX (days 17-19) ──
+  {
+    id: "final_reckoning", scene: "ethereal", title: "Голос моря",
+    text: s => {
+      if (s.curse >= 10) return "Море говорить вашим голосом. 'Час обирати. Залишитися чи повернутися?'";
+      if (s.karma >= 5) return "Золоте сяйво на горизонті. Берег? Чи щось більше?";
+      if (s.karma <= -3) return "Чорні хмари формують обличчя. Ваше обличчя. Час платити.";
+      return "Останній захід сонця перед кінцем. Команда чекає вашого слова.";
+    },
+    requires: s => s.day >= 17,
+    choices: [
+      { text: "🌅 Курс додому", eff: { gold: 0, crew: 0, karma: 2, curse: -2 }, msg: s => s.flags?.has("crew_bond") ? "Команда аплодує. Ви пливете разом. Нарешті — разом." : "Вітрила повні. Дім чекає. Може." },
+      { text: "🌊 Далі в невідоме", eff: { gold: [20, 50], crew: -1, karma: -1, curse: 2 }, msg: s => s.flags?.has("kraken_pact") ? "Кракен розчищає шлях. Попереду — те, що ніхто не бачив." : "Один матрос стрибає. Решта мовчить. Але ви не зупиняєтесь." },
+      { text: "⚖️ Відпустити команду", eff: { gold: -20, crew: -3, karma: 3, curse: -1 }, msg: "Шлюпка з добровольцями відпливає. Легше на душі. Важче на кораблі." },
+    ],
+  },
+  {
+    id: "sea_judges", scene: "ethereal", title: "Суд морів",
+    text: s => {
+      const crimes = [s.flags?.has("village_curse") && "село", s.flags?.has("arms_dealer_enemy") && "зброяр", s.flags?.has("port_royal_enemy") && "Порт-Ройял"].filter(Boolean);
+      return crimes.length > 0
+        ? `Привиди з'являються на палубі. Кожен — обличчя з минулого. ${crimes.join(", ")}. Вимагають відповіді.`
+        : "Тіні збираються на палубі. Хтось зважує ваші вчинки.";
+    },
+    requires: s => s.day >= 18 && s.curse >= 5,
+    choices: [
+      { text: "🙏 Визнати провину", eff: { gold: -30, crew: 0, karma: 3, curse: -4 }, msg: "Золото за кожен гріх. Привиди кивають і розчиняються. Легше дихати." },
+      { text: "💀 Кинути виклик", eff: { gold: 0, crew: -2, karma: -2, curse: 3 }, msg: "Двоє падають. Але ви стоїте. Море запам'ятає цю зухвалість." },
+      { text: "🪞 Показати себе справжнього", eff: { gold: 0, crew: 0, karma: 0, curse: -2 }, msg: s => s.flags?.has("met_double") ? "Двійник стоїть поряд. Разом ви — повна картина. Суд задоволений." : "Тіні дивляться. Кивають. Може, ви чесніший, ніж думали.", hidden: true },
+    ],
+  },
+
   // Item-gated encounters
   {
     id: "ghost_fleet_contact", scene: "ethereal", title: "Привидний флот",
@@ -813,6 +898,38 @@ export const encounters: Encounter[] = [
       { text: "⚔️ Прориватися", eff: { gold: 0, crew: [-3, -1], karma: 0, curse: 0 }, msg: "Прорвались! Але ціна висока. Більше ніяких 'старих знайомих'." },
       { text: "🏳️ Переговори", eff: { gold: [-30, -20], crew: 0, karma: 0, curse: 0 }, msg: "Хоче грошей. Платите і пливете. Дешевше, ніж могло бути." },
       { text: "🌫️ Втекти в туман", eff: { gold: 0, crew: -1, karma: 0, curse: 1 }, msg: "Туман з'являється, наче на замовлення. Один матрос падає за борт у хаосі." },
+    ],
+  },
+
+  // Item-unlocked encounters
+  {
+    id: "siren_sanctuary", scene: "underwater", title: "Притулок сирени",
+    text: "Мушля в кишені тягне вниз. Під водою — місто з перлів. Сирена чекає.",
+    requires: s => s.inventory.includes("siren_shell") && s.day >= 5,
+    choices: [
+      { text: "🐚 Повернути мушлю", eff: { gold: 0, crew: 0, karma: 3, curse: -3, loseItem: "siren_shell" }, msg: "Сирена співає. Прокляття тане. Ви чуєте океан по-іншому.", flag: "siren_bond" },
+      { text: "🎶 Заспівати разом", eff: { gold: 0, crew: 0, karma: 2, curse: -1 }, msg: "Голоси зливаються. Щось змінилося в серці. Мушля тепліє.", flag: "siren_bond" },
+      { text: "💎 Попросити скарб", eff: { gold: [60, 100], crew: 0, karma: -2, curse: 2 }, msg: "Перли сипляться, але очі сирени гаснуть. Більше не покличе." },
+    ],
+  },
+  {
+    id: "kraken_pact", scene: "kraken", title: "Заклик глибини",
+    text: "Зуб кракена пульсує. Море розступається. Велике око дивиться знизу.",
+    requires: s => s.inventory.includes("kraken_tooth") && s.day >= 8,
+    choices: [
+      { text: "🦷 Повернути зуб", eff: { gold: 0, crew: 0, karma: 0, curse: -2, loseItem: "kraken_tooth" }, msg: "Кракен забирає зуб. Щупальце торкається корпусу. Пакт укладено. Глибина захистить вас.", flag: "kraken_pact" },
+      { text: "🗡️ Вимагати данину", eff: { gold: [80, 130], crew: [-2, 0], karma: -3, curse: 3 }, msg: "Кракен кидає уламки затонулих кораблів. Золото і кістки. Але його гнів росте." },
+      { text: "🚢 Тікати", eff: { gold: 0, crew: 0, karma: 0, curse: 1 }, msg: "Зуб тріскає. Ви відчуваєте розчарування з глибини." },
+    ],
+  },
+  {
+    id: "temple_vault", scene: "cave", title: "Храм забутих",
+    text: "Ключ відкриває двері, яких хвилину тому не було. Всередині — давній храм, засипаний піском.",
+    requires: s => s.inventory.includes("ancient_key") && s.day >= 6,
+    choices: [
+      { text: "🗝️ Відкрити сховище", eff: { gold: [80, 150], crew: 0, karma: 0, curse: 2, loseItem: "ancient_key" }, msg: "Золото давніх. Ключ розсипається на пил. Щось шепоче 'дякую' або 'нарешті'." },
+      { text: "📖 Прочитати стіни", eff: { gold: 0, crew: 0, karma: 2, curse: -1 }, msg: "Історія загиблої цивілізації. Знання важче за золото. Ви розумієте море краще.", flag: "temple_knowledge" },
+      { text: "🚪 Зачинити двері", eff: { gold: 0, crew: 0, karma: 1, curse: 0 }, msg: "Деякі речі мають залишитися замкненими. Ключ зникає. Спокій." },
     ],
   },
 ];

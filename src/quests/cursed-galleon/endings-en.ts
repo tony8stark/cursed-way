@@ -6,7 +6,9 @@ export const endingsEn: Ending[] = [
     title: "B E T W E E N  W O R L D S",
     text: s => s.flags?.has("merged")
       ? "You and the doppelganger are one. An immortal captain. Your ship sails through time."
-      : "Eternal captain of an eternal ship. Your name is a warning.",
+      : s.flags?.has("met_double")
+        ? "The doppelganger is out there. Two shadows of one curse, two ships on an eternal course."
+        : "Eternal captain of an eternal ship. Your name is a warning.",
     color: "#40f8a0",
   },
   {

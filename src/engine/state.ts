@@ -96,6 +96,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
       return;
     }
 
+    // Low crew penalties: morale drops, risk of losing gold
+    if (state.crew <= 2 && state.crew > 0) {
+      state.karma = Math.round((state.karma - 0.5) * 10) / 10;
+    }
+
     // Apply passive artifact effects
     if (state.inventory.length > 0) {
       for (const itemId of state.inventory) {
@@ -223,6 +228,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (choice.flag) {
       const f = typeof choice.flag === "function" ? choice.flag(state) : choice.flag;
       if (f) ns.flags.add(f);
+    }
+
+    // Auto-flag combat actions for achievement tracking
+    if (encounter.scene === "combat" && cd < 0) {
+      ns.flags.add("combat_fought");
     }
 
     const msg = typeof choice.msg === "function" ? choice.msg(state) : choice.msg;

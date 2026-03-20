@@ -1,4 +1,5 @@
 import type { Encounter, GameState } from "./types";
+import { ARTIFACTS } from "./items";
 
 export function pickEncounter(
   encounters: Encounter[],
@@ -11,12 +12,21 @@ export function pickEncounter(
   const avail = encounters.filter(e => {
     if (used.has(e.id)) return false;
     if (e.requires && !e.requires(state)) return false;
-    // Location filter: location encounters only at their cell
-    if (e.location && e.location !== posKey) return false;
+    // Location filter: in enhanced mode, location encounters only at their cell
+    // In classic mode (no map), location encounters join the general pool
+    if (e.location && posKey !== null && e.location !== posKey) return false;
     return true;
   });
 
-  // Priority: location-specific encounters
+  // Priority 0: item-unlocked encounters (player has artifact that unlocks this encounter)
+  const itemUnlocked = avail.filter(e => {
+    return state.inventory.some(itemId => ARTIFACTS[itemId]?.encounterUnlock === e.id);
+  });
+  if (itemUnlocked.length > 0) {
+    return itemUnlocked[Math.floor(Math.random() * itemUnlocked.length)];
+  }
+
+  // Priority 1: location-specific encounters
   if (posKey) {
     const locationEnc = avail.filter(e => e.location === posKey);
     if (locationEnc.length > 0) {
@@ -24,8 +34,8 @@ export function pickEncounter(
     }
   }
 
-  // Non-location encounters only
-  const nonLocation = avail.filter(e => !e.location);
+  // In classic mode, location encounters join the general pool
+  const nonLocation = avail.filter(e => !e.location || posKey === null);
   const conseq = nonLocation.filter(e => e.requires);
   const normal = nonLocation.filter(e => !e.requires);
 
@@ -40,7 +50,7 @@ export function pickEncounter(
   // Fallback: reuse encounters if all used
   const fallback = encounters.filter(e => {
     if (e.requires && !e.requires(state)) return false;
-    if (e.location && e.location !== posKey) return false;
+    if (e.location && posKey !== null && e.location !== posKey) return false;
     return true;
   });
   return fallback[Math.floor(Math.random() * fallback.length)] || encounters[0];
