@@ -6,19 +6,19 @@ import { ChoiceCard } from "./ChoiceCard";
 import { TypewriterText } from "./TypewriterText";
 import { useGameStore } from "../../engine/state";
 import { audioManager } from "../../audio/audio-manager";
+import { useT } from "../../i18n";
 import type { Choice } from "../../engine/types";
 
 export function EncounterScreen() {
   const { state, encounter, result, makeChoice, continueSailing } = useGameStore();
+  const t = useT();
 
-  // Switch ambient music to match scene
   useEffect(() => {
     if (encounter?.scene) {
       audioManager.playAmbient(encounter.scene);
     }
   }, [encounter?.scene]);
 
-  // Play encounter SFX on mount
   useEffect(() => {
     audioManager.playSFX("encounter");
   }, [encounter?.id]);
@@ -42,7 +42,6 @@ export function EncounterScreen() {
     continueSailing();
   }, [continueSailing]);
 
-  // Keyboard shortcuts
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (result) {
@@ -135,7 +134,7 @@ export function EncounterScreen() {
               onClick={handleContinue}
               className="game-btn font-game text-[11px] text-[#40c0f0] border-2 border-[#40c0f0] bg-transparent px-6 py-3.5 cursor-pointer transition-all duration-200 hover:bg-[#40c0f0] hover:text-[#0a0a1a]"
             >
-              ПЛИВТИ ДАЛІ →
+              {t("continueButton")}
             </motion.button>
             <span className="font-game text-[8px] text-white/20 ml-3">[Space]</span>
           </motion.div>

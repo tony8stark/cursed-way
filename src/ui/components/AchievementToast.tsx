@@ -1,5 +1,8 @@
 import { motion, AnimatePresence } from "framer-motion";
 import type { Achievement } from "../../engine/achievements";
+import { useT } from "../../i18n";
+import { useLocaleStore } from "../../i18n";
+import { getAchievementText } from "../../engine/achievements-i18n";
 
 interface Props {
   achievement: Achievement | null;
@@ -7,6 +10,9 @@ interface Props {
 }
 
 export function AchievementToast({ achievement, onDone }: Props) {
+  const t = useT();
+  const locale = useLocaleStore(s => s.locale);
+
   return (
     <AnimatePresence>
       {achievement && (
@@ -24,9 +30,9 @@ export function AchievementToast({ achievement, onDone }: Props) {
         >
           <span className="text-2xl">{achievement.icon}</span>
           <div>
-            <div className="font-game text-[9px] text-[#f0c040] mb-1">ДОСЯГНЕННЯ</div>
-            <div className="font-game text-[10px] text-[#e8dcc8]">{achievement.title}</div>
-            <div className="font-game text-[7px] text-white/40 mt-0.5">{achievement.description}</div>
+            <div className="font-game text-[9px] text-[#f0c040] mb-1">{t("achievementLabel")}</div>
+            <div className="font-game text-[10px] text-[#e8dcc8]">{getAchievementText(achievement.id, locale).title}</div>
+            <div className="font-game text-[7px] text-white/40 mt-0.5">{getAchievementText(achievement.id, locale).description}</div>
           </div>
         </motion.div>
       )}

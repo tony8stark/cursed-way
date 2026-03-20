@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { GameCanvas } from "./GameCanvas";
 import { useGameStore } from "../../engine/state";
 import { audioManager } from "../../audio/audio-manager";
+import { useT } from "../../i18n";
 
 function StatBox({ label, value, color }: { label: string; value: string | number; color: string }) {
   return (
@@ -18,6 +19,7 @@ function StatBox({ label, value, color }: { label: string; value: string | numbe
 
 export function EndingScreen() {
   const { state, quest, endingIndex, startGame } = useGameStore();
+  const t = useT();
 
   useEffect(() => {
     audioManager.playAmbient("ethereal");
@@ -63,17 +65,16 @@ export function EndingScreen() {
         transition={{ delay: 1.5 }}
         className="flex justify-center gap-2.5 mb-5 flex-wrap"
       >
-        <StatBox label="ЗОЛОТО" value={state.gold} color="#f0c040" />
-        <StatBox label="КОМАНДА" value={state.crew} color="#40c0f0" />
+        <StatBox label={t("gold")} value={state.gold} color="#f0c040" />
+        <StatBox label={t("crew")} value={state.crew} color="#40c0f0" />
         <StatBox
-          label="КАРМА"
+          label={t("karma")}
           value={state.karma > 0 ? `+${state.karma}` : state.karma}
           color={state.karma >= 0 ? "#40f8a0" : "#c02020"}
         />
-        <StatBox label="ПРОКЛЯТТЯ" value={state.curse} color="#8020c0" />
+        <StatBox label={t("curse")} value={state.curse} color="#8020c0" />
       </motion.div>
 
-      {/* Journey log */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -81,7 +82,7 @@ export function EndingScreen() {
       >
         <div className="mb-2">
           <span className="font-game text-[8px] text-[#c8c8d8]">
-            ЖУРНАЛ ({state.log.length}):
+            {t("journal")} ({state.log.length}):
           </span>
         </div>
         <div className="max-h-[160px] overflow-y-auto text-left px-3 py-2 bg-black/40 rounded mb-5">
@@ -93,7 +94,7 @@ export function EndingScreen() {
               transition={{ delay: 2 + i * 0.05 }}
               className="mb-1.5"
             >
-              <span className="font-game text-[7px] text-[#f0c040]">Д{l.day}</span>{" "}
+              <span className="font-game text-[7px] text-[#f0c040]">{t("dayPrefix")}{l.day}</span>{" "}
               <span className="font-game text-[7px] text-[#c8c8d8]">{l.title}</span>{" "}
               <span className="font-game text-[7px] text-white/30">{l.summary}</span>
             </motion.div>
@@ -106,7 +107,7 @@ export function EndingScreen() {
           onClick={startGame}
           className="game-btn font-game text-[12px] text-[#f0c040] border-2 border-[#f0c040] bg-transparent px-6 py-3.5 cursor-pointer transition-all duration-200 hover:bg-[#f0c040] hover:text-[#0a0a1a]"
         >
-          ЗНОВУ В МОРЕ
+          {t("replayButton")}
         </motion.button>
       </motion.div>
     </motion.div>

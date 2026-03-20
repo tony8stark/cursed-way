@@ -10,9 +10,9 @@ export default defineConfig({
     VitePWA({
       registerType: "autoUpdate",
       manifest: {
-        name: "Проклятий Галеон",
-        short_name: "Галеон",
-        description: "Піратська текстова пригода з наслідками",
+        name: "Black Tide",
+        short_name: "Black Tide",
+        description: "Pirate text adventure with consequences",
         theme_color: "#0a0a14",
         background_color: "#0a0a14",
         display: "standalone",

@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { getRunHistory } from "../../engine/history";
+import { useT } from "../../i18n";
 
 interface Props {
   onClose: () => void;
@@ -12,6 +13,7 @@ function formatDate(ts: number): string {
 
 export function HistoryPanel({ onClose }: Props) {
   const history = getRunHistory();
+  const t = useT();
 
   return (
     <motion.div
@@ -28,11 +30,11 @@ export function HistoryPanel({ onClose }: Props) {
         onClick={e => e.stopPropagation()}
         className="bg-[#0e0e2a] border border-white/10 rounded-lg p-5 max-w-[500px] w-full max-h-[80vh] overflow-y-auto"
       >
-        <div className="font-game text-[12px] text-[#f0c040] mb-4">МИНУЛІ ПЛАВАННЯ</div>
+        <div className="font-game text-[12px] text-[#f0c040] mb-4">{t("pastVoyages")}</div>
 
         {history.length === 0 ? (
           <div className="font-game text-[9px] text-white/30 text-center py-8">
-            Ще жодного плавання. Вийдіть в море!
+            {t("noVoyages")}
           </div>
         ) : (
           <div className="space-y-2">
@@ -62,7 +64,7 @@ export function HistoryPanel({ onClose }: Props) {
                     ♥{run.karma > 0 ? "+" : ""}{run.karma}
                   </span>
                   <span className="text-[#8020c0]">☠{run.curse}</span>
-                  <span className="text-white/30">Д{run.days}</span>
+                  <span className="text-white/30">{t("dayPrefix")}{run.days}</span>
                 </div>
               </motion.div>
             ))}
@@ -73,7 +75,7 @@ export function HistoryPanel({ onClose }: Props) {
           onClick={onClose}
           className="mt-4 w-full font-game text-[10px] text-white/40 hover:text-white/70 transition-colors py-2"
         >
-          ЗАКРИТИ
+          {t("close")}
         </button>
       </motion.div>
     </motion.div>

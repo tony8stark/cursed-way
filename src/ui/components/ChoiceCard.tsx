@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import type { Choice, GameState } from "../../engine/types";
+import { useT } from "../../i18n";
 
 interface Props {
   choice: Choice;
@@ -9,6 +10,7 @@ interface Props {
 }
 
 export function ChoiceCard({ choice, index, state, onChoose }: Props) {
+  const t = useT();
   const cost = choice.eff.gold && typeof choice.eff.gold === "number" && choice.eff.gold < 0
     ? Math.abs(choice.eff.gold)
     : 0;
@@ -32,7 +34,7 @@ export function ChoiceCard({ choice, index, state, onChoose }: Props) {
         }
       `}
     >
-      {choice.text}{!canAfford ? " (замало 💰)" : ""}
+      {choice.text}{!canAfford ? ` ${t("cantAfford")}` : ""}
       <span className="text-white/20 ml-2 text-[8px]">[{index + 1}]</span>
     </motion.button>
   );

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { audioManager } from "../../audio/audio-manager";
+import { useT, useLocaleStore, type Locale } from "../../i18n";
 
 interface Props {
   onClose: () => void;
@@ -9,6 +10,13 @@ interface Props {
 export function SettingsModal({ onClose }: Props) {
   const [musicVol, setMusicVol] = useState(audioManager.getMusicVolume());
   const [sfxVol, setSfxVol] = useState(audioManager.getSfxVolume());
+  const t = useT();
+  const { locale, setLocale } = useLocaleStore();
+
+  const languages: { code: Locale; label: string }[] = [
+    { code: "uk", label: "Українська" },
+    { code: "en", label: "English" },
+  ];
 
   return (
     <motion.div
@@ -25,12 +33,35 @@ export function SettingsModal({ onClose }: Props) {
         onClick={e => e.stopPropagation()}
         className="bg-[#0e0e2a] border border-white/10 rounded-lg p-5 max-w-[400px] w-full"
       >
-        <div className="font-game text-[12px] text-[#f0c040] mb-5">НАЛАШТУВАННЯ</div>
+        <div className="font-game text-[12px] text-[#f0c040] mb-5">{t("settings")}</div>
 
         <div className="space-y-5">
+          {/* Language */}
           <div>
             <label className="font-game text-[8px] text-white/50 block mb-2">
-              МУЗИКА: {Math.round(musicVol * 100)}%
+              {t("language")}
+            </label>
+            <div className="flex gap-2">
+              {languages.map(lang => (
+                <button
+                  key={lang.code}
+                  onClick={() => setLocale(lang.code)}
+                  className={`font-game text-[9px] px-3 py-1.5 rounded border transition-all duration-200 ${
+                    locale === lang.code
+                      ? "border-[#f0c040] text-[#f0c040] bg-[#f0c040]/10"
+                      : "border-white/10 text-white/30 hover:text-white/50 hover:border-white/30"
+                  }`}
+                >
+                  {lang.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Music */}
+          <div>
+            <label className="font-game text-[8px] text-white/50 block mb-2">
+              {t("music")}: {Math.round(musicVol * 100)}%
             </label>
             <input
               type="range"
@@ -46,9 +77,10 @@ export function SettingsModal({ onClose }: Props) {
             />
           </div>
 
+          {/* SFX */}
           <div>
             <label className="font-game text-[8px] text-white/50 block mb-2">
-              ЕФЕКТИ: {Math.round(sfxVol * 100)}%
+              {t("sfx")}: {Math.round(sfxVol * 100)}%
             </label>
             <input
               type="range"
@@ -70,7 +102,7 @@ export function SettingsModal({ onClose }: Props) {
           onClick={onClose}
           className="mt-6 w-full font-game text-[10px] text-white/40 hover:text-white/70 transition-colors py-2 border border-white/10 rounded hover:border-white/30"
         >
-          ЗАКРИТИ
+          {t("close")}
         </button>
       </motion.div>
     </motion.div>

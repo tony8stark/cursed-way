@@ -4,9 +4,11 @@ import { GameCanvas } from "./GameCanvas";
 import { StatsBar } from "./StatsBar";
 import { useGameStore } from "../../engine/state";
 import { audioManager } from "../../audio/audio-manager";
+import { useT } from "../../i18n";
 
 export function SailingScreen() {
   const { state, sail } = useGameStore();
+  const t = useT();
 
   useEffect(() => {
     audioManager.playAmbient("open_sea");
@@ -41,17 +43,17 @@ export function SailingScreen() {
             borderColor: cr > 0.6 ? "#8020c0" : "#40c0f0",
           }}
           onMouseOver={e => {
-            const t = e.currentTarget;
-            t.style.background = cr > 0.6 ? "#8020c0" : "#40c0f0";
-            t.style.color = "#0a0a1a";
+            const el = e.currentTarget;
+            el.style.background = cr > 0.6 ? "#8020c0" : "#40c0f0";
+            el.style.color = "#0a0a1a";
           }}
           onMouseOut={e => {
-            const t = e.currentTarget;
-            t.style.background = "transparent";
-            t.style.color = cr > 0.6 ? "#8020c0" : "#40c0f0";
+            const el = e.currentTarget;
+            el.style.background = "transparent";
+            el.style.color = cr > 0.6 ? "#8020c0" : "#40c0f0";
           }}
         >
-          {cr > 0.6 ? "П̸Л̵И̶В̷Т̸И̵..." : "ПЛИВТИ ДАЛІ"}
+          {cr > 0.6 ? t("sailGlitch") : t("sailContinue")}
         </motion.button>
 
         {state.curse > 0 && state.curse < 5 && (
@@ -60,7 +62,7 @@ export function SailingScreen() {
             animate={{ opacity: 1 }}
             className="mt-3 font-game text-[9px] text-[#8020c0]/50"
           >
-            Щось дивне у повітрі...
+            {t("curseHint1")}
           </motion.div>
         )}
         {state.curse >= 5 && state.curse < 10 && (
@@ -69,7 +71,7 @@ export function SailingScreen() {
             animate={{ opacity: 1 }}
             className="mt-3 font-game text-[9px] text-[#8020c0]/70"
           >
-            Тіні рухаються самі по собі
+            {t("curseHint2")}
           </motion.div>
         )}
         {state.curse >= 10 && (
@@ -78,7 +80,7 @@ export function SailingScreen() {
             animate={{ opacity: 1 }}
             className="mt-3 font-game text-[9px] text-[#8020c0]"
           >
-            Р̶Е̷А̷Л̸Ь̵Н̸І̸С̷Т̸Ь̵ ̵Т̷Р̸І̶Щ̷И̸Т̵Ь̷
+            {t("curseHint3")}
           </motion.div>
         )}
       </div>

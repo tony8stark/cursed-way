@@ -1,5 +1,7 @@
 import { motion } from "framer-motion";
 import { ACHIEVEMENTS, getUnlockedAchievements } from "../../engine/achievements";
+import { getAchievementText } from "../../engine/achievements-i18n";
+import { useT, useLocaleStore } from "../../i18n";
 
 interface Props {
   onClose: () => void;
@@ -7,6 +9,8 @@ interface Props {
 
 export function AchievementsPanel({ onClose }: Props) {
   const unlocked = getUnlockedAchievements();
+  const t = useT();
+  const locale = useLocaleStore(s => s.locale);
 
   return (
     <motion.div
@@ -24,7 +28,7 @@ export function AchievementsPanel({ onClose }: Props) {
         className="bg-[#0e0e2a] border border-white/10 rounded-lg p-5 max-w-[500px] w-full max-h-[80vh] overflow-y-auto"
       >
         <div className="flex justify-between items-center mb-4">
-          <span className="font-game text-[12px] text-[#f0c040]">ДОСЯГНЕННЯ</span>
+          <span className="font-game text-[12px] text-[#f0c040]">{t("achievements")}</span>
           <span className="font-game text-[9px] text-white/40">
             {unlocked.size}/{ACHIEVEMENTS.length}
           </span>
@@ -33,6 +37,7 @@ export function AchievementsPanel({ onClose }: Props) {
         <div className="grid grid-cols-1 gap-2">
           {ACHIEVEMENTS.map((ach, i) => {
             const isUnlocked = unlocked.has(ach.id);
+            const text = getAchievementText(ach.id, locale);
             return (
               <motion.div
                 key={ach.id}
@@ -50,10 +55,10 @@ export function AchievementsPanel({ onClose }: Props) {
                 </span>
                 <div className="flex-1 min-w-0">
                   <div className={`font-game text-[9px] ${isUnlocked ? "text-[#e8dcc8]" : "text-white/25"}`}>
-                    {isUnlocked ? ach.title : "???"}
+                    {isUnlocked ? text.title : "???"}
                   </div>
                   <div className={`font-game text-[7px] mt-0.5 ${isUnlocked ? "text-white/40" : "text-white/15"}`}>
-                    {ach.description}
+                    {text.description}
                   </div>
                 </div>
                 {isUnlocked && (
@@ -68,7 +73,7 @@ export function AchievementsPanel({ onClose }: Props) {
           onClick={onClose}
           className="mt-4 w-full font-game text-[10px] text-white/40 hover:text-white/70 transition-colors py-2"
         >
-          ЗАКРИТИ
+          {t("close")}
         </button>
       </motion.div>
     </motion.div>

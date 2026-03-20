@@ -1,10 +1,13 @@
 import { motion } from "framer-motion";
 import { GameCanvas } from "./GameCanvas";
 import { useGameStore } from "../../engine/state";
+import { useT } from "../../i18n";
 
 export function TitleScreen() {
   const { startGame, load } = useGameStore();
+  const t = useT();
   const hasSave = !!localStorage.getItem("cursed-way-save");
+  const [line1, line2] = t("gameTitle").split("\n");
 
   return (
     <motion.div
@@ -27,7 +30,7 @@ export function TitleScreen() {
         transition={{ delay: 0.2, duration: 0.6 }}
         className="font-game text-[20px] text-[#f0c040] leading-[2.5]"
       >
-        ПРОКЛЯТИЙ<br />ГАЛЕОН
+        {line1}<br />{line2}
       </motion.h1>
 
       <motion.div
@@ -46,11 +49,11 @@ export function TitleScreen() {
         className="mb-6 leading-[2.5]"
       >
         <span className="font-game text-[10px] text-[#c8c8d8]">
-          20 днів. Один корабель. Кожен вибір — наслідок.
+          {t("tagline1")}
         </span>
         <br />
         <span className="font-game text-[10px] text-[#8020c0]">
-          Море пам'ятає все.
+          {t("tagline2")}
         </span>
       </motion.div>
 
@@ -64,7 +67,7 @@ export function TitleScreen() {
           onClick={startGame}
           className="game-btn font-game text-[13px] text-[#f0c040] border-2 border-[#f0c040] bg-transparent px-6 py-3.5 cursor-pointer transition-all duration-200 hover:bg-[#f0c040] hover:text-[#0a0a1a]"
         >
-          ВИЙТИ В МОРЕ
+          {t("startGame")}
         </button>
 
         {hasSave && (
@@ -72,7 +75,7 @@ export function TitleScreen() {
             onClick={() => load()}
             className="font-game text-[10px] text-[#40c0f0]/60 border border-[#40c0f0]/30 bg-transparent px-4 py-2 cursor-pointer transition-all duration-200 hover:text-[#40c0f0] hover:border-[#40c0f0]"
           >
-            ПРОДОВЖИТИ
+            {t("continueGame")}
           </button>
         )}
       </motion.div>

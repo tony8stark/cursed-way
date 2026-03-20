@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useGameStore } from "./engine/state";
-import { cursedGalleon } from "./quests/cursed-galleon";
+import { getCursedGalleon } from "./quests/cursed-galleon";
 import { checkAndUnlockAchievements, type Achievement } from "./engine/achievements";
 import { saveRun } from "./engine/history";
 import { TitleScreen } from "./ui/components/TitleScreen";
@@ -13,6 +13,8 @@ import { AchievementsPanel } from "./ui/components/AchievementsPanel";
 import { HistoryPanel } from "./ui/components/HistoryPanel";
 import { SettingsModal } from "./ui/components/SettingsModal";
 import { audioManager } from "./audio/audio-manager";
+import { useLocaleStore } from "./i18n";
+import { useT } from "./i18n";
 
 function rand(a: number, b: number) {
   return Math.floor(Math.random() * (b - a + 1)) + a;
@@ -20,6 +22,8 @@ function rand(a: number, b: number) {
 
 export default function App() {
   const { screen, state, quest, endingIndex, setQuest } = useGameStore();
+  const locale = useLocaleStore(s => s.locale);
+  const t = useT();
   const [glitch, setGlitch] = useState(false);
   const [muted, setMuted] = useState(false);
   const [toastQueue, setToastQueue] = useState<Achievement[]>([]);
@@ -29,9 +33,10 @@ export default function App() {
   const [showSettings, setShowSettings] = useState(false);
   const endingSavedRef = useRef(false);
 
+  // Load quest based on locale
   useEffect(() => {
-    setQuest(cursedGalleon);
-  }, [setQuest]);
+    setQuest(getCursedGalleon(locale));
+  }, [setQuest, locale]);
 
   // Check achievements + save run when ending is reached
   useEffect(() => {
@@ -112,14 +117,14 @@ export default function App() {
             <button
               onClick={() => setShowHistory(true)}
               className="font-game text-[9px] text-white/25 hover:text-white/50 transition-colors bg-transparent border-none cursor-pointer"
-              title="Історія"
+              title={t("historyTitle")}
             >
               📜
             </button>
             <button
               onClick={() => setShowAchievements(true)}
               className="font-game text-[9px] text-white/25 hover:text-white/50 transition-colors bg-transparent border-none cursor-pointer"
-              title="Досягнення"
+              title={t("achievementsTitle")}
             >
               🏆
             </button>
@@ -128,7 +133,7 @@ export default function App() {
         <button
           onClick={() => setShowSettings(true)}
           className="font-game text-[9px] text-white/25 hover:text-white/50 transition-colors bg-transparent border-none cursor-pointer"
-          title="Налаштування"
+          title={t("settingsTitle")}
         >
           ⚙️
         </button>

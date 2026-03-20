@@ -1,5 +1,6 @@
 import { motion, AnimatePresence } from "framer-motion";
 import type { GameState } from "../../engine/types";
+import { useT } from "../../i18n";
 
 interface Props {
   state: GameState;
@@ -27,14 +28,15 @@ function StatBox({ label, value, color, warning }: { label: string; value: strin
 }
 
 export function StatsBar({ state }: Props) {
+  const t = useT();
   const cr = Math.min(state.curse / 15, 1);
 
   return (
     <div className="flex gap-1.5 flex-wrap mb-3">
-      <StatBox label="ЗОЛОТО" value={state.gold} color="#f0c040" />
-      <StatBox label="КОМАНДА" value={state.crew} color="#40c0f0" warning={state.crew <= 3} />
+      <StatBox label={t("gold")} value={state.gold} color="#f0c040" />
+      <StatBox label={t("crew")} value={state.crew} color="#40c0f0" warning={state.crew <= 3} />
       <StatBox
-        label="ДЕНЬ"
+        label={t("day")}
         value={cr > 0.5 ? `${state.day}̷/̶2̸0̷` : `${state.day}/20`}
         color={cr > 0.5 ? "#8020c0" : "#c8c8d8"}
       />
@@ -47,7 +49,7 @@ export function StatsBar({ state }: Props) {
             className="flex-1 min-w-0"
           >
             <StatBox
-              label={cr > 0.6 ? "П̷Р̴К̸Л̵" : "ТЬМА"}
+              label={cr > 0.6 ? t("curseGlitch") : t("curse")}
               value={state.curse}
               color="#8020c0"
             />
