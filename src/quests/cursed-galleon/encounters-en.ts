@@ -453,4 +453,114 @@ export const encountersEn: Encounter[] = [
       { text: "🙏 Wait for dawn", eff: { gold: 0, crew: -1, karma: 0, curse: 2 }, msg: "Dawn takes 18 hours. The sun rises in the wrong place. One sailor loses his mind." },
     ],
   },
+
+  // ── LOCATION-BOUND ENCOUNTERS ──
+
+  // Havana (4,1)
+  {
+    id: "havana_market", scene: "port", title: "Havana Market",
+    location: "4,1",
+    text: "The biggest black market in the Caribbean. Everything is bought and sold here.",
+    choices: [
+      { text: "📜 Buy a license (-40)", eff: { gold: -40, crew: 0, karma: 0, curse: 0, item: "trade_license" }, msg: "Forged, but convincing. Trade freely." },
+      { text: "🗺️ Buy a map (-25)", eff: { gold: -25, crew: 0, karma: 0, curse: 0, item: "map_fragment" }, msg: "Half a map. The other half is somewhere else." },
+      { text: "👂 Gather rumors", eff: { gold: 0, crew: 0, karma: 0, curse: 0 }, msg: "Whispers of a ghost fleet to the south.", flag: "ghost_fleet_rumor" },
+    ],
+  },
+
+  // Nassau (14,2)
+  {
+    id: "nassau_tavern", scene: "port", title: "Nassau Tavern",
+    location: "14,2",
+    text: "The pirate republic. One law here: might makes right.",
+    choices: [
+      { text: "🍺 Buy drinks for the crew (-15)", eff: { gold: -15, crew: 1, karma: 0, curse: 0 }, msg: "Morale soars. Two newcomers ask to join." },
+      { text: "🖤 Buy the black pearl (-50)", eff: { gold: -50, crew: 0, karma: 0, curse: 1, item: "black_pearl" }, msg: "The trader vanishes the moment you touch the pearl. It's warm." },
+      { text: "📖 Read the notice board", eff: { gold: 0, crew: 0, karma: 0, curse: 0 }, msg: "The bounty on your head has increased.", flag: "wanted_nassau" },
+    ],
+  },
+
+  // Tortuga (0,4)
+  {
+    id: "tortuga_docks", scene: "port", title: "Tortuga Docks",
+    location: "0,4",
+    text: "Home port. Repairs, provisions, and trouble are always available here.",
+    choices: [
+      { text: "🔧 Repair the ship (-20)", eff: { gold: -20, crew: 0, karma: 0, curse: 0 }, msg: "Patched but holding. We sail on.", flag: "ship_repaired" },
+      { text: "🐚 Buy a shell from the shaman (-30)", eff: { gold: -30, crew: 0, karma: 0, curse: -1, item: "siren_shell" }, msg: "It whispers a lullaby. The darkness retreats." },
+      { text: "🍖 Restock supplies (-10)", eff: { gold: -10, crew: 0, karma: 1, curse: 0 }, msg: "Fresh food, clean water. The crew is grateful." },
+    ],
+  },
+
+  // Port Royal (10,6)
+  {
+    id: "port_royal_fort", scene: "port", title: "Port Royal Fort",
+    location: "10,6",
+    text: "British fortress. Risky, but the best goods are here.",
+    choices: [
+      { text: "💊 Buy medicine (-35)", eff: { gold: -35, crew: 0, karma: 0, curse: 0, item: "medicine_chest" }, msg: "Proper English medicine. The crew will stay healthier." },
+      { text: "🤝 Offer peace", eff: { gold: 0, crew: 0, karma: 2, curse: 0 }, msg: "The governor listens. Doesn't believe you, but listens.", flag: "british_contact" },
+      { text: "⚔️ Raid the warehouse", eff: { gold: [40, 70], crew: [-2, 0], karma: -3, curse: 0 }, msg: "Gold secured. But now the entire fleet hunts you.", flag: "port_royal_enemy" },
+    ],
+  },
+
+  // Cartagena (5,8)
+  {
+    id: "cartagena_treasury", scene: "port", title: "Cartagena Treasury",
+    location: "5,8",
+    text: "Spanish gold flows here from all the Americas. The fortress is impregnable... almost.",
+    choices: [
+      { text: "🗝️ Find the secret passage", eff: { gold: [20, 60], crew: 0, karma: -1, curse: 0 }, msg: "An old tunnel under the wall. You grab a sack." },
+      { text: "📜 Trade legally", eff: { gold: [10, 25], crew: 0, karma: 1, curse: 0 }, msg: "The Spanish are suspicious, but money is money." },
+      { text: "🗺️ Find a map (-20)", eff: { gold: -20, crew: 0, karma: 0, curse: 0, item: "map_fragment" }, msg: "An old cartographer sells the second fragment." },
+    ],
+  },
+
+  // Shadow Cave (6,6)
+  {
+    id: "shadow_cave_ritual", scene: "cave", title: "Shadow Cave Ritual",
+    location: "6,6",
+    text: "Firelight on the walls. A shaman in a bone mask waits.",
+    choices: [
+      { text: "🪆 Accept the gift", eff: { gold: 0, crew: 0, karma: 0, curse: 3, item: "voodoo_doll" }, msg: "A doll made with your hair. You feel a connection to something ancient." },
+      { text: "🏮 Take the lantern", eff: { gold: 0, crew: 0, karma: 0, curse: 2, item: "ghost_lantern" }, msg: "It glows without fire. Shows what is hidden." },
+      { text: "🚶 Leave", eff: { gold: 0, crew: 0, karma: 0, curse: 0 }, msg: "Some doors are best left closed." },
+    ],
+  },
+
+  // Mary's Wreck (8,3)
+  {
+    id: "marys_wreck_dive", scene: "underwater", title: "Wreck of the Santa Maria",
+    location: "8,3",
+    text: "A ship's skeleton on the seabed. 200 souls perished here. Gold glints between the ribs of the hull.",
+    choices: [
+      { text: "🏊 Dive for gold", eff: { gold: [30, 80], crew: [-2, 0], karma: 0, curse: 2 }, msg: "Gold found. But something grabs your leg. Barely escaped." },
+      { text: "🦷 Search for relics", eff: { gold: 0, crew: 0, karma: 0, curse: 1, item: "kraken_tooth" }, msg: "You find a tooth bigger than your head. The kraken was here." },
+      { text: "🙏 Pray for the dead", eff: { gold: 0, crew: 0, karma: 3, curse: -1 }, msg: "For a moment you see faces in the water. They smile. They thank you." },
+    ],
+  },
+
+  // Blood Reefs (7,2)
+  {
+    id: "blood_reefs_passage", scene: "storm", title: "Blood Reefs",
+    location: "7,2",
+    text: "Red water. The reefs slice ship hulls like a knife through butter. But treasure hides here.",
+    choices: [
+      { text: "⛵ Navigate carefully", eff: { gold: 0, crew: 0, karma: 0, curse: 0 }, msg: "Caution saves. You pass without losses." },
+      { text: "💎 Dive to the reefs", eff: { gold: [25, 55], crew: [-1, 0], karma: 0, curse: 1 }, msg: "Coral cuts your hands. But among them, something valuable." },
+      { text: "🗝️ Search for the sunken temple", eff: { gold: 0, crew: 0, karma: 0, curse: 2, item: "ancient_key" }, msg: "Ruins on the seabed. Among the stones, a glowing key." },
+    ],
+  },
+
+  // Coral Reefs (13,8)
+  {
+    id: "coral_reefs_garden", scene: "underwater", title: "Coral Gardens",
+    location: "13,8",
+    text: "Living corals of every color. Parrotfish, turtles, and something larger in the depths.",
+    choices: [
+      { text: "🐢 Observe", eff: { gold: 0, crew: 0, karma: 2, curse: -1 }, msg: "Beauty soothes. The curse weakens before nature." },
+      { text: "🪸 Collect corals (-5)", eff: { gold: -5, crew: 0, karma: -1, curse: 0 }, msg: "Beautiful, but dead in your hands." },
+      { text: "🏊 Dive deeper", eff: { gold: [10, 30], crew: 0, karma: 0, curse: 1 }, msg: "You find a sunken chest. Inside: coins and a note." },
+    ],
+  },
 ];

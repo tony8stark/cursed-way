@@ -64,6 +64,7 @@ export interface Encounter {
   requires?: (state: GameState) => boolean;
   choices: Choice[];
   enemyType?: "ghost" | "enemy";
+  location?: string; // "x,y" key - only triggers at this map cell
 }
 
 export interface Ending {

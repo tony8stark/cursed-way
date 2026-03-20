@@ -107,12 +107,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
       state.gold = Math.max(0, Math.round(state.gold));
     }
 
-    const enc = pickEncounter(quest.encounters, state, usedIds);
+    const { mapState } = get();
+    const playerPos = mapState?.playerPos;
+    const enc = pickEncounter(quest.encounters, state, usedIds, playerPos ?? undefined);
     const newUsed = new Set(usedIds);
     newUsed.add(enc.id);
 
     // Update map position for enhanced mode
-    const { mapState } = get();
     if (mapState) {
       // Calculate reveal radius from base + artifact bonuses
       let revealRadius = 3;
