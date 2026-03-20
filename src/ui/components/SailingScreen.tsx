@@ -5,6 +5,7 @@ import { StatsBar } from "./StatsBar";
 import { useGameStore } from "../../engine/state";
 import { audioManager } from "../../audio/audio-manager";
 import { useT } from "../../i18n";
+import { InventoryBar } from "./InventoryBar";
 
 export function SailingScreen() {
   const { state, sail } = useGameStore();
@@ -30,6 +31,7 @@ export function SailingScreen() {
       className="w-full max-w-[600px]"
     >
       <StatsBar state={state} />
+      <InventoryBar inventory={state.inventory} />
       <GameCanvas scene="open_sea" curse={state.curse} day={state.day} />
 
       <div className="text-center mt-4">

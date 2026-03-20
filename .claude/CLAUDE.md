@@ -18,10 +18,12 @@ src/
   i18n/
     index.ts          # Locale store (Zustand), useT() hook, UI translations (uk/en)
   engine/             # Quest-agnostic game engine
-    types.ts          # Core interfaces (Quest, Encounter, Choice, GameState)
+    types.ts          # Core interfaces (Quest, Encounter, Choice, GameState, DelayedEffect)
     state.ts          # Zustand store with save/load (localStorage)
     effects.ts        # Effect value resolution (fixed/range)
-    encounter-picker.ts  # Weighted encounter selection
+    encounter-picker.ts  # Weighted encounter selection with location priority
+    items.ts          # 10 artifact definitions with passive effects
+    items-i18n.ts     # Bilingual artifact names/descriptions
     achievements.ts   # 14 achievements with check/unlock logic
     achievements-i18n.ts # Locale-aware achievement titles/descriptions
     history.ts        # Run history tracking (last 20 voyages)
@@ -39,6 +41,7 @@ src/
   ui/components/      # React components
     GameCanvas.tsx     # Canvas with scene rendering + particle overlay
     StatsBar.tsx       # Animated stat display (gold, crew, day, curse)
+    InventoryBar.tsx   # Compact artifact inventory display
     ChoiceCard.tsx     # Animated choice buttons with keyboard hints
     TypewriterText.tsx # Character-by-character text reveal
     TitleScreen.tsx    # Title + new game / continue
@@ -51,8 +54,8 @@ src/
     HistoryPanel.tsx   # Past voyages list
     SettingsModal.tsx  # Volume sliders + language switcher
   quests/cursed-galleon/
-    encounters.ts     # 40+ encounters (Ukrainian)
-    encounters-en.ts  # 40+ encounters (English)
+    encounters.ts     # 75+ encounters (Ukrainian)
+    encounters-en.ts  # 75+ encounters (English)
     endings.ts        # 7 endings (Ukrainian)
     endings-en.ts     # 7 endings (English)
     index.ts          # Quest factory: getCursedGalleon(locale)
@@ -74,12 +77,21 @@ _legacy/
 ## Game Mechanics
 - **Stats**: gold, crew, karma, curse, day (max 20)
 - **Flags**: Set<string> tracking player choices for consequence encounters
-- **Encounter picker**: 60% weight toward consequence encounters (ones with `requires`)
+- **Inventory**: string[] of artifact IDs with passive per-day effects
+- **Encounter picker**: Location-bound > consequence (60%) > normal. Filters by player map position
+- **Encounter types**: Standard, chain (multi-step), location-bound, item-gated choices, delayed triggers
+- **Effects**: gold, crew, karma, curse, item gain/loss, map reveal, chain to next encounter, delayed encounter
+- **Delayed effects**: Scheduled encounters trigger N days later, with hint text shown on map
 - **Endings**: Priority-ordered, first matching condition wins
 - **Curse system**: Affects UI (glitch effects, zalgo text, scanlines at curse >= 8)
 - **Save system**: Auto-saves to localStorage after each encounter
 - **Achievements**: 14 unlockable, checked on game end, stored in localStorage
 - **Run history**: Last 20 completed games with stats
+
+## Inventory System
+10 artifacts with rarity (common/rare/cursed), passive per-day stat effects, reveal radius bonuses, and encounter unlocks.
+Items are gained/lost via `item`/`loseItem` in Effects. Choices can be gated with `requires_item`.
+InventoryBar component shown on sailing, map, and encounter screens.
 
 ## Audio System
 Fully procedural, no audio files needed:
@@ -92,8 +104,9 @@ Opt-in visual enhancement mode, toggled on title screen:
 - **Dynamic ship**: 6 conditional overlays (tattered sail, cannons, curse glow, gold trim, ghost sails)
 - **Atmosphere**: Time-of-day (dawn/day/dusk/night) deterministic from day number, weather (clear/overcast/foggy/rain) seeded from day
 - **World map**: 16x10 Caribbean grid with fog of war, 9 named locations (bilingual), terrain types (deep/water/shallow/land/port/reef/cave/wreck)
-- **Fog of war**: Reveals 3x3 area around player (5x5 with cursed_compass flag), persisted in save
-- **Map movement**: Ship auto-moves to terrain matching encounter scene type (not free-roam)
+- **Route system**: Named locations connected by route graph. Player picks destination from 2-3 revealed adjacent locations. Ship follows planned route with dashed line + pulsing diamond marker
+- **Fog of war**: Reveals 3x3 area around player (bonus from artifacts like cursed_compass), persisted in save
+- **Map movement**: Route-based (ship advances along planned route each encounter), falls back to terrain-matching if no route set
 - Classic mode remains unchanged
 
 ## Key Design Decisions
