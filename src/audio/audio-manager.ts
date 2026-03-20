@@ -10,7 +10,7 @@ const SFX_CONFIG: Record<SFXType, { frequency: number; duration: number; type: O
   splash: { frequency: 0, duration: 0, type: "sine", gain: 0 }, // handled by playSplash()
   thunder: { frequency: 80, duration: 0.5, type: "sawtooth", gain: 0.25, sweep: 30 },
   crewLoss: { frequency: 400, duration: 0.25, type: "triangle", gain: 0.12, sweep: 150 },
-  encounter: { frequency: 600, duration: 0.08, type: "square", gain: 0.1, sweep: 900 },
+  encounter: { frequency: 220, duration: 0.15, type: "triangle", gain: 0.1, sweep: 120 },
 };
 
 // Procedural ambient configs per scene
@@ -157,7 +157,7 @@ class AudioManager {
       const vol = this.sfxVolume;
 
       // Layer 1: noise burst through bandpass (splash)
-      const noiseBuf = ctx.createBuffer(1, ctx.sampleRate * 0.8, ctx.sampleRate);
+      const noiseBuf = ctx.createBuffer(1, ctx.sampleRate * 1.6, ctx.sampleRate);
       const noiseData = noiseBuf.getChannelData(0);
       for (let i = 0; i < noiseData.length; i++) {
         noiseData[i] = Math.random() * 2 - 1;
@@ -167,55 +167,55 @@ class AudioManager {
 
       const bandpass = ctx.createBiquadFilter();
       bandpass.type = "bandpass";
-      bandpass.frequency.setValueAtTime(1500, t);
-      bandpass.frequency.exponentialRampToValueAtTime(400, t + 0.6);
-      bandpass.Q.setValueAtTime(0.8, t);
+      bandpass.frequency.setValueAtTime(1200, t);
+      bandpass.frequency.exponentialRampToValueAtTime(300, t + 1.2);
+      bandpass.Q.setValueAtTime(0.6, t);
 
       const noiseGain = ctx.createGain();
       noiseGain.gain.setValueAtTime(0, t);
-      noiseGain.gain.linearRampToValueAtTime(0.18 * vol, t + 0.02);
-      noiseGain.gain.linearRampToValueAtTime(0.12 * vol, t + 0.15);
-      noiseGain.gain.exponentialRampToValueAtTime(0.001, t + 0.7);
+      noiseGain.gain.linearRampToValueAtTime(0.16 * vol, t + 0.05);
+      noiseGain.gain.linearRampToValueAtTime(0.10 * vol, t + 0.4);
+      noiseGain.gain.exponentialRampToValueAtTime(0.001, t + 1.4);
 
       noise.connect(bandpass);
       bandpass.connect(noiseGain);
       noiseGain.connect(ctx.destination);
       noise.start(t);
-      noise.stop(t + 0.8);
+      noise.stop(t + 1.6);
 
       // Layer 2: low rumble (hull meeting water)
       const rumble = ctx.createOscillator();
       rumble.type = "sine";
-      rumble.frequency.setValueAtTime(65, t);
-      rumble.frequency.exponentialRampToValueAtTime(40, t + 0.5);
+      rumble.frequency.setValueAtTime(55, t);
+      rumble.frequency.exponentialRampToValueAtTime(30, t + 1.0);
 
       const rumbleGain = ctx.createGain();
-      rumbleGain.gain.setValueAtTime(0.06 * vol, t);
-      rumbleGain.gain.exponentialRampToValueAtTime(0.001, t + 0.5);
+      rumbleGain.gain.setValueAtTime(0.07 * vol, t);
+      rumbleGain.gain.exponentialRampToValueAtTime(0.001, t + 1.0);
 
       rumble.connect(rumbleGain);
       rumbleGain.connect(ctx.destination);
       rumble.start(t);
-      rumble.stop(t + 0.5);
+      rumble.stop(t + 1.0);
 
-      // Layer 3: high fizz (foam/spray)
+      // Layer 3: high fizz (foam/spray) - delayed, longer tail
       const fizz = ctx.createBufferSource();
       fizz.buffer = noiseBuf;
       const highpass = ctx.createBiquadFilter();
       highpass.type = "highpass";
-      highpass.frequency.setValueAtTime(3000, t);
-      highpass.Q.setValueAtTime(0.5, t);
+      highpass.frequency.setValueAtTime(2500, t);
+      highpass.Q.setValueAtTime(0.4, t);
 
       const fizzGain = ctx.createGain();
       fizzGain.gain.setValueAtTime(0, t);
-      fizzGain.gain.linearRampToValueAtTime(0.05 * vol, t + 0.08);
-      fizzGain.gain.exponentialRampToValueAtTime(0.001, t + 0.4);
+      fizzGain.gain.linearRampToValueAtTime(0.04 * vol, t + 0.15);
+      fizzGain.gain.exponentialRampToValueAtTime(0.001, t + 0.9);
 
       fizz.connect(highpass);
       highpass.connect(fizzGain);
       fizzGain.connect(ctx.destination);
-      fizz.start(t + 0.05);
-      fizz.stop(t + 0.5);
+      fizz.start(t + 0.08);
+      fizz.stop(t + 1.0);
     } catch {
       // Audio not available
     }
