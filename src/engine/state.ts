@@ -37,6 +37,7 @@ function serialize(state: GameState, mapState: MapState | null): SerializedGameS
     ...state,
     flags: [...state.flags],
     inventory: state.inventory,
+    delayedEffects: state.delayedEffects,
     map: mapState ? serializeMap(mapState) : undefined,
   };
 }
@@ -44,7 +45,7 @@ function serialize(state: GameState, mapState: MapState | null): SerializedGameS
 function deserialize(data: SerializedGameState): { state: GameState; mapState: MapState | null } {
   const { map: mapData, ...rest } = data;
   return {
-    state: { ...rest, flags: new Set(data.flags), inventory: data.inventory ?? [] },
+    state: { ...rest, flags: new Set(data.flags), inventory: data.inventory ?? [], delayedEffects: data.delayedEffects ?? [] },
     mapState: mapData ? deserializeMap(mapData) : null,
   };
 }
@@ -69,6 +70,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       flags: new Set(quest.initialState.flags),
       log: [],
       inventory: [...(quest.initialState.inventory ?? [])],
+      delayedEffects: [...(quest.initialState.delayedEffects ?? [])],
     };
     const isEnhanced = useVariantStore.getState().variant === "enhanced";
     set({
@@ -105,6 +107,24 @@ export const useGameStore = create<GameStore>((set, get) => ({
       state.crew = Math.max(0, Math.round(state.crew));
       state.curse = Math.max(0, state.curse);
       state.gold = Math.max(0, Math.round(state.gold));
+    }
+
+    // Check for triggered delayed effects
+    const triggered = state.delayedEffects.filter(d => d.triggerDay <= state.day + 1);
+    if (triggered.length > 0) {
+      const delayed = triggered[0];
+      const forcedEnc = quest.encounters.find(e => e.id === delayed.encounterId);
+      if (forcedEnc) {
+        const remaining = state.delayedEffects.filter(d => d !== delayed);
+        set({
+          encounter: forcedEnc,
+          result: null,
+          screen: "encounter",
+          state: { ...state, day: state.day + 1, delayedEffects: remaining },
+        });
+        setTimeout(() => get().save(), 0);
+        return;
+      }
     }
 
     const { mapState } = get();
@@ -174,6 +194,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       curse: Math.max(0, state.curse + (choice.eff.curse || 0)),
       log: [...state.log],
       inventory: [...state.inventory],
+      delayedEffects: [...state.delayedEffects],
     };
 
     // Handle item gain
@@ -188,6 +209,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
         ns.inventory.splice(idx, 1);
         ns.flags.delete(`has_${choice.eff.loseItem}`);
       }
+    }
+
+    // Handle delayed effects
+    if (choice.eff.delay) {
+      ns.delayedEffects.push({
+        triggerDay: state.day + choice.eff.delay.daysLater,
+        encounterId: choice.eff.delay.encounterId,
+        hint: choice.eff.delay.hint,
+      });
     }
 
     if (choice.flag) {

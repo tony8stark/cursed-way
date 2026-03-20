@@ -757,4 +757,62 @@ export const encountersEn: Encounter[] = [
       { text: "🎲 Go random", eff: { gold: 0, crew: 0, karma: 0, curse: 1 }, msg: "We go where the current takes us. The sea god will decide." },
     ],
   },
+
+  // ── DELAYED EFFECTS ──
+
+  {
+    id: "rescued_spy", scene: "open_sea", title: "Rescue in the Storm",
+    text: "A person on wreckage. Crying for help. Clothes too fine for a sailor.",
+    choices: [
+      { text: "🆘 Save them", eff: { crew: 1, delay: { daysLater: 5, encounterId: "spy_betrayal", hint: "The new sailor acts strangely..." } }, msg: "Grateful. Claims to be a former navigator. Too grateful?" },
+      { text: "💨 Sail past", eff: { gold: 0, crew: 0, karma: -1, curse: 0 }, msg: "The cries fade. Silence." },
+    ],
+  },
+  {
+    id: "spy_betrayal", scene: "combat", title: "Betrayal!",
+    text: "The 'navigator' was a Royal Navy spy. At night, he signals the fleet.",
+    requires: () => false,
+    choices: [
+      { text: "⚔️ Seize the traitor", eff: { gold: 0, crew: -1, karma: 0, curse: 0 }, msg: "Just in time! The fleet didn't see the signal." },
+      { text: "🏃 Flee into darkness", eff: { gold: 0, crew: -2, karma: 0, curse: 0 }, msg: "The British are close. You lose two in the chaos." },
+    ],
+  },
+  {
+    id: "cursed_cargo", scene: "port", title: "A Good Deal",
+    text: "A merchant wants you to transport a sealed chest. Pays well. 'Just don't open it.'",
+    choices: [
+      { text: "📦 Accept (50 gold)", eff: { gold: 50, delay: { daysLater: 3, encounterId: "cargo_awakens", hint: "The chest makes sounds at night..." } }, msg: "The chest is heavy and warm to the touch. Good money." },
+      { text: "🔍 Open it in front of him", eff: { gold: 0, crew: 0, karma: 0, curse: 2 }, msg: "Inside: an emptiness that stares back at you. The merchant flees." },
+      { text: "❌ Refuse", eff: { gold: 0, crew: 0, karma: 1, curse: 0 }, msg: "Something in his eyes says you made the right choice." },
+    ],
+  },
+  {
+    id: "cargo_awakens", scene: "ethereal", title: "The Chest Awakens",
+    text: "At midnight the chest opens itself. Green light floods the hold. The crew screams.",
+    requires: () => false,
+    choices: [
+      { text: "🗡️ Destroy the contents", eff: { gold: -20, crew: 0, karma: 0, curse: 2 }, msg: "You destroy something ancient. It doesn't want to die. But it dies." },
+      { text: "🌊 Throw it overboard", eff: { gold: 0, crew: 0, karma: 0, curse: 1 }, msg: "The chest sinks. Green light glows underwater for another hour." },
+      { text: "👁️ Look inside", eff: { gold: 0, crew: 0, karma: 0, curse: 4, item: "black_pearl" }, msg: "You see an underwater city. A pearl sits in the center. You take it." },
+    ],
+  },
+  {
+    id: "old_friend", scene: "port", title: "Old Acquaintance",
+    text: "A face from the past. Smiling. 'Got a deal. Meet me at the reefs in three days.'",
+    choices: [
+      { text: "🤝 Agree", eff: { gold: 0, crew: 0, karma: 0, curse: 0, delay: { daysLater: 3, encounterId: "old_friend_trap" } }, msg: "'Don't be late.' Disappears into the crowd.", flag: "old_friend_deal" },
+      { text: "🤔 Ask for details", eff: { gold: 0, crew: 0, karma: 0, curse: 0 }, msg: "'The less you know, the better you sleep.' Smiles wider. Something's off." },
+      { text: "❌ Decline", eff: { gold: 0, crew: 0, karma: 0, curse: 0 }, msg: "The smile fades. 'Shame. Would've been good business.' Walks away." },
+    ],
+  },
+  {
+    id: "old_friend_trap", scene: "combat", title: "Ambush!",
+    text: "Three ships wait at the reefs. Your 'old friend' stands on the flagship's deck. It's a trap.",
+    requires: () => false,
+    choices: [
+      { text: "⚔️ Fight through", eff: { gold: 0, crew: [-3, -1], karma: 0, curse: 0 }, msg: "Broke through! But the price is steep. No more 'old friends'." },
+      { text: "🏳️ Negotiate", eff: { gold: [-30, -20], crew: 0, karma: 0, curse: 0 }, msg: "He wants money. You pay and sail. Cheaper than it could've been." },
+      { text: "🌫️ Escape into the fog", eff: { gold: 0, crew: -1, karma: 0, curse: 1 }, msg: "Fog appears as if on command. One sailor falls overboard in the chaos." },
+    ],
+  },
 ];

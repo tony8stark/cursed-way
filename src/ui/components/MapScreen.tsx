@@ -135,6 +135,20 @@ export function MapScreen() {
           </motion.button>
         )}
 
+        {state.delayedEffects
+          .filter(d => d.hint && d.triggerDay - state.day <= 2)
+          .map((d, i) => (
+            <motion.div
+              key={`hint-${i}`}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: [0.3, 0.6, 0.3] }}
+              transition={{ duration: 3, repeat: Infinity }}
+              className="mt-2 font-game text-[8px] text-yellow-400/50"
+            >
+              {d.hint}
+            </motion.div>
+          ))}
+
         {state.curse > 0 && state.curse < 5 && (
           <motion.div
             initial={{ opacity: 0 }}

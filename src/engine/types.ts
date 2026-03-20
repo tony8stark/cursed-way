@@ -1,3 +1,9 @@
+export interface DelayedEffect {
+  triggerDay: number;
+  encounterId: string;
+  hint?: string;
+}
+
 export interface GameState {
   gold: number;
   crew: number;
@@ -7,6 +13,7 @@ export interface GameState {
   flags: Set<string>;
   log: LogEntry[];
   inventory: string[];
+  delayedEffects: DelayedEffect[];
 }
 
 export interface SerializedGameState {
@@ -18,6 +25,7 @@ export interface SerializedGameState {
   flags: string[];
   log: LogEntry[];
   inventory?: string[];
+  delayedEffects?: DelayedEffect[];
   map?: import("../renderer/world-map").SerializedMapState;
 }
 
@@ -49,6 +57,11 @@ export interface Effects {
   loseItem?: string;   // artifact id to consume
   reveal?: [number, number]; // reveal around this map position
   chain?: string;            // encounter id to trigger next (no sailing)
+  delay?: {
+    daysLater: number;
+    encounterId: string;
+    hint?: string;
+  };
 }
 
 export interface Choice {
