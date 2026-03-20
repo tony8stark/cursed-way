@@ -20,9 +20,7 @@ export function EncounterScreen() {
     }
   }, [encounter?.scene]);
 
-  useEffect(() => {
-    audioManager.playSFX("encounter");
-  }, [encounter?.id]);
+  // encounter SFX removed — splash already plays on sail action
 
   const handleChoice = useCallback((choice: Choice) => {
     audioManager.playSFX("click");
