@@ -1,8 +1,13 @@
 import { useRef, useEffect } from "react";
 import { SCENES } from "../../renderer/scenes";
 import { ParticleSystem } from "../../renderer/particles";
-import type { SceneId } from "../../engine/types";
+import { getShipVisualState } from "../../renderer/ship-variants";
+import { getAtmosphere, drawFogOverlay } from "../../renderer/atmosphere";
+import { useVariantStore } from "../../engine/variant";
+import { useGameStore } from "../../engine/state";
 import { useLocaleStore, getT } from "../../i18n";
+import type { SceneId } from "../../engine/types";
+import type { SceneOpts } from "../../renderer/scenes";
 
 interface Props {
   scene: SceneId;
@@ -13,6 +18,8 @@ interface Props {
 
 export function GameCanvas({ scene, curse = 0, day = 0, enemyType }: Props) {
   const locale = useLocaleStore(s => s.locale);
+  const variant = useVariantStore(s => s.variant);
+  const state = useGameStore(s => s.state);
   const ref = useRef<HTMLCanvasElement>(null);
   const frameRef = useRef(0);
   const particlesRef = useRef(new ParticleSystem());
@@ -27,15 +34,32 @@ export function GameCanvas({ scene, curse = 0, day = 0, enemyType }: Props) {
     ps.clear();
     let id: number;
 
+    // Build scene opts
+    const opts: SceneOpts = { curse, enemyType };
+    if (variant === "enhanced" && state) {
+      opts.shipVisual = getShipVisualState(state);
+      opts.atmosphere = getAtmosphere(day);
+    }
+
     const draw = () => {
       frameRef.current++;
       const f = frameRef.current;
       const renderer = SCENES[scene] || SCENES.open_sea;
 
-      renderer(ctx, W, H, f, ps, { curse, enemyType });
+      renderer(ctx, W, H, f, ps, opts);
 
       ps.update();
       ps.draw(ctx);
+
+      // Weather overlay for enhanced mode
+      if (opts.atmosphere) {
+        drawFogOverlay(ctx, W, H, f, opts.atmosphere.weather);
+
+        // Rain particles for enhanced mode
+        if (opts.atmosphere.weather === "rain" && f % 3 === 0) {
+          ps.emit(3, { x: 0, y: -5, w: W, h: 1, color: "rgba(150,180,220,0.3)", size: 1, life: 25, vxRange: [0.3, 0.8], vyRange: [3, 5] });
+        }
+      }
 
       // HUD overlay
       ctx.fillStyle = "#f0c040";
@@ -54,7 +78,7 @@ export function GameCanvas({ scene, curse = 0, day = 0, enemyType }: Props) {
 
     draw();
     return () => cancelAnimationFrame(id);
-  }, [scene, curse, day, enemyType, locale]);
+  }, [scene, curse, day, enemyType, locale, variant, state]);
 
   return (
     <canvas

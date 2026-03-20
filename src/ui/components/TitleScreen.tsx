@@ -2,12 +2,19 @@ import { motion } from "framer-motion";
 import { GameCanvas } from "./GameCanvas";
 import { useGameStore } from "../../engine/state";
 import { useT } from "../../i18n";
+import { useVariantStore, type GameVariant } from "../../engine/variant";
 
 export function TitleScreen() {
   const { startGame, load } = useGameStore();
   const t = useT();
+  const { variant, setVariant } = useVariantStore();
   const hasSave = !!localStorage.getItem("cursed-way-save");
   const [line1, line2] = t("gameTitle").split("\n");
+
+  const variants: { code: GameVariant; label: string }[] = [
+    { code: "classic", label: t("variantClassic") },
+    { code: "enhanced", label: t("variantEnhanced") },
+  ];
 
   return (
     <motion.div
@@ -55,6 +62,30 @@ export function TitleScreen() {
         <span className="font-game text-[10px] text-[#8020c0]">
           {t("tagline2")}
         </span>
+      </motion.div>
+
+      {/* Variant toggle */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.8 }}
+        className="flex justify-center gap-2 mb-5"
+      >
+        {variants.map(v => (
+          <button
+            key={v.code}
+            onClick={() => setVariant(v.code)}
+            className={`font-game text-[8px] px-3 py-1.5 rounded border transition-all duration-200 ${
+              variant === v.code
+                ? v.code === "enhanced"
+                  ? "border-[#40f8a0] text-[#40f8a0] bg-[#40f8a0]/10"
+                  : "border-[#f0c040] text-[#f0c040] bg-[#f0c040]/10"
+                : "border-white/10 text-white/25 hover:text-white/40 hover:border-white/20"
+            }`}
+          >
+            {v.label}
+          </button>
+        ))}
       </motion.div>
 
       <motion.div

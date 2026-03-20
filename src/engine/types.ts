@@ -16,6 +16,7 @@ export interface SerializedGameState {
   day: number;
   flags: string[];
   log: LogEntry[];
+  map?: import("../renderer/world-map").SerializedMapState;
 }
 
 export interface LogEntry {

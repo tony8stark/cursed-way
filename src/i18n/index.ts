@@ -71,6 +71,11 @@ const translations = {
     language: "МОВА",
     // Common
     close: "ЗАКРИТИ",
+    // Variant
+    variantClassic: "КЛАСИКА",
+    variantEnhanced: "РОЗШИРЕНА",
+    // Map
+    mapTitle: "КАРТА",
     // Button titles
     historyTitle: "Історія",
     achievementsTitle: "Досягнення",
@@ -107,6 +112,9 @@ const translations = {
     sfx: "SFX",
     language: "LANGUAGE",
     close: "CLOSE",
+    variantClassic: "CLASSIC",
+    variantEnhanced: "ENHANCED",
+    mapTitle: "MAP",
     historyTitle: "History",
     achievementsTitle: "Achievements",
     settingsTitle: "Settings",

@@ -2,6 +2,9 @@ import { create } from "zustand";
 import type { GameState, Encounter, Choice, LogEntry, SerializedGameState, Quest } from "./types";
 import { resolveValue } from "./effects";
 import { pickEncounter } from "./encounter-picker";
+import { type MapState, createMapState, revealAround, serializeMap, deserializeMap } from "../renderer/world-map";
+import { START_POS, findNearestCell, getTerrainForScene } from "../renderer/map-data";
+import { useVariantStore } from "./variant";
 
 type Screen = "title" | "sailing" | "encounter" | "ending";
 
@@ -13,6 +16,7 @@ interface GameStore {
   usedIds: Set<string>;
   quest: Quest | null;
   endingIndex: number | null;
+  mapState: MapState | null;
 
   setQuest: (quest: Quest) => void;
   startGame: () => void;
@@ -26,12 +30,20 @@ interface GameStore {
 
 const SAVE_KEY = "cursed-way-save";
 
-function serialize(state: GameState): SerializedGameState {
-  return { ...state, flags: [...state.flags] };
+function serialize(state: GameState, mapState: MapState | null): SerializedGameState {
+  return {
+    ...state,
+    flags: [...state.flags],
+    map: mapState ? serializeMap(mapState) : undefined,
+  };
 }
 
-function deserialize(data: SerializedGameState): GameState {
-  return { ...data, flags: new Set(data.flags) };
+function deserialize(data: SerializedGameState): { state: GameState; mapState: MapState | null } {
+  const { map: mapData, ...rest } = data;
+  return {
+    state: { ...rest, flags: new Set(data.flags) },
+    mapState: mapData ? deserializeMap(mapData) : null,
+  };
 }
 
 export const useGameStore = create<GameStore>((set, get) => ({
@@ -42,6 +54,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   usedIds: new Set(),
   quest: null,
   endingIndex: null,
+  mapState: null,
 
   setQuest: (quest) => set({ quest }),
 
@@ -53,6 +66,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       flags: new Set(quest.initialState.flags),
       log: [],
     };
+    const isEnhanced = useVariantStore.getState().variant === "enhanced";
     set({
       state,
       usedIds: new Set(),
@@ -60,6 +74,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       encounter: null,
       result: null,
       endingIndex: null,
+      mapState: isEnhanced ? createMapState(START_POS) : null,
     });
   },
 
@@ -79,12 +94,25 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const newUsed = new Set(usedIds);
     newUsed.add(enc.id);
 
+    // Update map position for enhanced mode
+    const { mapState } = get();
+    if (mapState) {
+      const terrains = getTerrainForScene(enc.scene);
+      const nearest = findNearestCell(mapState.playerPos[0], mapState.playerPos[1], terrains);
+      if (nearest) {
+        mapState.playerPos = nearest;
+        const revealRadius = state.flags.has("cursed_compass") ? 5 : 3;
+        revealAround(mapState, nearest[0], nearest[1], revealRadius);
+      }
+    }
+
     set({
       usedIds: newUsed,
       encounter: enc,
       result: null,
       screen: "encounter",
       state: { ...state, day: state.day + 1 },
+      mapState: mapState ? { ...mapState } : null,
     });
 
     // Auto-save after picking encounter
@@ -135,11 +163,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
   },
 
   save: () => {
-    const { state, usedIds, quest } = get();
+    const { state, usedIds, quest, mapState } = get();
     if (!state || !quest) return;
     const data = {
       questId: quest.id,
-      state: serialize(state),
+      state: serialize(state, mapState),
       usedIds: [...usedIds],
       timestamp: Date.now(),
     };
@@ -153,8 +181,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const raw = localStorage.getItem(SAVE_KEY);
       if (!raw) return false;
       const data = JSON.parse(raw);
+      const { state: loadedState, mapState: loadedMap } = deserialize(data.state);
       set({
-        state: deserialize(data.state),
+        state: loadedState,
+        mapState: loadedMap,
         usedIds: new Set(data.usedIds),
         screen: "sailing",
         encounter: null,
