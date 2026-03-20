@@ -563,4 +563,198 @@ export const encountersEn: Encounter[] = [
       { text: "🏊 Dive deeper", eff: { gold: [10, 30], crew: 0, karma: 0, curse: 1 }, msg: "You find a sunken chest. Inside: coins and a note." },
     ],
   },
+
+  // ── NEW ENCOUNTER TYPES ──
+
+  // Navigation/discovery encounters
+  {
+    id: "crossroads_current", scene: "open_sea", title: "The Current",
+    text: "A strong current pulls east. Fight it or give in.",
+    choices: [
+      { text: "🌊 Surrender to the current", eff: { gold: 0, crew: 0, karma: 0, curse: 0, reveal: [14, 2] }, msg: "The current carries you to new shores. Something on the horizon." },
+      { text: "💪 Fight it", eff: { gold: 0, crew: -1, karma: 0, curse: 0 }, msg: "You stay on course. But the crew is exhausted." },
+      { text: "⚓ Wait", eff: { gold: 0, crew: 0, karma: 0, curse: 0 }, msg: "The current fades. Nothing happened." },
+    ],
+  },
+  {
+    id: "old_map_bottle", scene: "open_sea", title: "Bottle with a Map",
+    text: "A rum bottle. Inside: a piece of leather with a drawing.",
+    choices: [
+      { text: "🗺️ Unroll it", eff: { gold: 0, crew: 0, karma: 0, curse: 0, item: "map_fragment", reveal: [6, 6] }, msg: "A cave is marked with a word: 'DO NOT ENTER'." },
+      { text: "💨 Throw it away", eff: { gold: 0, crew: 0, karma: 0, curse: 0 }, msg: "Someone else's maps, someone else's problems." },
+    ],
+  },
+  {
+    id: "mirage_island", scene: "island", title: "Ghost Island",
+    text: "An island on no chart. Palm trees, sand, and the sound of a bell.",
+    choices: [
+      { text: "🏝️ Go ashore", eff: { gold: [10, 40], crew: 0, karma: 0, curse: 1, reveal: [5, 8] }, msg: "You find a chest on the beach. The island vanishes behind you." },
+      { text: "🔭 Watch from afar", eff: { gold: 0, crew: 0, karma: 0, curse: 0 }, msg: "The island fades like mist. Was it ever real?" },
+    ],
+  },
+  {
+    id: "whale_guide", scene: "open_sea", title: "The Whale Guide",
+    text: "A massive whale swims alongside. It seems to be waiting for you to follow.",
+    choices: [
+      { text: "🐋 Follow", eff: { gold: 0, crew: 0, karma: 1, curse: 0, reveal: [13, 8] }, msg: "The whale leads to clear waters. You discover a new area on the map." },
+      { text: "🎣 Hunt", eff: { gold: [15, 30], crew: 0, karma: -2, curse: 1 }, msg: "Whale oil is worth money. But something watches from the deep." },
+      { text: "👋 Wave", eff: { gold: 0, crew: 0, karma: 1, curse: 0 }, msg: "The whale sings. The crew laughs. A good day." },
+    ],
+  },
+
+  // Pure narrative encounters
+  {
+    id: "dream_sequence", scene: "ethereal", title: "Captain's Dream",
+    text: "A dream: you are underwater. Breathing. A city of mother-of-pearl.",
+    requires: s => s.curse >= 5,
+    choices: [
+      { text: "🏛️ Enter the city", eff: { gold: 0, crew: 0, karma: 0, curse: 0 }, msg: "You memorize the coordinates. Wake up with wet hair.", flag: "dream_city" },
+      { text: "🏊 Swim up", eff: { gold: 0, crew: 0, karma: 0, curse: 0 }, msg: "You wake. Just a dream. Probably.", hidden: true },
+      { text: "👁️ Seek the source of the voice", eff: { gold: 0, crew: 0, karma: 0, curse: 1 }, msg: "Someone knows your true name. The one you forgot.", flag: "true_name", hidden: true },
+    ],
+  },
+  {
+    id: "crew_stories", scene: "open_sea", title: "Evening Stories",
+    text: "Calm seas. The crew gathers on deck to share memories.",
+    choices: [
+      { text: "👂 Listen", eff: { gold: 0, crew: 0, karma: 1, curse: 0 }, msg: "Everyone was running from something. Now they're here. That's enough.", hidden: true },
+      { text: "📖 Tell yours", eff: { gold: 0, crew: 1, karma: 0, curse: 0 }, msg: "They look at you differently now. With respect. Or fear.", hidden: true },
+      { text: "🌙 Watch the stars", eff: { gold: 0, crew: 0, karma: 0, curse: -1 }, msg: "Silence. Peace. The sea isn't always hostile.", hidden: true },
+    ],
+  },
+  {
+    id: "dead_calm", scene: "open_sea", title: "Dead Calm",
+    text: "The wind dies. The sea is a mirror. Cloud reflections frozen in place.",
+    choices: [
+      { text: "⏳ Wait", eff: { gold: 0, crew: 0, karma: 0, curse: 0 }, msg: "Wind returns in an hour. All is normal." },
+      { text: "🚣 Row", eff: { gold: 0, crew: -1, karma: 0, curse: 0 }, msg: "Slow, but moving. The crew grumbles, but understands." },
+      { text: "🎵 Sing", eff: { gold: 0, crew: 0, karma: 0, curse: 0 }, msg: "The song carries over the water. Someone far away answers.", flag: "sea_song", hidden: true },
+    ],
+  },
+  {
+    id: "albatross", scene: "open_sea", title: "The Albatross",
+    text: "A huge bird circles the mast. Sailors believe it's a dead man's soul.",
+    choices: [
+      { text: "🍞 Feed it", eff: { gold: 0, crew: 0, karma: 2, curse: -1 }, msg: "It lands on your hand. Light as wind. The crew relaxes." },
+      { text: "🏹 Shoot it", eff: { gold: 0, crew: 0, karma: -3, curse: 2 }, msg: "It falls. The crew is silent. You feel it was a mistake.", flag: "killed_albatross" },
+      { text: "👀 Watch", eff: { gold: 0, crew: 0, karma: 0, curse: 0 }, msg: "It circles and flies west. Maybe there's land." },
+    ],
+  },
+
+  // Chain encounters
+  {
+    id: "merchant_mysterious", scene: "port", title: "Mysterious Merchant",
+    text: "Vanishes into shadows the moment you look away. Offers 'what you desire most'.",
+    choices: [
+      { text: "💰 'Gold'", eff: { chain: "merchant_gold_test" }, msg: "He smiles..." },
+      { text: "⚓ 'A safe harbor'", eff: { chain: "merchant_safety_test" }, msg: "He shakes his head..." },
+      { text: "🚶 Walk past", eff: { gold: 0, crew: 0, karma: 0, curse: 0 }, msg: "A wise choice. Or a cowardly one. Who can say." },
+    ],
+  },
+  {
+    id: "merchant_gold_test", scene: "port", title: "The Price of Desire",
+    text: "'Gold? Easy. But I'll take something in return.' He smiles.",
+    requires: () => false,
+    choices: [
+      { text: "🤝 Agree", eff: { gold: 100, crew: 0, karma: 0, curse: 4 }, msg: "Pockets full. But now you see shadows from the corner of your eye." },
+      { text: "❌ Refuse", eff: { gold: 0, crew: 0, karma: 1, curse: 0 }, msg: "'Smart.' He vanishes. The gold on the floor is copper." },
+    ],
+  },
+  {
+    id: "merchant_safety_test", scene: "port", title: "The Price of Peace",
+    text: "'A safe harbor? I can. But safety costs memory.' Eyes like mercury.",
+    requires: () => false,
+    choices: [
+      { text: "🤝 Agree", eff: { gold: 0, crew: 2, karma: 0, curse: 3 }, msg: "You forget something important. But the crew is safe. For now." },
+      { text: "❌ Refuse", eff: { gold: 0, crew: 0, karma: 1, curse: 0 }, msg: "'They all refuse. At first.' He vanishes into a shadow that shouldn't be there." },
+    ],
+  },
+  {
+    id: "shipwreck_survivors", scene: "open_sea", title: "Shipwreck",
+    text: "Planks, ropes, and three people on a raft. They are silent, watching.",
+    choices: [
+      { text: "🆘 Pick them up", eff: { crew: 2, chain: "survivors_story" }, msg: "They climb aboard..." },
+      { text: "🔍 Search the wreckage", eff: { gold: [10, 25], crew: 0, karma: -1, curse: 0 }, msg: "You find a small chest. The people on the raft watch in silence." },
+      { text: "💨 Sail past", eff: { gold: 0, crew: 0, karma: -2, curse: 0 }, msg: "Screams. Then silence. The crew won't look you in the eye." },
+    ],
+  },
+  {
+    id: "survivors_story", scene: "open_sea", title: "The Survivors' Tale",
+    text: "'Our captain found a treasure,' says the eldest. 'The treasure found him.'",
+    requires: () => false,
+    choices: [
+      { text: "📍 Where exactly?", eff: { gold: 0, crew: 0, karma: 0, curse: 0, reveal: [8, 3] }, msg: "He points on the map. Where their ship sank. Something is there." },
+      { text: "⚠️ What happened?", eff: { gold: 0, crew: 0, karma: 0, curse: 0 }, msg: "'Gold called from the water. Captain dove. Never came up. Ship started sinking on its own.'", flag: "cursed_treasure_warning" },
+      { text: "🤫 Don't ask", eff: { gold: 0, crew: 0, karma: 0, curse: 0 }, msg: "They're silent. Staring at the water. One whispers a prayer." },
+    ],
+  },
+
+  // Item-gated encounters
+  {
+    id: "ghost_fleet_contact", scene: "ethereal", title: "Ghost Fleet",
+    text: "Gray sails on the horizon. Ships that shouldn't exist.",
+    requires: s => s.flags.has("ghost_fleet_rumor"),
+    choices: [
+      { text: "🏮 Raise the lantern", eff: { gold: 0, crew: 0, karma: 0, curse: 2 }, msg: "The fleet turns toward you. A dead admiral salutes.", flag: "ghost_fleet_allied", requires_item: "ghost_lantern" },
+      { text: "⚔️ Prepare for battle", eff: { gold: 0, crew: [-2, 0], karma: 0, curse: 3 }, msg: "Cannonballs pass through their hulls. They laugh." },
+      { text: "🙏 Pray", eff: { gold: 0, crew: 0, karma: 1, curse: 1 }, msg: "The fleet passes by. One of them nods." },
+    ],
+  },
+  {
+    id: "pearl_merchant", scene: "port", title: "Pearl Collector",
+    text: "An old man with a monocle. 'Got anything interesting?' He eyes your pockets.",
+    choices: [
+      { text: "🖤 Sell the black pearl", eff: { gold: 150, crew: 0, karma: 0, curse: -2, loseItem: "black_pearl" }, msg: "His eyes gleam. 'At last...' He pays without haggling.", requires_item: "black_pearl" },
+      { text: "🗺️ Show the map", eff: { gold: 30, crew: 0, karma: 0, curse: 0, loseItem: "map_fragment" }, msg: "'Not bad, not bad.' He buys it, but without enthusiasm.", requires_item: "map_fragment" },
+      { text: "🤷 Nothing to sell", eff: { gold: 0, crew: 0, karma: 0, curse: 0 }, msg: "'Pity. Come back when you find something.' He vanishes around the corner." },
+    ],
+  },
+  {
+    id: "voodoo_ritual_encounter", scene: "cave", title: "Voodoo Ritual",
+    text: "Drums in the darkness. A circle of bones. The doll pulses in your pocket.",
+    requires: s => s.curse >= 4,
+    choices: [
+      { text: "🪆 Use the doll", eff: { gold: 0, crew: 0, karma: -2, curse: -3, loseItem: "voodoo_doll" }, msg: "The doll burns. The curse weakens. But something else awakens.", requires_item: "voodoo_doll" },
+      { text: "🔥 Burn the circle", eff: { gold: 0, crew: 0, karma: 1, curse: 1 }, msg: "The fire won't start. Then it won't stop." },
+      { text: "🚶 Run", eff: { gold: 0, crew: 0, karma: 0, curse: 0 }, msg: "The drums follow you for two more hours." },
+    ],
+  },
+
+  // Random events with non-standard outcomes
+  {
+    id: "bioluminescence", scene: "open_sea", title: "Bioluminescence",
+    text: "The water burns with blue fire. Every oar stroke, a flash of light.",
+    choices: [
+      { text: "🌊 Dive in", eff: { gold: 0, crew: 0, karma: 0, curse: 0 }, msg: "Underwater, it's like a starry sky. You'll remember this forever.", hidden: true },
+      { text: "🫙 Collect the water", eff: { gold: 5, crew: 0, karma: 0, curse: 0 }, msg: "Glows for another hour. Then fades. But it looks pretty in a bottle." },
+      { text: "🎵 Sing to the sea", eff: { gold: 0, crew: 0, karma: 2, curse: -1 }, msg: "The glow pulses to the rhythm. The crew is frozen in awe.", hidden: true },
+    ],
+  },
+  {
+    id: "sea_monster_baby", scene: "open_sea", title: "Baby Sea Monster",
+    text: "Something huge and small at the same time flounders by the hull. It cries.",
+    choices: [
+      { text: "🍞 Feed it", eff: { gold: -5, crew: 0, karma: 2, curse: 0 }, msg: "Eats from your hand. Dives. A minute later, a massive shadow under the ship. Mother says thanks?", flag: "monster_ally" },
+      { text: "🏹 Chase it away", eff: { gold: 0, crew: 0, karma: -1, curse: 1 }, msg: "It flees. A cry underwater. The ship trembles. Mother does NOT say thanks.", flag: "monster_enemy" },
+      { text: "🔬 Study it", eff: { gold: 0, crew: 0, karma: 0, curse: 0 }, msg: "Scales like opal. Three rows of teeth. Human eyes. It remembers you.", hidden: true },
+    ],
+  },
+  {
+    id: "floating_market", scene: "open_sea", title: "Floating Market",
+    text: "A dozen boats lashed together. They sell everything: from fruit to prophecies.",
+    choices: [
+      { text: "🔮 Buy a prophecy (-10)", eff: { gold: -10, crew: 0, karma: 0, curse: 0 }, msg: "'On the 15th day, beware the water.' Useful? Who knows.", flag: "prophecy_water" },
+      { text: "🍎 Buy food (-5)", eff: { gold: -5, crew: 0, karma: 1, curse: 0 }, msg: "Fresh fruit! The crew is happy." },
+      { text: "💰 Trade", eff: { gold: [10, 30], crew: 0, karma: 0, curse: 0 }, msg: "A good deal. Your reputation as a trader grows." },
+    ],
+  },
+  {
+    id: "compass_malfunction", scene: "open_sea", title: "Compass Gone Mad",
+    text: "The needle spins like a windmill. The sun is in the wrong place. Or are you?",
+    choices: [
+      { text: "🧭 Trust the compass", eff: { gold: 0, crew: 0, karma: 0, curse: 0, reveal: [7, 2] }, msg: "The compass leads somewhere. You spot a new area on the map.", requires_item: "cursed_compass" },
+      { text: "⭐ Navigate by the stars", eff: { gold: 0, crew: 0, karma: 0, curse: 0 }, msg: "The old way works. Staying on course." },
+      { text: "🎲 Go random", eff: { gold: 0, crew: 0, karma: 0, curse: 1 }, msg: "We go where the current takes us. The sea god will decide." },
+    ],
+  },
 ];

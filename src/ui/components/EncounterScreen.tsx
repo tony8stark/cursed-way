@@ -53,9 +53,10 @@ export function EncounterScreen() {
         return;
       }
       if (!encounter || !state) return;
+      const available = encounter.choices.filter(ch => !ch.requires_item || state.inventory.includes(ch.requires_item));
       const idx = parseInt(e.key) - 1;
-      if (idx >= 0 && idx < encounter.choices.length) {
-        const ch = encounter.choices[idx];
+      if (idx >= 0 && idx < available.length) {
+        const ch = available[idx];
         const cost = ch.eff.gold && typeof ch.eff.gold === "number" && ch.eff.gold < 0
           ? Math.abs(ch.eff.gold) : 0;
         if (cost <= state.gold) {
@@ -107,7 +108,9 @@ export function EncounterScreen() {
 
         {!result ? (
           <div className="flex flex-col gap-2.5">
-            {encounter.choices.map((ch, i) => (
+            {encounter.choices
+              .filter(ch => !ch.requires_item || state.inventory.includes(ch.requires_item))
+              .map((ch, i) => (
               <ChoiceCard
                 key={i}
                 choice={ch}

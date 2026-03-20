@@ -563,4 +563,198 @@ export const encounters: Encounter[] = [
       { text: "🏊 Пірнути глибше", eff: { gold: [10, 30], crew: 0, karma: 0, curse: 1 }, msg: "Знаходите затонулу скриню. Всередині — монети та записка." },
     ],
   },
+
+  // ── NEW ENCOUNTER TYPES ──
+
+  // Navigation/discovery encounters
+  {
+    id: "crossroads_current", scene: "open_sea", title: "Течія",
+    text: "Сильна течія несе на схід. Можна боротися або піддатися.",
+    choices: [
+      { text: "🌊 Піддатися течії", eff: { gold: 0, crew: 0, karma: 0, curse: 0, reveal: [14, 2] }, msg: "Течія виносить до нових берегів. Бачите щось на горизонті." },
+      { text: "💪 Боротися", eff: { gold: 0, crew: -1, karma: 0, curse: 0 }, msg: "Залишаєтесь на курсі. Але команда втомлена." },
+      { text: "⚓ Зачекати", eff: { gold: 0, crew: 0, karma: 0, curse: 0 }, msg: "Течія вщухає. Нічого не сталось." },
+    ],
+  },
+  {
+    id: "old_map_bottle", scene: "open_sea", title: "Пляшка з картою",
+    text: "Пляшка з-під рому. Всередині — шматок шкіри з малюнком.",
+    choices: [
+      { text: "🗺️ Розгорнути", eff: { gold: 0, crew: 0, karma: 0, curse: 0, item: "map_fragment", reveal: [6, 6] }, msg: "Позначено печеру і слово: 'НЕ ЗАХОДЬ'." },
+      { text: "💨 Викинути", eff: { gold: 0, crew: 0, karma: 0, curse: 0 }, msg: "Чужі карти — чужі проблеми." },
+    ],
+  },
+  {
+    id: "mirage_island", scene: "island", title: "Острів-привид",
+    text: "Острів, якого немає на жодній карті. Пальми, пісок, і дзвін дзвону.",
+    choices: [
+      { text: "🏝️ Висадитись", eff: { gold: [10, 40], crew: 0, karma: 0, curse: 1, reveal: [5, 8] }, msg: "Знаходите скриню на березі. Острів зникає за спиною." },
+      { text: "🔭 Спостерігати здалеку", eff: { gold: 0, crew: 0, karma: 0, curse: 0 }, msg: "Острів тане, як туман. Був він взагалі?" },
+    ],
+  },
+  {
+    id: "whale_guide", scene: "open_sea", title: "Кит-провідник",
+    text: "Величезний кит пливе поруч. Здається, він чекає, що ви підете за ним.",
+    choices: [
+      { text: "🐋 Слідувати", eff: { gold: 0, crew: 0, karma: 1, curse: 0, reveal: [13, 8] }, msg: "Кит веде до чистих вод. Відкриваєте нову область карти." },
+      { text: "🎣 Полювати", eff: { gold: [15, 30], crew: 0, karma: -2, curse: 1 }, msg: "Ворвань коштує грошей. Але щось дивиться з глибини." },
+      { text: "👋 Помахати", eff: { gold: 0, crew: 0, karma: 1, curse: 0 }, msg: "Кит видає звук. Команда сміється. Хороший день." },
+    ],
+  },
+
+  // Pure narrative encounters
+  {
+    id: "dream_sequence", scene: "ethereal", title: "Сон капітана",
+    text: "Снится: ви під водою. Дихаєте. Місто з перламутру.",
+    requires: s => s.curse >= 5,
+    choices: [
+      { text: "🏛️ Увійти в місто", eff: { gold: 0, crew: 0, karma: 0, curse: 0 }, msg: "Запам'ятовуєте координати. Прокидаєтесь з мокрим волоссям.", flag: "dream_city" },
+      { text: "🏊 Пливти вгору", eff: { gold: 0, crew: 0, karma: 0, curse: 0 }, msg: "Прокидаєтесь. Просто сон. Напевно.", hidden: true },
+      { text: "👁️ Шукати джерело голосу", eff: { gold: 0, crew: 0, karma: 0, curse: 1 }, msg: "Хтось знає ваше справжнє ім'я. Те, яке ви забули.", flag: "true_name", hidden: true },
+    ],
+  },
+  {
+    id: "crew_stories", scene: "open_sea", title: "Вечірні історії",
+    text: "Штиль. Команда збирається на палубі і ділиться спогадами.",
+    choices: [
+      { text: "👂 Слухати", eff: { gold: 0, crew: 0, karma: 1, curse: 0 }, msg: "Кожен тікав від чогось. Тепер вони тут. Це достатньо.", hidden: true },
+      { text: "📖 Розповісти свою", eff: { gold: 0, crew: 1, karma: 0, curse: 0 }, msg: "Вони дивляться інакше. З повагою. Або зі страхом.", hidden: true },
+      { text: "🌙 Дивитися на зорі", eff: { gold: 0, crew: 0, karma: 0, curse: -1 }, msg: "Тиша. Спокій. Море не завжди вороже.", hidden: true },
+    ],
+  },
+  {
+    id: "dead_calm", scene: "open_sea", title: "Мертвий штиль",
+    text: "Вітер зник. Море як дзеркало. Відображення хмар нерухоме.",
+    choices: [
+      { text: "⏳ Чекати", eff: { gold: 0, crew: 0, karma: 0, curse: 0 }, msg: "Вітер повертається через годину. Все як звичайно." },
+      { text: "🚣 Веслувати", eff: { gold: 0, crew: -1, karma: 0, curse: 0 }, msg: "Повільно, але рухаємось. Команда ниє, але розуміє." },
+      { text: "🎵 Заспівати", eff: { gold: 0, crew: 0, karma: 0, curse: 0 }, msg: "Пісня розноситься по воді. Хтось далеко відповідає.", flag: "sea_song", hidden: true },
+    ],
+  },
+  {
+    id: "albatross", scene: "open_sea", title: "Альбатрос",
+    text: "Величезний птах кружляє над щоглою. Моряки вірять — це душа загиблого.",
+    choices: [
+      { text: "🍞 Погодувати", eff: { gold: 0, crew: 0, karma: 2, curse: -1 }, msg: "Сідає на руку. Легкий, як вітер. Команда заспокоюється." },
+      { text: "🏹 Стріляти", eff: { gold: 0, crew: 0, karma: -3, curse: 2 }, msg: "Падає. Команда мовчить. Ви відчуваєте — це була помилка.", flag: "killed_albatross" },
+      { text: "👀 Спостерігати", eff: { gold: 0, crew: 0, karma: 0, curse: 0 }, msg: "Кружляє і летить на захід. Може, там земля." },
+    ],
+  },
+
+  // Chain encounters
+  {
+    id: "merchant_mysterious", scene: "port", title: "Таємничий торговець",
+    text: "Зникає в тінях, щойно ви відвертаєтесь. Пропонує 'те, чого бажаєте найбільше'.",
+    choices: [
+      { text: "💰 'Золото'", eff: { chain: "merchant_gold_test" }, msg: "Посміхається..." },
+      { text: "⚓ 'Безпечний порт'", eff: { chain: "merchant_safety_test" }, msg: "Хитає головою..." },
+      { text: "🚶 Пройти повз", eff: { gold: 0, crew: 0, karma: 0, curse: 0 }, msg: "Мудре рішення. Або боягузливе. Хто знає." },
+    ],
+  },
+  {
+    id: "merchant_gold_test", scene: "port", title: "Ціна бажання",
+    text: "'Золото? Легко. Але щось візьму натомість.' Посміхається.",
+    requires: () => false,
+    choices: [
+      { text: "🤝 Погодитись", eff: { gold: 100, crew: 0, karma: 0, curse: 4 }, msg: "Кишені повні. Але тепер бачите тіні краєм ока." },
+      { text: "❌ Відмовитись", eff: { gold: 0, crew: 0, karma: 1, curse: 0 }, msg: "'Розумний.' Зникає. Золото на підлозі — мідне." },
+    ],
+  },
+  {
+    id: "merchant_safety_test", scene: "port", title: "Ціна спокою",
+    text: "'Безпечний порт? Можу. Але безпека коштує пам'яті.' Очі як ртуть.",
+    requires: () => false,
+    choices: [
+      { text: "🤝 Погодитись", eff: { gold: 0, crew: 2, karma: 0, curse: 3 }, msg: "Забуваєте щось важливе. Але команда в безпеці. Поки що." },
+      { text: "❌ Відмовитись", eff: { gold: 0, crew: 0, karma: 1, curse: 0 }, msg: "'Всі відмовляються. Спочатку.' Зникає в тіні, якої не повинно бути." },
+    ],
+  },
+  {
+    id: "shipwreck_survivors", scene: "open_sea", title: "Уламки корабля",
+    text: "Дошки, мотузки, і троє людей на плоту. Вони мовчать і дивляться.",
+    choices: [
+      { text: "🆘 Підібрати", eff: { crew: 2, chain: "survivors_story" }, msg: "Вони піднімаються на борт..." },
+      { text: "🔍 Обшукати уламки", eff: { gold: [10, 25], crew: 0, karma: -1, curse: 0 }, msg: "Знаходите скриньку. Люди на плоту дивляться мовчки." },
+      { text: "💨 Пропливти", eff: { gold: 0, crew: 0, karma: -2, curse: 0 }, msg: "Крики. Потім тиша. Команда не дивиться вам в очі." },
+    ],
+  },
+  {
+    id: "survivors_story", scene: "open_sea", title: "Історія врятованих",
+    text: "'Наш капітан знайшов скарб,' каже старший. 'Скарб знайшов його.'",
+    requires: () => false,
+    choices: [
+      { text: "📍 Де саме?", eff: { gold: 0, crew: 0, karma: 0, curse: 0, reveal: [8, 3] }, msg: "Показує на карті. Місце, де затонув їхній корабель. Там щось є." },
+      { text: "⚠️ Що сталось?", eff: { gold: 0, crew: 0, karma: 0, curse: 0 }, msg: "'Золото кликало з води. Капітан пірнув. Не піднявся. Корабель почав тонути сам.'", flag: "cursed_treasure_warning" },
+      { text: "🤫 Не питати", eff: { gold: 0, crew: 0, karma: 0, curse: 0 }, msg: "Мовчать. Дивляться на воду. Один шепоче молитву." },
+    ],
+  },
+
+  // Item-gated encounters
+  {
+    id: "ghost_fleet_contact", scene: "ethereal", title: "Привидний флот",
+    text: "Сірі вітрила на горизонті. Кораблі, яких не повинно бути.",
+    requires: s => s.flags.has("ghost_fleet_rumor"),
+    choices: [
+      { text: "🏮 Підняти ліхтар", eff: { gold: 0, crew: 0, karma: 0, curse: 2 }, msg: "Флот повертає до вас. Мертвий адмірал салютує.", flag: "ghost_fleet_allied", requires_item: "ghost_lantern" },
+      { text: "⚔️ Приготуватися до бою", eff: { gold: 0, crew: [-2, 0], karma: 0, curse: 3 }, msg: "Ядра проходять крізь їхні корпуси. Вони сміються." },
+      { text: "🙏 Помолитися", eff: { gold: 0, crew: 0, karma: 1, curse: 1 }, msg: "Флот проходить повз. Один з них киває." },
+    ],
+  },
+  {
+    id: "pearl_merchant", scene: "port", title: "Колекціонер перлин",
+    text: "Старий з моноклем. 'Маєте щось цікаве?' Дивиться на ваші кишені.",
+    choices: [
+      { text: "🖤 Продати чорну перлину", eff: { gold: 150, crew: 0, karma: 0, curse: -2, loseItem: "black_pearl" }, msg: "Очі блищать. 'Нарешті...' Платить не торгуючись.", requires_item: "black_pearl" },
+      { text: "🗺️ Показати карту", eff: { gold: 30, crew: 0, karma: 0, curse: 0, loseItem: "map_fragment" }, msg: "'Непогано, непогано.' Купує, але без ентузіазму.", requires_item: "map_fragment" },
+      { text: "🤷 Нічого немає", eff: { gold: 0, crew: 0, karma: 0, curse: 0 }, msg: "'Шкода. Повертайтесь, коли знайдете.' Зникає за рогом." },
+    ],
+  },
+  {
+    id: "voodoo_ritual_encounter", scene: "cave", title: "Ритуал вуду",
+    text: "Барабани в темряві. Коло з кісток. Лялька пульсує у вашій кишені.",
+    requires: s => s.curse >= 4,
+    choices: [
+      { text: "🪆 Використати ляльку", eff: { gold: 0, crew: 0, karma: -2, curse: -3, loseItem: "voodoo_doll" }, msg: "Лялька згорає. Прокляття слабшає. Але щось інше прокидається.", requires_item: "voodoo_doll" },
+      { text: "🔥 Спалити коло", eff: { gold: 0, crew: 0, karma: 1, curse: 1 }, msg: "Вогонь не хоче горіти. Потім не хоче гаснути." },
+      { text: "🚶 Тікати", eff: { gold: 0, crew: 0, karma: 0, curse: 0 }, msg: "Барабани слідкують за вами ще дві години." },
+    ],
+  },
+
+  // Random events with non-standard outcomes
+  {
+    id: "bioluminescence", scene: "open_sea", title: "Світіння моря",
+    text: "Вода горить блакитним вогнем. Кожен рух весла — спалах світла.",
+    choices: [
+      { text: "🌊 Пірнути", eff: { gold: 0, crew: 0, karma: 0, curse: 0 }, msg: "Під водою — як у зоряному небі. Запам'ятаєте до кінця життя.", hidden: true },
+      { text: "🫙 Зібрати воду", eff: { gold: 5, crew: 0, karma: 0, curse: 0 }, msg: "Світиться ще годину. Потім гасне. Але виглядає красиво у пляшці." },
+      { text: "🎵 Заспівати для моря", eff: { gold: 0, crew: 0, karma: 2, curse: -1 }, msg: "Світіння пульсує в ритм пісні. Команда завмирає від краси.", hidden: true },
+    ],
+  },
+  {
+    id: "sea_monster_baby", scene: "open_sea", title: "Дитинча морського чудовиська",
+    text: "Щось велике і маленьке одночасно бовтається біля борту. Плаче.",
+    choices: [
+      { text: "🍞 Погодувати", eff: { gold: -5, crew: 0, karma: 2, curse: 0 }, msg: "Їсть із рук. Пірнає. Через хвилину — величезна тінь під кораблем. Мати дякує?", flag: "monster_ally" },
+      { text: "🏹 Прогнати", eff: { gold: 0, crew: 0, karma: -1, curse: 1 }, msg: "Тікає. Крик під водою. Корабель тремтить. Мати НЕ дякує.", flag: "monster_enemy" },
+      { text: "🔬 Вивчити", eff: { gold: 0, crew: 0, karma: 0, curse: 0 }, msg: "Луска як опал. Три ряди зубів. Очі як у людини. Пам'ятає вас.", hidden: true },
+    ],
+  },
+  {
+    id: "floating_market", scene: "open_sea", title: "Плавучий ринок",
+    text: "Десяток човнів, зв'язаних разом. Торгують усім: від фруктів до пророцтв.",
+    choices: [
+      { text: "🔮 Купити пророцтво (−10)", eff: { gold: -10, crew: 0, karma: 0, curse: 0 }, msg: "'На 15-й день стережись води.' Корисно? Хто знає.", flag: "prophecy_water" },
+      { text: "🍎 Купити їжу (−5)", eff: { gold: -5, crew: 0, karma: 1, curse: 0 }, msg: "Свіжі фрукти! Команда щаслива." },
+      { text: "💰 Торгувати", eff: { gold: [10, 30], crew: 0, karma: 0, curse: 0 }, msg: "Вдала угода. Ваша репутація торговця зростає." },
+    ],
+  },
+  {
+    id: "compass_malfunction", scene: "open_sea", title: "Компас збожеволів",
+    text: "Стрілка крутиться, як вітряк. Сонце — не на своєму місці. Або ви — не на своєму?",
+    choices: [
+      { text: "🧭 Довіритися компасу", eff: { gold: 0, crew: 0, karma: 0, curse: 0, reveal: [7, 2] }, msg: "Компас веде кудись. Бачите нову ділянку карти.", requires_item: "cursed_compass" },
+      { text: "⭐ Навігувати за зорями", eff: { gold: 0, crew: 0, karma: 0, curse: 0 }, msg: "Старий спосіб працює. Тримаємось курсу." },
+      { text: "🎲 Навмання", eff: { gold: 0, crew: 0, karma: 0, curse: 1 }, msg: "Пливемо, куди несе. Бог морів вирішить." },
+    ],
+  },
 ];

@@ -210,10 +210,28 @@ export const useGameStore = create<GameStore>((set, get) => ({
     }
 
     const title = typeof encounter.title === "function" ? encounter.title(state) : encounter.title;
-    const entry: LogEntry = { day: state.day, title, summary: sum.join(" ") };
+    const entry: LogEntry = { day: state.day, title, summary: choice.hidden ? "" : sum.join(" ") };
     ns.log.push(entry);
 
-    set({ state: ns, result: msg });
+    // Handle reveal effect
+    const { mapState } = get();
+    if (choice.eff.reveal && mapState) {
+      revealAround(mapState, choice.eff.reveal[0], choice.eff.reveal[1], 3);
+      set({ state: ns, result: msg, mapState: { ...mapState } });
+    } else {
+      set({ state: ns, result: msg });
+    }
+
+    // Handle chain effect: trigger next encounter after brief pause
+    if (choice.eff.chain) {
+      const { quest } = get();
+      const chainEnc = quest?.encounters.find(e => e.id === choice.eff.chain);
+      if (chainEnc) {
+        setTimeout(() => {
+          set({ encounter: chainEnc, result: null });
+        }, 1500);
+      }
+    }
   },
 
   continueSailing: () => {

@@ -47,6 +47,8 @@ export interface Effects {
   curse?: number;
   item?: string;       // artifact id to gain
   loseItem?: string;   // artifact id to consume
+  reveal?: [number, number]; // reveal around this map position
+  chain?: string;            // encounter id to trigger next (no sailing)
 }
 
 export interface Choice {
@@ -54,6 +56,8 @@ export interface Choice {
   eff: Effects;
   msg: string | ((state: GameState) => string);
   flag?: string | ((state: GameState) => string | null);
+  requires_item?: string;  // only show if player has this item
+  hidden?: boolean;         // don't show stat changes in log
 }
 
 export interface Encounter {
