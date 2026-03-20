@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { motion } from "framer-motion";
 import { GameCanvas } from "./GameCanvas";
 import { StatsBar } from "./StatsBar";
@@ -6,6 +7,11 @@ import { audioManager } from "../../audio/audio-manager";
 
 export function SailingScreen() {
   const { state, sail } = useGameStore();
+
+  useEffect(() => {
+    audioManager.playAmbient("open_sea");
+  }, []);
+
   if (!state) return null;
 
   const cr = Math.min(state.curse / 15, 1);

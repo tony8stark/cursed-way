@@ -1,11 +1,17 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useGameStore } from "./engine/state";
 import { cursedGalleon } from "./quests/cursed-galleon";
+import { checkAndUnlockAchievements, type Achievement } from "./engine/achievements";
+import { saveRun } from "./engine/history";
 import { TitleScreen } from "./ui/components/TitleScreen";
 import { SailingScreen } from "./ui/components/SailingScreen";
 import { EncounterScreen } from "./ui/components/EncounterScreen";
 import { EndingScreen } from "./ui/components/EndingScreen";
+import { AchievementToast } from "./ui/components/AchievementToast";
+import { AchievementsPanel } from "./ui/components/AchievementsPanel";
+import { HistoryPanel } from "./ui/components/HistoryPanel";
+import { SettingsModal } from "./ui/components/SettingsModal";
 import { audioManager } from "./audio/audio-manager";
 
 function rand(a: number, b: number) {
@@ -13,14 +19,46 @@ function rand(a: number, b: number) {
 }
 
 export default function App() {
-  const { screen, state, setQuest } = useGameStore();
+  const { screen, state, quest, endingIndex, setQuest } = useGameStore();
   const [glitch, setGlitch] = useState(false);
   const [muted, setMuted] = useState(false);
+  const [toastQueue, setToastQueue] = useState<Achievement[]>([]);
+  const [currentToast, setCurrentToast] = useState<Achievement | null>(null);
+  const [showAchievements, setShowAchievements] = useState(false);
+  const [showHistory, setShowHistory] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
+  const endingSavedRef = useRef(false);
 
   useEffect(() => {
     setQuest(cursedGalleon);
   }, [setQuest]);
 
+  // Check achievements + save run when ending is reached
+  useEffect(() => {
+    if (screen === "ending" && state && quest && endingIndex !== null && !endingSavedRef.current) {
+      endingSavedRef.current = true;
+      const ending = quest.endings[endingIndex];
+      saveRun(state, ending.title, ending.color);
+
+      const newAch = checkAndUnlockAchievements(state);
+      if (newAch.length > 0) {
+        setToastQueue(newAch);
+      }
+    }
+    if (screen !== "ending") {
+      endingSavedRef.current = false;
+    }
+  }, [screen, state, quest, endingIndex]);
+
+  // Process toast queue
+  useEffect(() => {
+    if (!currentToast && toastQueue.length > 0) {
+      setCurrentToast(toastQueue[0]);
+      setToastQueue(q => q.slice(1));
+    }
+  }, [currentToast, toastQueue]);
+
+  // Glitch effect
   useEffect(() => {
     if (state && state.curse >= 8) {
       const iv = setInterval(() => {
@@ -31,6 +69,13 @@ export default function App() {
     }
     setGlitch(false);
   }, [state?.curse]);
+
+  // Stop ambient on title
+  useEffect(() => {
+    if (screen === "title") {
+      audioManager.stopAmbient();
+    }
+  }, [screen]);
 
   const toggleMute = useCallback(() => {
     setMuted(m => {
@@ -49,6 +94,7 @@ export default function App() {
         transform: glitch ? `translate(${rand(-3, 3)}px, ${rand(-2, 2)}px)` : "none",
       }}
     >
+      {/* Scanline overlay */}
       {state && state.curse >= 8 && (
         <div
           className="fixed inset-0 pointer-events-none z-50"
@@ -59,13 +105,55 @@ export default function App() {
         />
       )}
 
-      <button
-        onClick={toggleMute}
-        className="fixed top-3 right-3 z-50 font-game text-[10px] text-white/30 hover:text-white/60 transition-colors bg-transparent border-none cursor-pointer"
-      >
-        {muted ? "🔇" : "🔊"}
-      </button>
+      {/* Top bar buttons */}
+      <div className="fixed top-3 right-3 z-[60] flex gap-2">
+        {screen === "title" && (
+          <>
+            <button
+              onClick={() => setShowHistory(true)}
+              className="font-game text-[9px] text-white/25 hover:text-white/50 transition-colors bg-transparent border-none cursor-pointer"
+              title="Історія"
+            >
+              📜
+            </button>
+            <button
+              onClick={() => setShowAchievements(true)}
+              className="font-game text-[9px] text-white/25 hover:text-white/50 transition-colors bg-transparent border-none cursor-pointer"
+              title="Досягнення"
+            >
+              🏆
+            </button>
+          </>
+        )}
+        <button
+          onClick={() => setShowSettings(true)}
+          className="font-game text-[9px] text-white/25 hover:text-white/50 transition-colors bg-transparent border-none cursor-pointer"
+          title="Налаштування"
+        >
+          ⚙️
+        </button>
+        <button
+          onClick={toggleMute}
+          className="font-game text-[10px] text-white/25 hover:text-white/50 transition-colors bg-transparent border-none cursor-pointer"
+        >
+          {muted ? "🔇" : "🔊"}
+        </button>
+      </div>
 
+      {/* Achievement toast */}
+      <AchievementToast
+        achievement={currentToast}
+        onDone={() => setCurrentToast(null)}
+      />
+
+      {/* Modals */}
+      <AnimatePresence>
+        {showAchievements && <AchievementsPanel onClose={() => setShowAchievements(false)} />}
+        {showHistory && <HistoryPanel onClose={() => setShowHistory(false)} />}
+        {showSettings && <SettingsModal onClose={() => setShowSettings(false)} />}
+      </AnimatePresence>
+
+      {/* Game screens */}
       <AnimatePresence mode="wait">
         <motion.div
           key={screen}

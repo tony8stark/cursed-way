@@ -1,6 +1,8 @@
+import { useEffect } from "react";
 import { motion } from "framer-motion";
 import { GameCanvas } from "./GameCanvas";
 import { useGameStore } from "../../engine/state";
+import { audioManager } from "../../audio/audio-manager";
 
 function StatBox({ label, value, color }: { label: string; value: string | number; color: string }) {
   return (
@@ -16,6 +18,11 @@ function StatBox({ label, value, color }: { label: string; value: string | numbe
 
 export function EndingScreen() {
   const { state, quest, endingIndex, startGame } = useGameStore();
+
+  useEffect(() => {
+    audioManager.playAmbient("ethereal");
+  }, []);
+
   if (!state || !quest || endingIndex === null) return null;
 
   const ending = quest.endings[endingIndex];

@@ -11,6 +11,18 @@ import type { Choice } from "../../engine/types";
 export function EncounterScreen() {
   const { state, encounter, result, makeChoice, continueSailing } = useGameStore();
 
+  // Switch ambient music to match scene
+  useEffect(() => {
+    if (encounter?.scene) {
+      audioManager.playAmbient(encounter.scene);
+    }
+  }, [encounter?.scene]);
+
+  // Play encounter SFX on mount
+  useEffect(() => {
+    audioManager.playSFX("encounter");
+  }, [encounter?.id]);
+
   const handleChoice = useCallback((choice: Choice) => {
     audioManager.playSFX("click");
 
@@ -18,6 +30,9 @@ export function EncounterScreen() {
     const goldVal = typeof goldEff === "number" ? goldEff : Array.isArray(goldEff) ? goldEff[0] : 0;
     if (goldVal > 0) setTimeout(() => audioManager.playSFX("coin"), 200);
     if ((choice.eff.curse ?? 0) > 0) setTimeout(() => audioManager.playSFX("curse"), 300);
+    const crewEff = choice.eff.crew;
+    const crewVal = typeof crewEff === "number" ? crewEff : Array.isArray(crewEff) ? crewEff[0] : 0;
+    if (crewVal < 0) setTimeout(() => audioManager.playSFX("crewLoss"), 250);
 
     makeChoice(choice);
   }, [makeChoice]);
