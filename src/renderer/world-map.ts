@@ -6,6 +6,10 @@ export interface MapState {
   revealed: boolean[][];
   targetPos: [number, number] | null; // for animation
   animProgress: number; // 0..1
+  // Route system
+  currentRoute: [number, number][] | null;  // cells along current voyage
+  routeProgress: number;                     // how many cells traveled on current route
+  destination: [number, number] | null;      // where we're heading
 }
 
 export function createMapState(startPos: [number, number]): MapState {
@@ -18,6 +22,9 @@ export function createMapState(startPos: [number, number]): MapState {
     revealed,
     targetPos: null,
     animProgress: 0,
+    currentRoute: null,
+    routeProgress: 0,
+    destination: null,
   };
   revealAround(state, startPos[0], startPos[1], 3);
   return state;
@@ -40,12 +47,18 @@ export function revealAround(map: MapState, cx: number, cy: number, radius: numb
 export interface SerializedMapState {
   playerPos: [number, number];
   revealed: boolean[][];
+  currentRoute?: [number, number][] | null;
+  routeProgress?: number;
+  destination?: [number, number] | null;
 }
 
 export function serializeMap(map: MapState): SerializedMapState {
   return {
     playerPos: map.playerPos,
     revealed: map.revealed,
+    currentRoute: map.currentRoute,
+    routeProgress: map.routeProgress,
+    destination: map.destination,
   };
 }
 
@@ -55,6 +68,9 @@ export function deserializeMap(data: SerializedMapState): MapState {
     revealed: data.revealed,
     targetPos: null,
     animProgress: 0,
+    currentRoute: data.currentRoute ?? null,
+    routeProgress: data.routeProgress ?? 0,
+    destination: data.destination ?? null,
   };
 }
 
@@ -152,6 +168,37 @@ export function drawWorldMap(
       ctx.fillStyle = "#f0c040";
       ctx.fillText(label, cx + CELL_W + 1, cy + 12);
     }
+  }
+
+  // Draw planned route
+  if (map.currentRoute && map.destination) {
+    ctx.strokeStyle = "rgba(240,192,64,0.25)";
+    ctx.lineWidth = 2;
+    ctx.setLineDash([3, 3]);
+    ctx.beginPath();
+    const startX = ox + map.playerPos[0] * CELL_W + CELL_W / 2;
+    const startY = oy + map.playerPos[1] * CELL_H + CELL_H / 2;
+    ctx.moveTo(startX, startY);
+
+    for (const [rx, ry] of map.currentRoute.slice(map.routeProgress)) {
+      ctx.lineTo(ox + rx * CELL_W + CELL_W / 2, oy + ry * CELL_H + CELL_H / 2);
+    }
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Destination marker (pulsing diamond)
+    const [dx, dy] = map.destination;
+    const destX = ox + dx * CELL_W + CELL_W / 2;
+    const destY = oy + dy * CELL_H + CELL_H / 2;
+    const dp = 1 + Math.sin(frame * 0.06) * 0.3;
+    ctx.fillStyle = "rgba(240,192,64,0.5)";
+    ctx.beginPath();
+    ctx.moveTo(destX, destY - 5 * dp);
+    ctx.lineTo(destX + 4 * dp, destY);
+    ctx.lineTo(destX, destY + 5 * dp);
+    ctx.lineTo(destX - 4 * dp, destY);
+    ctx.closePath();
+    ctx.fill();
   }
 
   // Player ship

@@ -82,6 +82,63 @@ export const TERRAIN_COLORS: Record<TerrainType, string> = {
 // Starting position
 export const START_POS: [number, number] = [0, 4]; // Tortuga
 
+// Route graph: edges between named locations (bidirectional)
+export const ROUTES: Record<string, string[]> = {
+  "0,4":  ["4,1", "6,6"],          // Tortuga -> Havana, Shadow Cave
+  "4,1":  ["0,4", "14,2", "8,3"],  // Havana -> Tortuga, Nassau, Mary's Wreck
+  "14,2": ["4,1", "10,6", "13,8"], // Nassau -> Havana, Port Royal, Coral Reefs
+  "10,6": ["14,2", "5,8", "6,6"],  // Port Royal -> Nassau, Cartagena, Shadow Cave
+  "5,8":  ["10,6", "0,4", "6,6"],  // Cartagena -> Port Royal, Tortuga, Shadow Cave
+  "6,6":  ["0,4", "10,6", "5,8", "8,3"], // Shadow Cave -> Tortuga, Port Royal, Cartagena, Mary's Wreck
+  "8,3":  ["4,1", "6,6", "7,2"],   // Mary's Wreck -> Havana, Shadow Cave, Blood Reefs
+  "7,2":  ["8,3", "14,2"],         // Blood Reefs -> Mary's Wreck, Nassau
+  "13,8": ["14,2", "10,6"],        // Coral Reefs -> Nassau, Port Royal
+};
+
+// Get connected destinations from current location
+export function getConnectedLocations(pos: [number, number]): Array<{
+  pos: [number, number];
+  name: Record<Locale, string>;
+  icon: string;
+  terrain: TerrainType;
+}> {
+  const key = `${pos[0]},${pos[1]}`;
+  const edges = ROUTES[key];
+  if (!edges) return [];
+
+  return edges
+    .map(k => {
+      const [x, y] = k.split(",").map(Number);
+      const loc = LOCATIONS[k];
+      if (!loc) return null;
+      return {
+        pos: [x, y] as [number, number],
+        name: loc.name,
+        icon: loc.icon,
+        terrain: MAP_CELLS[y][x].terrain,
+      };
+    })
+    .filter((v): v is NonNullable<typeof v> => v !== null);
+}
+
+// Compute intermediate cells along a straight line between two points
+export function computeRoute(from: [number, number], to: [number, number]): [number, number][] {
+  const steps: [number, number][] = [];
+  const dx = to[0] - from[0];
+  const dy = to[1] - from[1];
+  const dist = Math.max(Math.abs(dx), Math.abs(dy));
+  if (dist === 0) return [to];
+
+  for (let i = 1; i <= dist; i++) {
+    const t = i / dist;
+    steps.push([
+      Math.round(from[0] + dx * t),
+      Math.round(from[1] + dy * t),
+    ]);
+  }
+  return steps;
+}
+
 // Find cells matching a terrain type near a position
 export function findNearestCell(
   fromX: number,

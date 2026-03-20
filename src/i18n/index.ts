@@ -76,6 +76,8 @@ const translations = {
     variantEnhanced: "РОЗШИРЕНА",
     // Map
     mapTitle: "КАРТА",
+    chooseDestination: "КУДИ ПЛИВЕМО?",
+    enRoute: "В ДОРОЗІ",
     // Button titles
     historyTitle: "Історія",
     achievementsTitle: "Досягнення",
@@ -115,6 +117,8 @@ const translations = {
     variantClassic: "CLASSIC",
     variantEnhanced: "ENHANCED",
     mapTitle: "MAP",
+    chooseDestination: "WHERE TO?",
+    enRoute: "EN ROUTE",
     historyTitle: "History",
     achievementsTitle: "Achievements",
     settingsTitle: "Settings",

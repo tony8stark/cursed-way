@@ -3,7 +3,7 @@ import type { GameState, Encounter, Choice, LogEntry, SerializedGameState, Quest
 import { resolveValue } from "./effects";
 import { pickEncounter } from "./encounter-picker";
 import { type MapState, createMapState, revealAround, serializeMap, deserializeMap } from "../renderer/world-map";
-import { START_POS, findNearestCell, getTerrainForScene } from "../renderer/map-data";
+import { START_POS, findNearestCell, getTerrainForScene, computeRoute } from "../renderer/map-data";
 import { useVariantStore } from "./variant";
 
 type Screen = "title" | "sailing" | "encounter" | "ending";
@@ -23,6 +23,7 @@ interface GameStore {
   sail: () => void;
   makeChoice: (choice: Choice) => void;
   continueSailing: () => void;
+  setDestination: (pos: [number, number]) => void;
   save: () => void;
   load: () => boolean;
   clearSave: () => void;
@@ -97,12 +98,28 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // Update map position for enhanced mode
     const { mapState } = get();
     if (mapState) {
-      const terrains = getTerrainForScene(enc.scene);
-      const nearest = findNearestCell(mapState.playerPos[0], mapState.playerPos[1], terrains);
-      if (nearest) {
-        mapState.playerPos = nearest;
-        const revealRadius = state.flags.has("cursed_compass") ? 5 : 3;
-        revealAround(mapState, nearest[0], nearest[1], revealRadius);
+      const revealRadius = state.flags.has("cursed_compass") ? 5 : 3;
+      // Route-based movement: advance along planned route
+      if (mapState.currentRoute && mapState.routeProgress < mapState.currentRoute.length) {
+        const nextCell = mapState.currentRoute[mapState.routeProgress];
+        mapState.playerPos = nextCell;
+        mapState.routeProgress++;
+        revealAround(mapState, nextCell[0], nextCell[1], revealRadius);
+
+        // Arrived at destination?
+        if (mapState.routeProgress >= mapState.currentRoute.length) {
+          mapState.currentRoute = null;
+          mapState.destination = null;
+          mapState.routeProgress = 0;
+        }
+      } else {
+        // Fallback: terrain-matching (for when no route is set, e.g. first encounter)
+        const terrains = getTerrainForScene(enc.scene);
+        const nearest = findNearestCell(mapState.playerPos[0], mapState.playerPos[1], terrains);
+        if (nearest) {
+          mapState.playerPos = nearest;
+          revealAround(mapState, nearest[0], nearest[1], revealRadius);
+        }
       }
     }
 
@@ -160,6 +177,22 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
   continueSailing: () => {
     set({ screen: "sailing", encounter: null, result: null });
+  },
+
+  setDestination: (pos) => {
+    const { mapState } = get();
+    if (!mapState) return;
+    const route = computeRoute(mapState.playerPos, pos);
+    set({
+      mapState: {
+        ...mapState,
+        destination: pos,
+        currentRoute: route,
+        routeProgress: 0,
+      },
+    });
+    // Immediately start sailing
+    get().sail();
   },
 
   save: () => {
