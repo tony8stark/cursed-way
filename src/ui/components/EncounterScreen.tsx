@@ -8,6 +8,7 @@ import { useGameStore } from "../../engine/state";
 import { audioManager } from "../../audio/audio-manager";
 import { useT } from "../../i18n";
 import type { Choice } from "../../engine/types";
+import { InventoryBar } from "./InventoryBar";
 
 export function EncounterScreen() {
   const { state, encounter, result, makeChoice, continueSailing } = useGameStore();
@@ -79,6 +80,7 @@ export function EncounterScreen() {
       className="w-full max-w-[600px]"
     >
       <StatsBar state={state} />
+      <InventoryBar inventory={state.inventory} />
       <GameCanvas scene={scene} curse={state.curse} day={state.day} enemyType={encounter.enemyType} />
 
       <div className="mt-3.5">

@@ -4,6 +4,7 @@ import { resolveValue } from "./effects";
 import { pickEncounter } from "./encounter-picker";
 import { type MapState, createMapState, revealAround, serializeMap, deserializeMap } from "../renderer/world-map";
 import { START_POS, findNearestCell, getTerrainForScene, computeRoute } from "../renderer/map-data";
+import { ARTIFACTS } from "./items";
 import { useVariantStore } from "./variant";
 
 type Screen = "title" | "sailing" | "encounter" | "ending";
@@ -35,6 +36,7 @@ function serialize(state: GameState, mapState: MapState | null): SerializedGameS
   return {
     ...state,
     flags: [...state.flags],
+    inventory: state.inventory,
     map: mapState ? serializeMap(mapState) : undefined,
   };
 }
@@ -42,7 +44,7 @@ function serialize(state: GameState, mapState: MapState | null): SerializedGameS
 function deserialize(data: SerializedGameState): { state: GameState; mapState: MapState | null } {
   const { map: mapData, ...rest } = data;
   return {
-    state: { ...rest, flags: new Set(data.flags) },
+    state: { ...rest, flags: new Set(data.flags), inventory: data.inventory ?? [] },
     mapState: mapData ? deserializeMap(mapData) : null,
   };
 }
@@ -66,6 +68,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       ...quest.initialState,
       flags: new Set(quest.initialState.flags),
       log: [],
+      inventory: [...(quest.initialState.inventory ?? [])],
     };
     const isEnhanced = useVariantStore.getState().variant === "enhanced";
     set({
@@ -91,6 +94,19 @@ export const useGameStore = create<GameStore>((set, get) => ({
       return;
     }
 
+    // Apply passive artifact effects
+    if (state.inventory.length > 0) {
+      for (const itemId of state.inventory) {
+        const def = ARTIFACTS[itemId];
+        if (def?.passive) {
+          (state as unknown as Record<string, number>)[def.passive.stat] += def.passive.perDay;
+        }
+      }
+      state.crew = Math.max(0, Math.round(state.crew));
+      state.curse = Math.max(0, state.curse);
+      state.gold = Math.max(0, Math.round(state.gold));
+    }
+
     const enc = pickEncounter(quest.encounters, state, usedIds);
     const newUsed = new Set(usedIds);
     newUsed.add(enc.id);
@@ -98,7 +114,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // Update map position for enhanced mode
     const { mapState } = get();
     if (mapState) {
-      const revealRadius = state.flags.has("cursed_compass") ? 5 : 3;
+      // Calculate reveal radius from base + artifact bonuses
+      let revealRadius = 3;
+      for (const itemId of state.inventory) {
+        const def = ARTIFACTS[itemId];
+        if (def?.revealRadius) revealRadius += def.revealRadius;
+      }
       // Route-based movement: advance along planned route
       if (mapState.currentRoute && mapState.routeProgress < mapState.currentRoute.length) {
         const nextCell = mapState.currentRoute[mapState.routeProgress];
@@ -151,7 +172,22 @@ export const useGameStore = create<GameStore>((set, get) => ({
       karma: state.karma + (choice.eff.karma || 0),
       curse: Math.max(0, state.curse + (choice.eff.curse || 0)),
       log: [...state.log],
+      inventory: [...state.inventory],
     };
+
+    // Handle item gain
+    if (choice.eff.item) {
+      ns.inventory.push(choice.eff.item);
+      ns.flags.add(`has_${choice.eff.item}`);
+    }
+    // Handle item loss
+    if (choice.eff.loseItem) {
+      const idx = ns.inventory.indexOf(choice.eff.loseItem);
+      if (idx >= 0) {
+        ns.inventory.splice(idx, 1);
+        ns.flags.delete(`has_${choice.eff.loseItem}`);
+      }
+    }
 
     if (choice.flag) {
       const f = typeof choice.flag === "function" ? choice.flag(state) : choice.flag;
@@ -167,6 +203,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (cd < 0) sum.push(`${cd}👥`);
     if ((choice.eff.curse ?? 0) > 0) sum.push(`+${choice.eff.curse}☠`);
     if ((choice.eff.curse ?? 0) < 0) sum.push(`${choice.eff.curse}☠`);
+    if (choice.eff.item) {
+      const def = ARTIFACTS[choice.eff.item];
+      sum.push(`+${def?.icon ?? "?"}`);
+    }
 
     const title = typeof encounter.title === "function" ? encounter.title(state) : encounter.title;
     const entry: LogEntry = { day: state.day, title, summary: sum.join(" ") };

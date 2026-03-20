@@ -6,6 +6,7 @@ export interface GameState {
   day: number;
   flags: Set<string>;
   log: LogEntry[];
+  inventory: string[];
 }
 
 export interface SerializedGameState {
@@ -16,6 +17,7 @@ export interface SerializedGameState {
   day: number;
   flags: string[];
   log: LogEntry[];
+  inventory?: string[];
   map?: import("../renderer/world-map").SerializedMapState;
 }
 
@@ -43,6 +45,8 @@ export interface Effects {
   crew?: EffectValue;
   karma?: number;
   curse?: number;
+  item?: string;       // artifact id to gain
+  loseItem?: string;   // artifact id to consume
 }
 
 export interface Choice {

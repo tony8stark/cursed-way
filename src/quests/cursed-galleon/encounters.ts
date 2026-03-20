@@ -24,7 +24,7 @@ export const encounters: Encounter[] = [
     id: "merchant_silk", scene: "open_sea", title: "Китайська джонка",
     text: "Величний корабель з багряними вітрилами. Шовк, порцеляна, чай.",
     choices: [
-      { text: "🤝 Торгувати чесно", eff: { gold: [5, 20], crew: 0, karma: 2, curse: 0 }, msg: "Капітан дарує компас, що 'показує не північ, а те, що шукаєш'.", flag: "cursed_compass" },
+      { text: "🤝 Торгувати чесно", eff: { gold: [5, 20], crew: 0, karma: 2, curse: 0, item: "cursed_compass" }, msg: "Капітан дарує компас, що 'показує не північ, а те, що шукаєш'." },
       { text: "⚔️ Абордаж", eff: { gold: [40, 80], crew: [-3, -1], karma: -3, curse: 2 }, msg: "Джонка горить. Серед шовку — сувій з невідомими символами. Він пульсує." },
       { text: "🍵 Чай з капітаном", eff: { gold: 0, crew: 1, karma: 1, curse: 0 }, msg: "Колишній пірат. Один з ваших лишається, але двоє його людей просяться до вас.", flag: "chinese_allies" },
     ],

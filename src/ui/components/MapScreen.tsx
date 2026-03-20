@@ -6,6 +6,7 @@ import { audioManager } from "../../audio/audio-manager";
 import { useT, useLocaleStore } from "../../i18n";
 import { drawWorldMap } from "../../renderer/world-map";
 import { getConnectedLocations } from "../../renderer/map-data";
+import { InventoryBar } from "./InventoryBar";
 
 export function MapScreen() {
   const { state, sail, setDestination, mapState } = useGameStore();
@@ -69,6 +70,7 @@ export function MapScreen() {
       className="w-full max-w-[600px]"
     >
       <StatsBar state={state} />
+      <InventoryBar inventory={state.inventory} />
 
       <canvas
         ref={canvasRef}

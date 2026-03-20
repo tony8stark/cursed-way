@@ -24,7 +24,7 @@ export const encountersEn: Encounter[] = [
     id: "merchant_silk", scene: "open_sea", title: "Chinese Junk",
     text: "A majestic ship with crimson sails. Silk, porcelain, tea.",
     choices: [
-      { text: "🤝 Trade fairly", eff: { gold: [5, 20], crew: 0, karma: 2, curse: 0 }, msg: "The captain gifts a compass that 'points not north, but to what you seek'.", flag: "cursed_compass" },
+      { text: "🤝 Trade fairly", eff: { gold: [5, 20], crew: 0, karma: 2, curse: 0, item: "cursed_compass" }, msg: "The captain gifts a compass that 'points not north, but to what you seek'." },
       { text: "⚔️ Board them", eff: { gold: [40, 80], crew: [-3, -1], karma: -3, curse: 2 }, msg: "The junk burns. Among the silk — a scroll with unknown symbols. It pulses." },
       { text: "🍵 Tea with the captain", eff: { gold: 0, crew: 1, karma: 1, curse: 0 }, msg: "A former pirate. One of yours stays, but two of his crew ask to join you.", flag: "chinese_allies" },
     ],
