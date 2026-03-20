@@ -25,10 +25,15 @@ src/
     achievements.ts   # 14 achievements with check/unlock logic
     achievements-i18n.ts # Locale-aware achievement titles/descriptions
     history.ts        # Run history tracking (last 20 voyages)
+    variant.ts        # Zustand store for game variant (classic/enhanced), persisted
   renderer/           # Visual layer
     sprites.ts        # Pixel art sprite definitions + drawing
     particles.ts      # Particle system for weather/combat/ambient effects
-    scenes/index.ts   # 9 scene renderers (open_sea, storm, island, cave, combat, ethereal, port, underwater, kraken)
+    scenes/index.ts   # 9 scene renderers with atmosphere palette support
+    ship-variants.ts  # Layered ship drawing (6 conditional overlays based on game state)
+    atmosphere.ts     # Time-of-day palettes (dawn/day/dusk/night) + weather overlays
+    map-data.ts       # 16x10 Caribbean grid: terrain types, named locations, helpers
+    world-map.ts      # World map renderer with fog of war, ship animation
   audio/
     audio-manager.ts  # Procedural ambient per scene + SFX oscillators
   ui/components/      # React components
@@ -37,7 +42,8 @@ src/
     ChoiceCard.tsx     # Animated choice buttons with keyboard hints
     TypewriterText.tsx # Character-by-character text reveal
     TitleScreen.tsx    # Title + new game / continue
-    SailingScreen.tsx  # Between-encounter sailing view
+    SailingScreen.tsx  # Between-encounter sailing view (Classic mode)
+    MapScreen.tsx      # World map sailing view (Enhanced mode)
     EncounterScreen.tsx # Encounter with choices + result
     EndingScreen.tsx   # Game ending with journey log
     AchievementToast.tsx # Animated toast notification for new achievements
@@ -81,6 +87,15 @@ Fully procedural, no audio files needed:
 - **SFX**: click, coin, curse, wave, thunder, crewLoss, encounter
 - **Crossfade**: 1.5s fade between scene ambient tracks
 
+## Enhanced Mode (Variant B)
+Opt-in visual enhancement mode, toggled on title screen:
+- **Dynamic ship**: 6 conditional overlays (tattered sail, cannons, curse glow, gold trim, ghost sails)
+- **Atmosphere**: Time-of-day (dawn/day/dusk/night) deterministic from day number, weather (clear/overcast/foggy/rain) seeded from day
+- **World map**: 16x10 Caribbean grid with fog of war, 9 named locations (bilingual), terrain types (deep/water/shallow/land/port/reef/cave/wreck)
+- **Fog of war**: Reveals 3x3 area around player (5x5 with cursed_compass flag), persisted in save
+- **Map movement**: Ship auto-moves to terrain matching encounter scene type (not free-roam)
+- Classic mode remains unchanged
+
 ## Key Design Decisions
 - Canvas 2D (not PixiJS) for scene rendering to keep bundle small
 - All audio synthesized via Web Audio API (zero audio file dependencies)
@@ -88,6 +103,7 @@ Fully procedural, no audio files needed:
 - Tailwind custom theme: `--font-game` for "Press Start 2P"
 - PWA with service worker for offline play
 - i18n without external library (simple Zustand store + translation objects)
+- Enhanced mode is a rendering layer on top, not a separate game engine
 
 ## Build & Deploy
 ```bash
