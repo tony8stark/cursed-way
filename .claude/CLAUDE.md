@@ -35,7 +35,8 @@ src/
     scenes/index.ts   # 9 scene renderers with atmosphere palette support
     ship-variants.ts  # Layered ship drawing (6 conditional overlays based on game state)
     atmosphere.ts     # Time-of-day palettes (dawn/day/dusk/night) + weather overlays
-    map-data.ts       # 16x10 Caribbean grid: terrain types, named locations, helpers
+    map-data.ts       # Active map state + accessors (terrain types, locations, routes)
+    map-generator.ts  # Procedural map generation: 30x18 grid, island clusters, location placement
     world-map.ts      # World map renderer with fog of war, ship animation
   audio/
     audio-manager.ts  # Procedural ambient per scene + SFX oscillators
@@ -100,8 +101,9 @@ Mode stored in `useGameModeStore` (Zustand), persisted to localStorage. Saved wi
 Always-on enhanced visuals (no classic/simple mode):
 - **Dynamic ship**: 6 conditional overlays (tattered sail, cannons, curse glow, gold trim, ghost sails)
 - **Atmosphere**: Time-of-day (dawn/day/dusk/night) deterministic from day number, weather (clear/overcast/foggy/rain) seeded from day
-- **World map**: 16x10 Caribbean grid with fog of war, 9 named locations (bilingual), terrain types (deep/water/shallow/land/port/reef/cave/wreck)
-- **Route system**: Named locations connected by route graph. Player picks destination from 2-3 revealed adjacent locations. Ship follows planned route with dashed line + pulsing diamond marker
+- **Procedural map**: 30x18 grid generated each run from seed. 8-14 island clusters with terrain (deep/water/shallow/land/port/reef/cave/wreck). 10-16 locations picked from pool of ~32 (12 ports, 12 exploration sites, 8 wild islands). Map seed saved for deterministic regeneration on load.
+- **Location pool**: Weighted selection from bilingual location templates. Ports (Tortuga weight 3, others 1-2), exploration (caves, wrecks, reefs), wild islands. Each run gets a unique combination.
+- **Route system**: Auto-built graph connecting nearby locations (2-3 nearest within 15 cells). Validated for full connectivity. Player picks destination from connected locations.
 - **Fog of war**: Reveals 3x3 area around player (bonus from artifacts like cursed_compass), persisted in save
 - **Map movement**: Route-based (ship advances along planned route each encounter), falls back to terrain-matching if no route set
 

@@ -3,7 +3,8 @@ import type { GameState, Watch, Encounter, Choice, LogEntry, SerializedGameState
 import { resolveValue } from "./effects";
 import { pickEncounter, type PickerContext } from "./encounter-picker";
 import { type MapState, createMapState, revealAround, serializeMap, deserializeMap } from "../renderer/world-map";
-import { START_POS, findNearestCell, getTerrainForScene, computeRoute } from "../renderer/map-data";
+import { findNearestCell, getTerrainForScene, computeRoute, setActiveMap } from "../renderer/map-data";
+import { generateMap } from "../renderer/map-generator";
 import { ARTIFACTS } from "./items";
 import { useGameModeStore } from "./game-mode";
 
@@ -21,6 +22,7 @@ interface GameStore {
   quest: Quest | null;
   endingIndex: number | null;
   mapState: MapState | null;
+  mapSeed: number | null;
   // Storylet scheduler context
   recentFamilies: string[];
   recentTags: Set<string>;
@@ -50,22 +52,28 @@ function advanceWatch(state: { day: number; watch: Watch }): { day: number; watc
   };
 }
 
-function serialize(state: GameState, mapState: MapState | null): SerializedGameState {
+function serialize(state: GameState, mapState: MapState | null, mapSeed: number | null): SerializedGameState {
   return {
     ...state,
     flags: [...state.flags],
     inventory: state.inventory,
     delayedEffects: state.delayedEffects,
     gameMode: useGameModeStore.getState().mode,
+    mapSeed: mapSeed ?? undefined,
     map: mapState ? serializeMap(mapState) : undefined,
   };
 }
 
-function deserialize(data: SerializedGameState): { state: GameState; mapState: MapState | null } {
-  const { map: mapData, gameMode, ...rest } = data;
+function deserialize(data: SerializedGameState): { state: GameState; mapState: MapState | null; mapSeed: number | null } {
+  const { map: mapData, gameMode, mapSeed, ...rest } = data;
   // Restore game mode from save
   if (gameMode) {
     useGameModeStore.getState().setMode(gameMode);
+  }
+  // Regenerate map terrain from seed (so renderer has the cells)
+  if (mapSeed !== undefined) {
+    const genMap = generateMap(mapSeed);
+    setActiveMap(genMap);
   }
   return {
     state: {
@@ -76,6 +84,7 @@ function deserialize(data: SerializedGameState): { state: GameState; mapState: M
       delayedEffects: data.delayedEffects ?? [],
     },
     mapState: mapData ? deserializeMap(mapData) : null,
+    mapSeed: mapSeed ?? null,
   };
 }
 
@@ -88,6 +97,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   quest: null,
   endingIndex: null,
   mapState: null,
+  mapSeed: null,
   recentFamilies: [],
   recentTags: new Set(),
   usedGroups: new Set(),
@@ -97,6 +107,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
   startGame: () => {
     const { quest } = get();
     if (!quest) return;
+
+    // Generate procedural map for this run
+    const genMap = generateMap();
+    setActiveMap(genMap);
+
     const state: GameState = {
       ...quest.initialState,
       watch: 0 as Watch, // Start at dawn
@@ -112,7 +127,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
       encounter: null,
       result: null,
       endingIndex: null,
-      mapState: createMapState(START_POS),
+      mapState: createMapState(genMap.startPos),
+      mapSeed: genMap.seed,
       recentFamilies: [],
       recentTags: new Set(),
       usedGroups: new Set(),
@@ -355,11 +371,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
   },
 
   save: () => {
-    const { state, usedIds, quest, mapState } = get();
+    const { state, usedIds, quest, mapState, mapSeed } = get();
     if (!state || !quest) return;
     const data = {
       questId: quest.id,
-      state: serialize(state, mapState),
+      state: serialize(state, mapState, mapSeed),
       usedIds: [...usedIds],
       timestamp: Date.now(),
     };
@@ -373,10 +389,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const raw = localStorage.getItem(SAVE_KEY);
       if (!raw) return false;
       const data = JSON.parse(raw);
-      const { state: loadedState, mapState: loadedMap } = deserialize(data.state);
+      const { state: loadedState, mapState: loadedMap, mapSeed: loadedSeed } = deserialize(data.state);
       set({
         state: loadedState,
         mapState: loadedMap,
+        mapSeed: loadedSeed,
         usedIds: new Set(data.usedIds),
         screen: "sailing",
         encounter: null,

@@ -73,9 +73,9 @@ export function MapScreen() {
 
       <canvas
         ref={canvasRef}
-        width={380}
-        height={210}
-        className="w-full max-w-[760px] rounded border-2 transition-colors duration-500"
+        width={420}
+        height={240}
+        className="w-full max-w-[840px] rounded border-2 transition-colors duration-500"
         style={{
           imageRendering: "pixelated",
           borderColor: state.curse > 10 ? "#8020c0" : "#1a3a5e",

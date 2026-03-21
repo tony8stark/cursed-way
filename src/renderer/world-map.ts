@@ -1,4 +1,4 @@
-import { MAP_CELLS, MAP_W, MAP_H, TERRAIN_COLORS } from "./map-data";
+import { getMapCells, getMapWidth, getMapHeight, TERRAIN_COLORS } from "./map-data";
 import type { Locale } from "../i18n";
 
 export interface MapState {
@@ -13,9 +13,11 @@ export interface MapState {
 }
 
 export function createMapState(startPos: [number, number]): MapState {
+  const W = getMapWidth();
+  const H = getMapHeight();
   const revealed: boolean[][] = [];
-  for (let y = 0; y < MAP_H; y++) {
-    revealed.push(new Array(MAP_W).fill(false));
+  for (let y = 0; y < H; y++) {
+    revealed.push(new Array(W).fill(false));
   }
   const state: MapState = {
     playerPos: startPos,
@@ -31,11 +33,13 @@ export function createMapState(startPos: [number, number]): MapState {
 }
 
 export function revealAround(map: MapState, cx: number, cy: number, radius: number) {
+  const W = getMapWidth();
+  const H = getMapHeight();
   for (let dy = -radius; dy <= radius; dy++) {
     for (let dx = -radius; dx <= radius; dx++) {
       const nx = cx + dx;
       const ny = cy + dy;
-      if (nx >= 0 && nx < MAP_W && ny >= 0 && ny < MAP_H) {
+      if (nx >= 0 && nx < W && ny >= 0 && ny < H) {
         if (Math.abs(dx) + Math.abs(dy) <= radius) {
           map.revealed[ny][nx] = true;
         }
@@ -74,9 +78,11 @@ export function deserializeMap(data: SerializedMapState): MapState {
   };
 }
 
-// Cell size
-const CELL_W = 24;
-const CELL_H = 21;
+// ── Renderer ──
+
+// Cell size (slightly smaller for larger maps)
+const CELL_W = 13;
+const CELL_H = 12;
 
 // Fog colors
 const FOG_COLOR = "#08080e";
@@ -90,6 +96,10 @@ export function drawWorldMap(
   map: MapState,
   locale: Locale,
 ) {
+  const MAP_W = getMapWidth();
+  const MAP_H = getMapHeight();
+  const MAP_CELLS = getMapCells();
+
   // Background
   ctx.fillStyle = FOG_COLOR;
   ctx.fillRect(0, 0, W, H);
@@ -106,13 +116,13 @@ export function drawWorldMap(
       const cx = ox + x * CELL_W;
       const cy = oy + y * CELL_H;
 
-      if (!map.revealed[y][x]) {
+      if (!map.revealed[y]?.[x]) {
         // Fog - already filled by background
-        // Draw subtle grid line for discovered neighbor hints
+        // Draw subtle hint for discovered neighbor
         const hasRevealedNeighbor = [
           [x - 1, y], [x + 1, y], [x, y - 1], [x, y + 1],
         ].some(([nx, ny]) =>
-          nx >= 0 && nx < MAP_W && ny >= 0 && ny < MAP_H && map.revealed[ny][nx]
+          nx >= 0 && nx < MAP_W && ny >= 0 && ny < MAP_H && map.revealed[ny]?.[nx]
         );
         if (hasRevealedNeighbor) {
           ctx.fillStyle = FOG_EDGE;
@@ -121,14 +131,14 @@ export function drawWorldMap(
         continue;
       }
 
-      const cell = MAP_CELLS[y][x];
+      const cell = MAP_CELLS[y]?.[x];
+      if (!cell) continue;
       const baseColor = TERRAIN_COLORS[cell.terrain];
 
       // Animated water shimmer
       if (cell.terrain === "water" || cell.terrain === "deep" || cell.terrain === "shallow") {
         ctx.fillStyle = baseColor;
         ctx.fillRect(cx, cy, CELL_W, CELL_H);
-        // Subtle wave shimmer
         const shimmer = Math.sin(frame * 0.03 + x * 0.7 + y * 0.5) * 0.08;
         if (shimmer > 0) {
           ctx.fillStyle = `rgba(100,150,220,${shimmer})`;
@@ -140,33 +150,33 @@ export function drawWorldMap(
       }
 
       // Grid lines
-      ctx.strokeStyle = "rgba(255,255,255,0.04)";
+      ctx.strokeStyle = "rgba(255,255,255,0.03)";
       ctx.strokeRect(cx, cy, CELL_W, CELL_H);
 
       // Named location icon
       if (cell.icon) {
-        ctx.font = "10px sans-serif";
-        ctx.fillText(cell.icon, cx + 7, cy + 14);
+        ctx.font = "8px sans-serif";
+        ctx.fillText(cell.icon, cx + 2, cy + 10);
       }
     }
   }
 
   // Named location labels (only revealed ones)
-  ctx.font = "bold 6px 'Press Start 2P', monospace";
+  ctx.font = "bold 5px 'Press Start 2P', monospace";
   for (let y = 0; y < MAP_H; y++) {
     for (let x = 0; x < MAP_W; x++) {
-      if (!map.revealed[y][x]) continue;
-      const cell = MAP_CELLS[y][x];
-      if (!cell.name) continue;
+      if (!map.revealed[y]?.[x]) continue;
+      const cell = MAP_CELLS[y]?.[x];
+      if (!cell?.name) continue;
       const label = cell.name[locale];
       const cx = ox + x * CELL_W;
       const cy = oy + y * CELL_H;
       // Shadow
       ctx.fillStyle = "rgba(0,0,0,0.7)";
-      ctx.fillText(label, cx + CELL_W + 2, cy + 13);
+      ctx.fillText(label, cx + CELL_W + 2, cy + 9);
       // Text
       ctx.fillStyle = "#f0c040";
-      ctx.fillText(label, cx + CELL_W + 1, cy + 12);
+      ctx.fillText(label, cx + CELL_W + 1, cy + 8);
     }
   }
 
@@ -193,10 +203,10 @@ export function drawWorldMap(
     const dp = 1 + Math.sin(frame * 0.06) * 0.3;
     ctx.fillStyle = "rgba(240,192,64,0.5)";
     ctx.beginPath();
-    ctx.moveTo(destX, destY - 5 * dp);
-    ctx.lineTo(destX + 4 * dp, destY);
-    ctx.lineTo(destX, destY + 5 * dp);
-    ctx.lineTo(destX - 4 * dp, destY);
+    ctx.moveTo(destX, destY - 4 * dp);
+    ctx.lineTo(destX + 3 * dp, destY);
+    ctx.lineTo(destX, destY + 4 * dp);
+    ctx.lineTo(destX - 3 * dp, destY);
     ctx.closePath();
     ctx.fill();
   }
@@ -211,21 +221,21 @@ export function drawWorldMap(
     const [tx, ty] = map.targetPos;
     const targetX = ox + tx * CELL_W + CELL_W / 2;
     const targetY = oy + ty * CELL_H + CELL_H / 2;
-    const startX = ox + px * CELL_W + CELL_W / 2;
-    const startY = oy + py * CELL_H + CELL_H / 2;
+    const sX = ox + px * CELL_W + CELL_W / 2;
+    const sY = oy + py * CELL_H + CELL_H / 2;
     const t = easeInOut(map.animProgress);
-    drawX = startX + (targetX - startX) * t;
-    drawY = startY + (targetY - startY) * t;
+    drawX = sX + (targetX - sX) * t;
+    drawY = sY + (targetY - sY) * t;
   }
 
   // Ship icon (pulsing)
   const pulse = 1 + Math.sin(frame * 0.08) * 0.1;
-  const shipSize = 5 * pulse;
+  const shipSize = 4 * pulse;
 
   // Ship glow
   ctx.fillStyle = "rgba(240,192,64,0.3)";
   ctx.beginPath();
-  ctx.arc(drawX, drawY, shipSize + 3, 0, Math.PI * 2);
+  ctx.arc(drawX, drawY, shipSize + 2, 0, Math.PI * 2);
   ctx.fill();
 
   // Ship dot
@@ -237,31 +247,28 @@ export function drawWorldMap(
   // Small ship triangle
   ctx.fillStyle = "#0a0a1a";
   ctx.beginPath();
-  ctx.moveTo(drawX, drawY - 3);
-  ctx.lineTo(drawX - 2, drawY + 2);
-  ctx.lineTo(drawX + 2, drawY + 2);
+  ctx.moveTo(drawX, drawY - 2);
+  ctx.lineTo(drawX - 1.5, drawY + 1.5);
+  ctx.lineTo(drawX + 1.5, drawY + 1.5);
   ctx.closePath();
   ctx.fill();
 
   // Compass rose (top-right corner)
-  drawCompass(ctx, W - 20, 20, frame);
+  drawCompass(ctx, W - 16, 16, frame);
 }
 
 function drawCompass(ctx: CanvasRenderingContext2D, x: number, y: number, _frame: number) {
-  const s = 8;
+  const s = 7;
   ctx.strokeStyle = "rgba(240,192,64,0.3)";
   ctx.lineWidth = 1;
-  // N-S
   ctx.beginPath();
   ctx.moveTo(x, y - s);
   ctx.lineTo(x, y + s);
   ctx.stroke();
-  // E-W
   ctx.beginPath();
   ctx.moveTo(x - s, y);
   ctx.lineTo(x + s, y);
   ctx.stroke();
-  // N label
   ctx.fillStyle = "rgba(240,192,64,0.5)";
   ctx.font = "bold 5px 'Press Start 2P', monospace";
   ctx.fillText("N", x - 2, y - s - 2);

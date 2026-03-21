@@ -31,6 +31,7 @@ export interface SerializedGameState {
   inventory?: string[];
   delayedEffects?: DelayedEffect[];
   gameMode?: import("../engine/game-mode").GameMode;
+  mapSeed?: number;
   map?: import("../renderer/world-map").SerializedMapState;
 }
 
