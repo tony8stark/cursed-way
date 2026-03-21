@@ -8,6 +8,7 @@ import { generateMap } from "../renderer/map-generator";
 import { ARTIFACTS } from "./items";
 import { useGameModeStore } from "./game-mode";
 import { useOriginStore, getOrigin } from "./origins";
+import { useObjectiveStore } from "./objectives";
 
 type Screen = "title" | "sailing" | "encounter" | "ending";
 
@@ -59,6 +60,8 @@ function serialize(state: GameState, mapState: MapState | null, mapSeed: number 
     flags: [...state.flags],
     inventory: state.inventory,
     delayedEffects: state.delayedEffects,
+    visitedLocations: [...(state.visitedLocations ?? [])],
+    objectiveId: useObjectiveStore.getState().objectiveId ?? undefined,
     gameMode: useGameModeStore.getState().mode,
     mapSeed: mapSeed ?? undefined,
     map: mapState ? serializeMap(mapState) : undefined,
@@ -66,10 +69,14 @@ function serialize(state: GameState, mapState: MapState | null, mapSeed: number 
 }
 
 function deserialize(data: SerializedGameState): { state: GameState; mapState: MapState | null; mapSeed: number | null } {
-  const { map: mapData, gameMode, mapSeed, ...rest } = data;
+  const { map: mapData, gameMode, mapSeed, objectiveId, ...rest } = data;
   // Restore game mode from save
   if (gameMode) {
     useGameModeStore.getState().setMode(gameMode);
+  }
+  // Restore objective from save
+  if (objectiveId) {
+    useObjectiveStore.getState().setObjective(objectiveId);
   }
   // Regenerate map terrain from seed (so renderer has the cells)
   if (mapSeed !== undefined) {
@@ -83,6 +90,7 @@ function deserialize(data: SerializedGameState): { state: GameState; mapState: M
       flags: new Set(data.flags),
       inventory: data.inventory ?? [],
       delayedEffects: data.delayedEffects ?? [],
+      visitedLocations: new Set(data.visitedLocations ?? []),
     },
     mapState: mapData ? deserializeMap(mapData) : null,
     mapSeed: mapSeed ?? null,
@@ -129,6 +137,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       log: [],
       inventory: [...(quest.initialState.inventory ?? []), ...(origin.items ?? [])],
       delayedEffects: [...(quest.initialState.delayedEffects ?? [])],
+      visitedLocations: new Set<string>(),
     };
     set({
       state,
@@ -238,6 +247,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
         // Arrived at destination?
         if (mapState.routeProgress >= mapState.currentRoute.length) {
+          // Track visited location for objective progress
+          const destKey = `${nextCell[0]},${nextCell[1]}`;
+          state.visitedLocations.add(destKey);
+
           mapState.currentRoute = null;
           mapState.destination = null;
           mapState.routeProgress = 0;
@@ -253,12 +266,19 @@ export const useGameStore = create<GameStore>((set, get) => ({
       }
     }
 
+    // Track curse peak for curse_breaker objective
+    if (state.curse >= 8 && !state.flags.has("curse_peaked_8")) {
+      state.flags.add("curse_peaked_8");
+    }
+
+    const updatedState = { ...state, day: newDay, watch: newWatch };
+
     set({
       usedIds: newUsed,
       encounter: enc,
       result: null,
       screen: "encounter",
-      state: { ...state, day: newDay, watch: newWatch },
+      state: updatedState,
       mapState: mapState ? { ...mapState } : null,
       recentFamilies: newRecentFamilies,
       recentTags: newRecentTags,
@@ -286,6 +306,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       log: [...state.log],
       inventory: [...state.inventory],
       delayedEffects: [...state.delayedEffects],
+      visitedLocations: new Set(state.visitedLocations),
     };
 
     // Handle item gain

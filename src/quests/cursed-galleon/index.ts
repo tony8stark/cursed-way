@@ -36,6 +36,7 @@ export function getCursedGalleon(locale: Locale): Quest {
       log: [],
       inventory: [],
       delayedEffects: [],
+      visitedLocations: new Set(),
     },
   };
 }

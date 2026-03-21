@@ -17,6 +17,7 @@ export interface GameState {
   log: LogEntry[];
   inventory: string[];
   delayedEffects: DelayedEffect[];
+  visitedLocations: Set<string>;
 }
 
 export interface SerializedGameState {
@@ -30,6 +31,8 @@ export interface SerializedGameState {
   log: LogEntry[];
   inventory?: string[];
   delayedEffects?: DelayedEffect[];
+  visitedLocations?: string[];
+  objectiveId?: string;
   gameMode?: import("../engine/game-mode").GameMode;
   mapSeed?: number;
   map?: import("../renderer/world-map").SerializedMapState;

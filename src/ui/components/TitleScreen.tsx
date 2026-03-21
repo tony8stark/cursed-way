@@ -3,6 +3,7 @@ import { useGameStore } from "../../engine/state";
 import { useT, useLocaleStore } from "../../i18n";
 import { useGameModeStore, type GameMode } from "../../engine/game-mode";
 import { useOriginStore, ORIGINS } from "../../engine/origins";
+import { useObjectiveStore, OBJECTIVES } from "../../engine/objectives";
 
 export function TitleScreen() {
   const { startGame, load } = useGameStore();
@@ -10,6 +11,7 @@ export function TitleScreen() {
   const locale = useLocaleStore(s => s.locale);
   const { mode, setMode } = useGameModeStore();
   const { origin, setOrigin } = useOriginStore();
+  const { objectiveId, setObjective } = useObjectiveStore();
   const hasSave = !!localStorage.getItem("cursed-way-save");
   const [line1, line2] = t("gameTitle").split("\n");
 
@@ -130,6 +132,51 @@ export function TitleScreen() {
           </button>
         ))}
       </motion.div>
+
+      {/* Objective selector (Free Roam only) */}
+      {mode === "free_roam" && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.65 }}
+          className="mb-4"
+        >
+          <div className="font-game text-[8px] text-white/40 mb-2">
+            {t("chooseObjective")}
+          </div>
+          <div className="flex justify-center gap-2 flex-wrap">
+            <button
+              onClick={() => setObjective(null)}
+              className={`font-game text-[8px] px-3 py-2 rounded border transition-all duration-200 text-left min-w-[130px] ${
+                !objectiveId
+                  ? "border-[#40f8a0] text-[#40f8a0] bg-[#40f8a0]/10"
+                  : "border-white/10 text-white/25 hover:text-white/40 hover:border-white/20"
+              }`}
+            >
+              <div>🌊 {t("objectiveNone")}</div>
+              <div className={`text-[7px] mt-1 ${!objectiveId ? "opacity-60" : "opacity-30"}`}>
+                {t("objectiveNoneDesc")}
+              </div>
+            </button>
+            {OBJECTIVES.map(obj => (
+              <button
+                key={obj.id}
+                onClick={() => setObjective(obj.id)}
+                className={`font-game text-[8px] px-3 py-2 rounded border transition-all duration-200 text-left min-w-[130px] ${
+                  objectiveId === obj.id
+                    ? "border-[#f0c040] text-[#f0c040] bg-[#f0c040]/10"
+                    : "border-white/10 text-white/25 hover:text-white/40 hover:border-white/20"
+                }`}
+              >
+                <div>{obj.icon} {obj.name[locale]}</div>
+                <div className={`text-[7px] mt-1 ${objectiveId === obj.id ? "opacity-60" : "opacity-30"}`}>
+                  {obj.desc[locale]}
+                </div>
+              </button>
+            ))}
+          </div>
+        </motion.div>
+      )}
 
       <motion.div
         initial={{ opacity: 0, y: 10 }}

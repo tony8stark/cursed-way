@@ -9,10 +9,13 @@ import { audioManager } from "../../audio/audio-manager";
 import { useT } from "../../i18n";
 import type { Choice } from "../../engine/types";
 import { InventoryBar } from "./InventoryBar";
+import { useObjectiveStore, getObjective } from "../../engine/objectives";
 
 export function EncounterScreen() {
-  const { state, encounter, result, makeChoice, continueSailing } = useGameStore();
+  const { state, encounter, result, makeChoice, continueSailing, mapState } = useGameStore();
   const t = useT();
+  const objectiveId = useObjectiveStore(s => s.objectiveId);
+  const objectiveDef = objectiveId ? getObjective(objectiveId) : null;
 
   useEffect(() => {
     if (encounter?.scene) {
@@ -125,6 +128,31 @@ export function EncounterScreen() {
       <div className="w-[280px] shrink-0 flex flex-col gap-3">
         <StatsBar state={state} />
         <InventoryBar inventory={state.inventory} />
+
+        {/* Compact objective indicator */}
+        {objectiveDef && state && (() => {
+          const prog = objectiveDef.check(state, mapState ?? null);
+          return (
+            <div className="flex items-center gap-2 px-2 py-1.5 rounded border border-white/10 bg-black/20">
+              <span className="text-[10px]">{objectiveDef.icon}</span>
+              <div className="flex-1 min-w-0">
+                <div className="h-[3px] bg-white/10 rounded overflow-hidden">
+                  <div
+                    className="h-full rounded transition-all duration-500"
+                    style={{
+                      width: `${Math.min(100, (prog.current / prog.target) * 100)}%`,
+                      background: prog.complete ? "#40f8a0" : "#f0c040",
+                    }}
+                  />
+                </div>
+              </div>
+              <span className="font-game text-[7px] text-white/30">
+                {prog.current}/{prog.target}
+                {prog.complete && <span className="text-[#40f8a0]"> ✓</span>}
+              </span>
+            </div>
+          );
+        })()}
 
         {/* Encounter narrative */}
         <div className="rounded border border-white/10 bg-black/30 px-3 py-3 flex-1">

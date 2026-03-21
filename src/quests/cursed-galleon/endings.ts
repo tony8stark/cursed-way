@@ -48,6 +48,20 @@ export const endings: Ending[] = [
     color: "#f0c040",
   },
   {
+    req: s => s.flags?.has("objective_complete") === true,
+    title: "М І С І Я  В И К О Н А Н А",
+    text: s => {
+      if (s.flags?.has("objective_treasure_hunter")) return "П'ять реліквій з п'яти проклятих кутів світу. Колекціонери і королі б'ються за ваш здобуток.";
+      if (s.flags?.has("objective_curse_breaker")) return "Ви торкнулись безодні і повернулись. Мало хто може сказати те саме. Море вам більше нічого не винне.";
+      if (s.flags?.has("objective_explorer")) return "Десять портів, десять історій. Ви бачили більше, ніж більшість моряків бачить за все життя.";
+      if (s.flags?.has("objective_trade_baron")) return "Триста золотих. Досить, щоб купити флот, фортецю і мовчання кожного губернатора.";
+      if (s.flags?.has("objective_redeemer")) return "Море випробовувало вас. Ви щоразу обирали милосердя. Про ваше плавання складуть пісні.";
+      if (s.flags?.has("objective_cartographer")) return "Карта майже завершена. Білі плями заповнені, міфи підтверджені. Картографи вивчатимуть ваші карти поколіннями.";
+      return "Ви вирушили з метою і досягли її. Небагато хто може сказати те саме.";
+    },
+    color: "#40f8a0",
+  },
+  {
     req: () => true,
     title: "В И Ж И В",
     text: s => s.flags?.has("visited_phantom")

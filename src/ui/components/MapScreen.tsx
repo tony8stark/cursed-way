@@ -7,6 +7,7 @@ import { useT, useLocaleStore } from "../../i18n";
 import { drawWorldMap } from "../../renderer/world-map";
 import { getConnectedLocations } from "../../renderer/map-data";
 import { InventoryBar } from "./InventoryBar";
+import { useObjectiveStore, getObjective } from "../../engine/objectives";
 
 export function MapScreen() {
   const { state, sail, setDestination, mapState } = useGameStore();
@@ -62,6 +63,13 @@ export function MapScreen() {
     ? getConnectedLocations(mapState.playerPos)
     : [];
 
+  // Objective progress
+  const objectiveId = useObjectiveStore(s => s.objectiveId);
+  const objectiveDef = objectiveId ? getObjective(objectiveId) : null;
+  const objectiveProgress = objectiveDef && state
+    ? objectiveDef.check(state, mapState ?? null)
+    : null;
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -86,6 +94,89 @@ export function MapScreen() {
       <div className="w-[260px] shrink-0 flex flex-col gap-3">
         <StatsBar state={state} />
         <InventoryBar inventory={state.inventory} />
+
+        {/* Objective progress */}
+        {objectiveDef && objectiveProgress && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="rounded border px-3 py-2"
+            style={{
+              borderColor: objectiveProgress.complete ? "#40f8a0" : "#f0c040",
+              background: objectiveProgress.complete ? "rgba(64,248,160,0.08)" : "rgba(0,0,0,0.3)",
+            }}
+          >
+            <div className="font-game text-[7px] text-white/40 mb-1">
+              {t("objectiveProgress")}
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-[12px]">{objectiveDef.icon}</span>
+              <div className="flex-1 min-w-0">
+                <div className="font-game text-[8px]" style={{ color: objectiveProgress.complete ? "#40f8a0" : "#f0c040" }}>
+                  {objectiveDef.name[locale]}
+                </div>
+                {/* Progress bar */}
+                <div className="mt-1 h-[4px] bg-white/10 rounded overflow-hidden">
+                  <motion.div
+                    initial={{ width: 0 }}
+                    animate={{ width: `${Math.min(100, (objectiveProgress.current / objectiveProgress.target) * 100)}%` }}
+                    transition={{ duration: 0.5 }}
+                    className="h-full rounded"
+                    style={{ background: objectiveProgress.complete ? "#40f8a0" : "#f0c040" }}
+                  />
+                </div>
+                <div className="font-game text-[7px] text-white/30 mt-1">
+                  {objectiveProgress.current}/{objectiveProgress.target}
+                  {objectiveProgress.complete && (
+                    <span className="text-[#40f8a0] ml-2">✓</span>
+                  )}
+                </div>
+              </div>
+            </div>
+            {objectiveProgress.complete && (
+              <motion.div
+                initial={{ opacity: 0, y: 5 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mt-2"
+              >
+                <div className="font-game text-[7px] text-[#40f8a0]/70 mb-2">
+                  {t("objectiveCompleteHint")}
+                </div>
+                <button
+                  onClick={() => {
+                    audioManager.playSFX("coin");
+                    // Trigger ending via sail (objective complete = special ending)
+                    const { state: currentState, quest } = useGameStore.getState();
+                    if (currentState && quest) {
+                      currentState.flags.add("objective_complete");
+                      currentState.flags.add(`objective_${objectiveId}`);
+                      // Force ending check
+                      const idx = quest.endings.findIndex(e => e.req(currentState));
+                      useGameStore.setState({
+                        endingIndex: idx >= 0 ? idx : quest.endings.length - 1,
+                        screen: "ending",
+                        state: currentState,
+                      });
+                      useGameStore.getState().clearSave();
+                    }
+                  }}
+                  className="game-btn font-game text-[9px] w-full px-3 py-2 border bg-transparent cursor-pointer transition-all duration-200"
+                  style={{ color: "#40f8a0", borderColor: "#40f8a0" }}
+                  onMouseOver={e => {
+                    e.currentTarget.style.background = "#40f8a0";
+                    e.currentTarget.style.color = "#0a0a1a";
+                  }}
+                  onMouseOut={e => {
+                    e.currentTarget.style.background = "transparent";
+                    e.currentTarget.style.color = "#40f8a0";
+                  }}
+                >
+                  {t("objectiveEndVoyage")}
+                </button>
+              </motion.div>
+            )}
+          </motion.div>
+        )}
 
         {/* Navigation panel */}
         <div className="rounded border border-white/10 bg-black/30 px-3 py-3">

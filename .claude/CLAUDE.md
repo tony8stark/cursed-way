@@ -29,6 +29,7 @@ src/
     achievements.ts   # 14 achievements with check/unlock logic
     achievements-i18n.ts # Locale-aware achievement titles/descriptions
     history.ts        # Run history tracking (last 20 voyages)
+    objectives.ts     # 6 run objectives (treasure_hunter, curse_breaker, explorer, trade_baron, redeemer, cartographer)
   renderer/           # Visual layer
     sprites.ts        # Pixel art sprite definitions + drawing
     particles.ts      # Particle system for weather/combat/ambient effects
@@ -91,7 +92,8 @@ Mode stored in `useGameModeStore` (Zustand), persisted to localStorage. Saved wi
 - **Encounter types**: Standard, chain (multi-step), location-bound, item-gated choices, delayed triggers
 - **Effects**: gold, crew, karma, curse, item gain/loss, map reveal, chain to next encounter, delayed encounter
 - **Delayed effects**: Scheduled encounters trigger N days later, with hint text shown on map
-- **Endings**: Priority-ordered, first matching condition wins
+- **Objectives**: 6 run objectives for Free Roam mode (treasure_hunter, curse_breaker, explorer, trade_baron, redeemer, cartographer). Player picks one on title screen. Progress tracked via progress bar in sidebar. Completing objective unlocks special ending + option to end voyage or keep sailing.
+- **Endings**: Priority-ordered, first matching condition wins (+ objective_complete ending)
 - **Curse system**: Affects UI (glitch effects, zalgo text, scanlines at curse >= 8)
 - **Save system**: Auto-saves to localStorage after each encounter
 - **Achievements**: 14 unlockable, checked on game end, stored in localStorage

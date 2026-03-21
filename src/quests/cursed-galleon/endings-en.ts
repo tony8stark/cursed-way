@@ -48,6 +48,20 @@ export const endingsEn: Ending[] = [
     color: "#f0c040",
   },
   {
+    req: s => s.flags?.has("objective_complete") === true,
+    title: "M I S S I O N  C O M P L E T E",
+    text: s => {
+      if (s.flags?.has("objective_treasure_hunter")) return "Five relics from five cursed corners of the world. Collectors and kings will fight over your haul.";
+      if (s.flags?.has("objective_curse_breaker")) return "You touched the abyss and pulled yourself back. Few can say the same. The sea owes you nothing now.";
+      if (s.flags?.has("objective_explorer")) return "Ten ports, ten stories. You have seen more than most sailors see in a lifetime.";
+      if (s.flags?.has("objective_trade_baron")) return "Three hundred gold pieces. Enough to buy a fleet, a fortress, and the silence of every governor.";
+      if (s.flags?.has("objective_redeemer")) return "The sea tested you. You chose mercy every time. Songs will be written about your voyage.";
+      if (s.flags?.has("objective_cartographer")) return "The map is almost complete. Blank spaces filled, myths confirmed. Cartographers will study your charts for generations.";
+      return "You set out with a purpose and accomplished it. Not many can say that.";
+    },
+    color: "#40f8a0",
+  },
+  {
     req: () => true,
     title: "S U R V I V O R",
     text: s => s.flags?.has("visited_phantom")
