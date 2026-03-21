@@ -22,7 +22,8 @@ src/
     state.ts          # Zustand store with save/load (localStorage)
     game-mode.ts      # Game mode store: "expedition" (20-day) vs "free_roam" (no limit)
     effects.ts        # Effect value resolution (fixed/range)
-    encounter-picker.ts  # Weighted encounter selection with location priority
+    encounter-picker.ts  # Storylet scheduler: weighted selection with phase/family/novelty scoring
+    storylet-tagger.ts   # Auto-infers storylet metadata (family, tags, phase, weight) from encounter properties
     items.ts          # 10 artifact definitions with passive effects
     items-i18n.ts     # Bilingual artifact names/descriptions
     achievements.ts   # 14 achievements with check/unlock logic
@@ -85,7 +86,7 @@ Mode stored in `useGameModeStore` (Zustand), persisted to localStorage. Saved wi
 - **Watches**: 4 watches per day (dawn 🌅, day ☀️, dusk 🌆, night 🌙). Each sail/encounter = 1 watch. Day increments when all 4 watches spent. Passive artifact effects apply once per day (at dawn). Atmosphere visuals (sky/water colors, weather) tied to current watch.
 - **Flags**: Set<string> tracking player choices for consequence encounters
 - **Inventory**: string[] of artifact IDs with passive per-day effects
-- **Encounter picker**: Location-bound > consequence (60%) > normal. Filters by player map position
+- **Storylet scheduler**: Weighted encounter selection using: phase fit (early/mid/late), family diversity (ambient/consequence/quest/relationship/setpiece), tag novelty (anti-repeat), base weight, exclusivity groups. Falls back to top-40% weighted random for variety. Auto-tagger infers metadata from encounter id/scene/requires for backward compat.
 - **Encounter types**: Standard, chain (multi-step), location-bound, item-gated choices, delayed triggers
 - **Effects**: gold, crew, karma, curse, item gain/loss, map reveal, chain to next encounter, delayed encounter
 - **Delayed effects**: Scheduled encounters trigger N days later, with hint text shown on map

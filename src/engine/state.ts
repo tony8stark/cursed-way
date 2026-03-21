@@ -1,13 +1,16 @@
 import { create } from "zustand";
 import type { GameState, Watch, Encounter, Choice, LogEntry, SerializedGameState, Quest } from "./types";
 import { resolveValue } from "./effects";
-import { pickEncounter } from "./encounter-picker";
+import { pickEncounter, type PickerContext } from "./encounter-picker";
 import { type MapState, createMapState, revealAround, serializeMap, deserializeMap } from "../renderer/world-map";
 import { START_POS, findNearestCell, getTerrainForScene, computeRoute } from "../renderer/map-data";
 import { ARTIFACTS } from "./items";
 import { useGameModeStore } from "./game-mode";
 
 type Screen = "title" | "sailing" | "encounter" | "ending";
+
+/** How many recent encounters to track for diversity scoring */
+const RECENT_WINDOW = 5;
 
 interface GameStore {
   screen: Screen;
@@ -18,6 +21,10 @@ interface GameStore {
   quest: Quest | null;
   endingIndex: number | null;
   mapState: MapState | null;
+  // Storylet scheduler context
+  recentFamilies: string[];
+  recentTags: Set<string>;
+  usedGroups: Set<string>;
 
   setQuest: (quest: Quest) => void;
   startGame: () => void;
@@ -81,6 +88,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
   quest: null,
   endingIndex: null,
   mapState: null,
+  recentFamilies: [],
+  recentTags: new Set(),
+  usedGroups: new Set(),
 
   setQuest: (quest) => set({ quest }),
 
@@ -103,6 +113,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
       result: null,
       endingIndex: null,
       mapState: createMapState(START_POS),
+      recentFamilies: [],
+      recentTags: new Set(),
+      usedGroups: new Set(),
     });
   },
 
@@ -165,11 +178,22 @@ export const useGameStore = create<GameStore>((set, get) => ({
       }
     }
 
-    const { mapState } = get();
+    const { mapState, recentFamilies, recentTags, usedGroups } = get();
     const playerPos = mapState?.playerPos;
-    const enc = pickEncounter(quest.encounters, state, usedIds, playerPos ?? undefined);
+    const pickerCtx: PickerContext = { recentFamilies, recentTags, usedGroups };
+    const enc = pickEncounter(quest.encounters, state, usedIds, playerPos ?? undefined, pickerCtx);
     const newUsed = new Set(usedIds);
     newUsed.add(enc.id);
+
+    // Update storylet context for diversity tracking
+    const encFamily = enc.family ?? "ambient";
+    const newRecentFamilies = [...recentFamilies, encFamily].slice(-RECENT_WINDOW);
+    const newRecentTags = new Set<string>();
+    // Keep tags from last RECENT_WINDOW encounters (approximate via current + new)
+    if (enc.tags) enc.tags.forEach(t => newRecentTags.add(t));
+    recentTags.forEach(t => newRecentTags.add(t));
+    const newUsedGroups = new Set(usedGroups);
+    if (enc.exclusivityGroup) newUsedGroups.add(enc.exclusivityGroup);
 
     // Update map position
     if (mapState) {
@@ -210,6 +234,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
       screen: "encounter",
       state: { ...state, day: newDay, watch: newWatch },
       mapState: mapState ? { ...mapState } : null,
+      recentFamilies: newRecentFamilies,
+      recentTags: newRecentTags,
+      usedGroups: newUsedGroups,
     });
 
     // Auto-save after picking encounter

@@ -78,6 +78,12 @@ export interface Choice {
   hidden?: boolean;         // don't show stat changes in log
 }
 
+/** Storylet content category */
+export type StoryletFamily = "ambient" | "consequence" | "quest" | "relationship" | "setpiece";
+
+/** Run phase for pacing */
+export type RunPhase = "early" | "mid" | "late";
+
 export interface Encounter {
   id: string;
   scene: SceneId;
@@ -87,6 +93,14 @@ export interface Encounter {
   choices: Choice[];
   enemyType?: "ghost" | "enemy";
   location?: string; // "x,y" key - only triggers at this map cell
+
+  // Storylet metadata (all optional for backward compat)
+  family?: StoryletFamily;         // content category, default "ambient"
+  tags?: string[];                 // semantic tags for theme matching
+  phase?: RunPhase | RunPhase[];   // when this fits best in a run
+  weight?: number;                 // base selection weight, default 1
+  cooldown?: number;               // min encounters before reuse (for fallback pool)
+  exclusivityGroup?: string;       // only one from this group per run
 }
 
 export interface Ending {
