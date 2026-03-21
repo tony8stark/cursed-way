@@ -936,4 +936,150 @@ export const encountersEn: Encounter[] = [
       { text: "🚪 Close the door", eff: { gold: 0, crew: 0, karma: 1, curse: 0 }, msg: "Some things should stay locked. The key vanishes. Peace." },
     ],
   },
+
+  // ── RECURRING NPCs ──
+
+  // OLD BONES - mysterious merchant who appears at different ports
+  {
+    id: "npc_bones_1", scene: "port", family: "relationship", phase: "early", title: "Old Bones",
+    text: "A skeleton-thin man at a corner table. One eye clouded, the other sees too much. 'First time in these waters, Captain? Sit. I have something for you.'",
+    choices: [
+      { text: "💰 Buy his wares (-15)", eff: { gold: -15, rep: { guild: 1 } }, msg: "'A compass that points to regret.' He laughs. Useless? Or is it? His prices are always strange.", flag: "met_bones" },
+      { text: "🍺 Buy him a drink (-5)", eff: { gold: -5 }, msg: "'I've sailed every sea that exists, and a few that don't.' He knows things. Things no living person should.", flag: "met_bones" },
+      { text: "🚶 Ignore him", eff: {}, msg: "He watches you leave. 'We'll meet again. We always do.'" },
+    ],
+  },
+  {
+    id: "npc_bones_2", scene: "port", family: "relationship", phase: "mid", title: "Old Bones Again",
+    text: "Different port, same corner. He waves as if expecting you. 'Told you. Sit down. I have a proposition.'",
+    requires: s => s.flags.has("met_bones") && s.day >= 6,
+    choices: [
+      { text: "💼 Hear the deal", eff: { gold: 0, rep: { guild: 1 } }, msg: "'Deliver a sealed box to Isla de los Muertos. Don't open it. 100 gold on delivery.' He slides it across the table.", flag: "bones_package" },
+      { text: "❓ Who are you really?", eff: {}, msg: "'I'm the man between the deals. The handshake nobody sees. I've been doing this longer than you'd believe.' He smiles with too many teeth.", flag: "bones_curious" },
+      { text: "🚫 No more deals", eff: {}, msg: "'Everyone says that. Then the sea gets lean and they come back.' He sips his drink. You feel watched for hours." },
+    ],
+  },
+  {
+    id: "npc_bones_3", scene: "port", family: "relationship", phase: ["mid", "late"], title: "Old Bones' Secret",
+    text: s => s.flags.has("bones_package")
+      ? "'You still have my package? Good. Change of plans. Open it.' His one good eye glitters."
+      : "'I hear you've been asking about me. Smart captain. Dangerous captain.'",
+    requires: s => (s.flags.has("bones_package") || s.flags.has("bones_curious")) && s.day >= 10,
+    choices: [
+      { text: "📦 Open the box", eff: { gold: 0, curse: 2, item: "ghost_lantern", rep: { guild: 2 } }, msg: "Inside: a lantern that burns with cold fire. 'Payment for trust. This shows what the living can't see. I should know. I stopped being one long ago.'", flag: "bones_truth", requires_flag: "bones_package" },
+      { text: "❓ Press for truth", eff: { gold: 0, curse: 1 }, msg: "'I drowned in 1643. The sea sent me back because I still had debts to collect. Every port needs a middleman, even the ports between worlds.' He isn't joking.", flag: "bones_truth" },
+      { text: "🤝 Offer partnership", eff: { gold: [20, 50], rep: { guild: 3, brethren: 1 } }, msg: "'A partner? Nobody's asked that in two hundred years.' His laugh is like breaking ice. 'Fine. When you need something impossible, call my name at any dock. But the price will be... creative.'", flag: "bones_ally" },
+      { text: "💨 Walk away", eff: {}, msg: "He doesn't try to stop you. But from now on, you see him in every port. Standing in shadows, watching. Waiting." },
+    ],
+  },
+  {
+    id: "npc_bones_4", scene: "port", family: "relationship", phase: "late", title: "Old Bones' Farewell",
+    text: "'Last time, Captain. My debts are nearly paid. I have one thing left to offer. Something I've been carrying since 1643.'",
+    requires: s => s.flags.has("bones_truth") && s.day >= 14,
+    choices: [
+      { text: "🎁 Accept his gift", eff: { gold: 0, curse: -3, karma: 2, rep: { guild: 2 } }, msg: "A pearl. Black and warm. 'It absorbs regret. I've filled it for centuries. Now it's empty. Like me.' He fades. A chair, a drink, no man.", flag: "bones_farewell" },
+      { text: "🤝 Help him move on", eff: { karma: 3, curse: -2 }, msg: "'Nobody ever asked...' His eye tears. The other one too. 'Say my name. My real name.' You don't know it. But somehow, you do. 'Thomas Whitmore.' He exhales. Sunlight hits where he sat. Gone.", flag: "bones_farewell" },
+      { text: "🔮 Ask about the curse", eff: { curse: 1 }, msg: "'Your curse? Child's play. Mine lasted 383 years. The sea is patient. It always collects.' He pauses. 'But sometimes it forgives. If you give it something it values more than a soul.'", flag: "bones_curse_wisdom" },
+    ],
+  },
+
+  // CAPITANA VEGA - rival pirate captain
+  {
+    id: "npc_vega_1", scene: "combat", family: "relationship", phase: "early", title: "La Venganza",
+    text: "A sleek brigantine cuts your path. On the bow: a woman with a saber and a smile. 'I'm taking your cargo, Captain. Nothing personal. I'm Vega.'",
+    choices: [
+      { text: "⚔️ Fight!", eff: { gold: 0, crew: [-2, -1], karma: 0, curse: 0, rep: { brethren: -1 } }, msg: "She fights like lightning. You win, barely. She jumps overboard laughing. 'Better luck next time, Captain!'", flag: "vega_fought" },
+      { text: "💰 Surrender cargo (-20)", eff: { gold: -20, rep: { brethren: 1 } }, msg: "'Smart choice.' She takes the gold and tosses you a bottle. Inside: coordinates. 'Consider it a receipt.'", flag: "vega_surrendered" },
+      { text: "🍺 Invite her aboard", eff: { gold: -10, crew: 0, karma: 0, curse: 0, rep: { brethren: 2 } }, msg: "'Nobody's ever tried that.' She's suspicious. Then curious. Then drunk. She tells you about a treasure she can't reach alone.", flag: "vega_talked" },
+    ],
+  },
+  {
+    id: "npc_vega_2", scene: "open_sea", family: "relationship", phase: "mid", title: "Vega's Signal",
+    text: s => {
+      if (s.flags.has("vega_fought")) return "A red flare from the east. It's her ship. La Venganza lists badly. She's in trouble.";
+      if (s.flags.has("vega_talked")) return "A red flare: Vega's signal. 'Remember that treasure? It's time. Meet me at the reef.'";
+      return "A red flare on the horizon. A pirate signal. Your lookout spots La Venganza.";
+    },
+    requires: s => (s.flags.has("vega_fought") || s.flags.has("vega_surrendered") || s.flags.has("vega_talked")) && s.day >= 7,
+    choices: [
+      { text: "🆘 Help her", eff: { gold: 0, crew: [-1, 0], karma: 1, curse: 0, rep: { brethren: 2 } }, msg: s => s.flags.has("vega_fought") ? "'You? After our fight... why?' She's bleeding. You save her. Something shifts between you." : "'You came.' Relief in her voice. Together, you fight off the Crown patrol.", flag: "vega_saved" },
+      { text: "⚔️ Attack while weak", eff: { gold: [30, 60], crew: [-1, 0], karma: -3, curse: 1, rep: { brethren: -3 } }, msg: "She curses you with her dying breath. The Brethren will remember this.", flag: "vega_killed" },
+      { text: "👀 Watch from afar", eff: {}, msg: s => s.flags.has("vega_talked") ? "She escapes on her own. You've lost her trust." : "She limps away. You'll hear about this." },
+    ],
+  },
+  {
+    id: "npc_vega_3", scene: "open_sea", family: "relationship", phase: ["mid", "late"], title: "Vega's Proposition",
+    text: "'Two captains, two ships. We can own these waters.' She lays a chart on your table. Her eyes are serious for the first time.",
+    requires: s => s.flags.has("vega_saved") && s.day >= 11,
+    choices: [
+      { text: "🤝 Alliance", eff: { crew: [2, 3], gold: [20, 40], rep: { brethren: 3, crown: -2 } }, msg: "'Equal partners. The Vega-Captain fleet.' She spits in her palm. You shake. The sea belongs to both of you now.", flag: "vega_alliance" },
+      { text: "💋 Something more", eff: { crew: 1, karma: 1, curse: -1, rep: { brethren: 2 } }, msg: "'I was hoping you'd say that.' A night with stars and rum and honesty. In the morning, two ships sail as one.", flag: "vega_love" },
+      { text: "🚫 Sail alone", eff: { karma: 0, rep: { brethren: -1 } }, msg: "'Your loss, Captain.' She sails east. You see La Venganza in your dreams sometimes." },
+    ],
+  },
+  {
+    id: "npc_vega_final", scene: "combat", family: "relationship", phase: "late", title: "Vega's Last Stand",
+    text: s => {
+      if (s.flags.has("vega_love")) return "Crown warships. Six of them. Vega grabs your hand. 'Together. Like we promised.'";
+      if (s.flags.has("vega_alliance")) return "Crown ambush! Six warships. Vega signals from La Venganza: 'FIGHT OR FLEE?'";
+      return "You find La Venganza burning. Vega fights alone against two Crown frigates.";
+    },
+    requires: s => (s.flags.has("vega_alliance") || s.flags.has("vega_love") || s.flags.has("vega_saved")) && s.day >= 15,
+    choices: [
+      { text: "⚔️ Fight together", eff: { gold: [40, 80], crew: [-3, -1], karma: 0, curse: 0, rep: { crown: -4, brethren: 4 } }, msg: s => s.flags.has("vega_love") ? "Back to back. Two captains. Six ships burn. They'll write songs about this." : "Side by side, you break the Crown line. Legend-making.", flag: "vega_victory" },
+      { text: "🏃 Cover her retreat", eff: { crew: [-2, -1], karma: 2, rep: { brethren: 3 } }, msg: "'GO!' You draw their fire. She escapes. The crew respects you more than ever.", flag: "vega_sacrifice" },
+      { text: "💨 Flee alone", eff: { karma: -2, rep: { brethren: -4 } }, msg: s => s.flags.has("vega_love") ? "She watches you go. The betrayal in her eyes will haunt you forever." : "La Venganza goes down. Vega's last word is your name.", flag: "vega_abandoned" },
+    ],
+  },
+
+  // KOJO THE BOSUN - loyal crew member who develops personality
+  {
+    id: "npc_kojo_1", scene: "open_sea", family: "relationship", phase: "early", title: "The New Bosun",
+    text: "The biggest man you've ever seen steps forward. 'Name's Kojo. I'll keep order. If you're worth following.'",
+    choices: [
+      { text: "🤝 Welcome aboard", eff: { crew: 1 }, msg: "He shakes your hand. Yours disappears inside his. The crew straightens up. Order has arrived.", flag: "kojo_joined" },
+      { text: "💪 Test him first", eff: { crew: 1, karma: 0 }, msg: "Arm wrestling. He wins. Then helps you up, grinning. 'Good. You're not afraid to lose.' The crew has a bosun.", flag: "kojo_joined" },
+      { text: "🚫 No room", eff: {}, msg: "He nods. 'Your ship. Your choice.' He walks away. The dock feels smaller without him." },
+    ],
+  },
+  {
+    id: "npc_kojo_2", scene: "open_sea", family: "relationship", phase: "mid", title: "Kojo's Story",
+    text: s => s.karma >= 2
+      ? "Night watch. Kojo sits beside you. 'Captain, you're a decent person. That's dangerous here. Let me tell you why I know.'"
+      : "Night watch. Kojo is quiet. Then: 'Captain, I was a slave. A plantation in Barbados. I killed the overseer with my chains. I need you to know that.'",
+    requires: s => s.flags.has("kojo_joined") && s.day >= 6,
+    choices: [
+      { text: "👂 Listen", eff: { karma: 1, crew: 1 }, msg: "'I was a king's son in Ashanti. Stolen at twelve. Thirty years in chains. I've earned my freedom. Now I choose who I follow.' He looks at you. 'Don't make me regret it.'", flag: "kojo_story" },
+      { text: "🤝 Share your story", eff: { crew: 1 }, msg: "You trade scars and stories until dawn. Two people on an ocean of grief, building something new.", flag: "kojo_story" },
+      { text: "⚓ 'We don't talk about the past'", eff: {}, msg: "He nods. The wall stays. But he still fights for you." },
+    ],
+  },
+  {
+    id: "npc_kojo_3", scene: "combat", family: "relationship", phase: ["mid", "late"], title: "Kojo's Judgment",
+    text: s => {
+      if (s.karma <= -3) return "Kojo blocks your path. The crew behind him. 'Captain. We need to talk about what you've become.'";
+      if (s.flags.has("kojo_story")) return "A slaver ship on the horizon. Kojo goes still. His hands shake. 'Captain. That ship carries my people.'";
+      return "Kojo points at a ship flying Crown colors. 'That's the Retribution. They hunt pirates and runaways. Captain, they have a price on my head.'";
+    },
+    requires: s => s.flags.has("kojo_joined") && s.day >= 10,
+    choices: [
+      { text: "⚔️ Attack the slavers", eff: { gold: -10, crew: [2, 4], karma: 3, curse: 0, rep: { crown: -3, brethren: 2 } }, msg: "You break the chains. Thirty souls set free. Kojo weeps for the first time. 'Captain. I will follow you to the end of the sea.'", flag: "kojo_freed_slaves" },
+      { text: "🏴 Let Kojo lead the attack", eff: { gold: 0, crew: [1, 3], karma: 2, curse: 0, rep: { crown: -2 } }, msg: "He fights with the fury of thirty years. When it's over, he stands among the freed, speaking Ashanti. They choose to follow him. He chooses to stay with you.", flag: "kojo_freed_slaves" },
+      { text: "💨 It's not our fight", eff: { karma: -2, crew: -1, rep: { crown: 1 } }, msg: s => s.flags.has("kojo_story") ? "Kojo looks at you. Says nothing. Takes his hammock and sleeps on the far end of the ship. Something broke." : "The crew murmurs. Kojo is silent. The worst kind of silence.", flag: "kojo_disappointed" },
+    ],
+  },
+  {
+    id: "npc_kojo_4", scene: "open_sea", family: "relationship", phase: "late", title: "Kojo's Choice",
+    text: s => {
+      if (s.flags.has("kojo_freed_slaves")) return "Kojo comes with a carved wooden figure. 'In Ashanti, we give this to family. You are my family now, Captain.'";
+      if (s.flags.has("kojo_disappointed")) return "Kojo approaches. 'I'm leaving at the next port. I can't follow someone who sails past chains.'";
+      return "Kojo stands at the bow. 'I've been thinking about home. About Ashanti. About whether there's still a place for me there.'";
+    },
+    requires: s => (s.flags.has("kojo_freed_slaves") || s.flags.has("kojo_disappointed") || s.flags.has("kojo_story")) && s.day >= 14,
+    choices: [
+      { text: "🎁 Accept the gift", eff: { crew: 2, karma: 2, curse: -1, rep: { brethren: 1 } }, msg: "'You gave me back my name. Now I give you mine: Kwame Kojo Asante. Prince, slave, free man. Your bosun forever.' The crew cheers.", flag: "kojo_loyal", requires_flag: "kojo_freed_slaves" },
+      { text: "🏠 Help him go home", eff: { crew: -1, karma: 3 }, msg: "'Home is... I don't know if it exists anymore.' You change course. Three weeks later, a coast. He steps ashore and doesn't look back. Then he does. A wave. Everything he needed to say.", flag: "kojo_home" },
+      { text: "⚓ Ask him to stay", eff: { crew: 0, karma: 0 }, msg: s => s.flags.has("kojo_disappointed") ? "'Give me a reason.' You can't. He leaves at dawn." : "'I'll stay. But not because you asked. Because this ship is the first place I chose to be.' He smiles.", flag: "kojo_stays" },
+    ],
+  },
 ];
