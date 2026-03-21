@@ -34,7 +34,7 @@ const translations = {
   uk: {
     // Title screen
     gameTitle: "ЧОРНИЙ\nПРИЛИВ",
-    tagline1: "20 днів. Один корабель. Кожен вибір — наслідок.",
+    tagline1: "Один корабель. Кожен вибір має наслідки.",
     tagline2: "Море пам'ятає все.",
     startGame: "ВИЙТИ В МОРЕ",
     continueGame: "ПРОДОВЖИТИ",
@@ -71,9 +71,11 @@ const translations = {
     language: "МОВА",
     // Common
     close: "ЗАКРИТИ",
-    // Variant
-    variantClassic: "КЛАСИКА",
-    variantEnhanced: "РОЗШИРЕНА",
+    // Game mode
+    modeExpedition: "ЕКСПЕДИЦІЯ",
+    modeExpeditionDesc: "20 днів. Виживи.",
+    modeFreeRoam: "ВІЛЬНЕ ПЛАВАННЯ",
+    modeFreeRoamDesc: "Без ліміту. Досліджуй.",
     // Map
     mapTitle: "КАРТА",
     chooseDestination: "КУДИ ПЛИВЕМО?",
@@ -85,7 +87,7 @@ const translations = {
   },
   en: {
     gameTitle: "BLACK\nTIDE",
-    tagline1: "20 days. One ship. Every choice has consequences.",
+    tagline1: "One ship. Every choice has consequences.",
     tagline2: "The sea remembers everything.",
     startGame: "SET SAIL",
     continueGame: "CONTINUE",
@@ -114,8 +116,10 @@ const translations = {
     sfx: "SFX",
     language: "LANGUAGE",
     close: "CLOSE",
-    variantClassic: "CLASSIC",
-    variantEnhanced: "ENHANCED",
+    modeExpedition: "EXPEDITION",
+    modeExpeditionDesc: "20 days. Survive.",
+    modeFreeRoam: "FREE ROAM",
+    modeFreeRoamDesc: "No limit. Explore.",
     mapTitle: "MAP",
     chooseDestination: "WHERE TO?",
     enRoute: "EN ROUTE",

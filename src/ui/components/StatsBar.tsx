@@ -1,6 +1,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import type { GameState } from "../../engine/types";
 import { useT } from "../../i18n";
+import { useGameModeStore } from "../../engine/game-mode";
 
 interface Props {
   state: GameState;
@@ -29,7 +30,12 @@ function StatBox({ label, value, color, warning }: { label: string; value: strin
 
 export function StatsBar({ state }: Props) {
   const t = useT();
+  const mode = useGameModeStore(s => s.mode);
   const cr = Math.min(state.curse / 15, 1);
+
+  const dayDisplay = mode === "expedition"
+    ? (cr > 0.5 ? `${state.day}̷/̶2̸0̷` : `${state.day}/20`)
+    : String(state.day);
 
   return (
     <div className="flex gap-1.5 flex-wrap mb-3">
@@ -37,7 +43,7 @@ export function StatsBar({ state }: Props) {
       <StatBox label={t("crew")} value={state.crew} color="#40c0f0" warning={state.crew <= 3} />
       <StatBox
         label={t("day")}
-        value={cr > 0.5 ? `${state.day}̷/̶2̸0̷` : `${state.day}/20`}
+        value={dayDisplay}
         color={cr > 0.5 ? "#8020c0" : "#c8c8d8"}
       />
       <AnimatePresence>

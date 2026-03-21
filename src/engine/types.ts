@@ -26,6 +26,7 @@ export interface SerializedGameState {
   log: LogEntry[];
   inventory?: string[];
   delayedEffects?: DelayedEffect[];
+  gameMode?: import("../engine/game-mode").GameMode;
   map?: import("../renderer/world-map").SerializedMapState;
 }
 

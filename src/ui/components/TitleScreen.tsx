@@ -2,18 +2,18 @@ import { motion } from "framer-motion";
 import { GameCanvas } from "./GameCanvas";
 import { useGameStore } from "../../engine/state";
 import { useT } from "../../i18n";
-import { useVariantStore, type GameVariant } from "../../engine/variant";
+import { useGameModeStore, type GameMode } from "../../engine/game-mode";
 
 export function TitleScreen() {
   const { startGame, load } = useGameStore();
   const t = useT();
-  const { variant, setVariant } = useVariantStore();
+  const { mode, setMode } = useGameModeStore();
   const hasSave = !!localStorage.getItem("cursed-way-save");
   const [line1, line2] = t("gameTitle").split("\n");
 
-  const variants: { code: GameVariant; label: string }[] = [
-    { code: "classic", label: t("variantClassic") },
-    { code: "enhanced", label: t("variantEnhanced") },
+  const modes: { code: GameMode; label: string; desc: string }[] = [
+    { code: "expedition", label: t("modeExpedition"), desc: t("modeExpeditionDesc") },
+    { code: "free_roam", label: t("modeFreeRoam"), desc: t("modeFreeRoamDesc") },
   ];
 
   return (
@@ -64,26 +64,31 @@ export function TitleScreen() {
         </span>
       </motion.div>
 
-      {/* Variant toggle */}
+      {/* Game mode selector */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.8 }}
-        className="flex justify-center gap-2 mb-5"
+        className="flex justify-center gap-3 mb-5"
       >
-        {variants.map(v => (
+        {modes.map(m => (
           <button
-            key={v.code}
-            onClick={() => setVariant(v.code)}
-            className={`font-game text-[8px] px-3 py-1.5 rounded border transition-all duration-200 ${
-              variant === v.code
-                ? v.code === "enhanced"
+            key={m.code}
+            onClick={() => setMode(m.code)}
+            className={`font-game text-[8px] px-3 py-2 rounded border transition-all duration-200 text-left ${
+              mode === m.code
+                ? m.code === "free_roam"
                   ? "border-[#40f8a0] text-[#40f8a0] bg-[#40f8a0]/10"
                   : "border-[#f0c040] text-[#f0c040] bg-[#f0c040]/10"
                 : "border-white/10 text-white/25 hover:text-white/40 hover:border-white/20"
             }`}
           >
-            {v.label}
+            <div>{m.label}</div>
+            <div className={`text-[7px] mt-1 ${
+              mode === m.code ? "opacity-60" : "opacity-30"
+            }`}>
+              {m.desc}
+            </div>
           </button>
         ))}
       </motion.div>

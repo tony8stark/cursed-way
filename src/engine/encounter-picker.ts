@@ -12,8 +12,7 @@ export function pickEncounter(
   const avail = encounters.filter(e => {
     if (used.has(e.id)) return false;
     if (e.requires && !e.requires(state)) return false;
-    // Location filter: in enhanced mode, location encounters only at their cell
-    // In classic mode (no map), location encounters join the general pool
+    // Location encounters only trigger at their map cell
     if (e.location && posKey !== null && e.location !== posKey) return false;
     return true;
   });
@@ -34,10 +33,10 @@ export function pickEncounter(
     }
   }
 
-  // In classic mode, location encounters join the general pool
-  const nonLocation = avail.filter(e => !e.location || posKey === null);
-  const conseq = nonLocation.filter(e => e.requires);
-  const normal = nonLocation.filter(e => !e.requires);
+  // Filter out location-bound encounters from general pool
+  const general = avail.filter(e => !e.location);
+  const conseq = general.filter(e => e.requires);
+  const normal = general.filter(e => !e.requires);
 
   if (conseq.length > 0 && (normal.length === 0 || Math.random() < 0.6)) {
     return conseq[Math.floor(Math.random() * conseq.length)];

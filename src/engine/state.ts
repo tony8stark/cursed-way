@@ -5,7 +5,7 @@ import { pickEncounter } from "./encounter-picker";
 import { type MapState, createMapState, revealAround, serializeMap, deserializeMap } from "../renderer/world-map";
 import { START_POS, findNearestCell, getTerrainForScene, computeRoute } from "../renderer/map-data";
 import { ARTIFACTS } from "./items";
-import { useVariantStore } from "./variant";
+import { useGameModeStore } from "./game-mode";
 
 type Screen = "title" | "sailing" | "encounter" | "ending";
 
@@ -38,12 +38,17 @@ function serialize(state: GameState, mapState: MapState | null): SerializedGameS
     flags: [...state.flags],
     inventory: state.inventory,
     delayedEffects: state.delayedEffects,
+    gameMode: useGameModeStore.getState().mode,
     map: mapState ? serializeMap(mapState) : undefined,
   };
 }
 
 function deserialize(data: SerializedGameState): { state: GameState; mapState: MapState | null } {
-  const { map: mapData, ...rest } = data;
+  const { map: mapData, gameMode, ...rest } = data;
+  // Restore game mode from save
+  if (gameMode) {
+    useGameModeStore.getState().setMode(gameMode);
+  }
   return {
     state: { ...rest, flags: new Set(data.flags), inventory: data.inventory ?? [], delayedEffects: data.delayedEffects ?? [] },
     mapState: mapData ? deserializeMap(mapData) : null,
@@ -72,7 +77,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
       inventory: [...(quest.initialState.inventory ?? [])],
       delayedEffects: [...(quest.initialState.delayedEffects ?? [])],
     };
-    const isEnhanced = useVariantStore.getState().variant === "enhanced";
     set({
       state,
       usedIds: new Set(),
@@ -80,7 +84,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       encounter: null,
       result: null,
       endingIndex: null,
-      mapState: isEnhanced ? createMapState(START_POS) : null,
+      mapState: createMapState(START_POS),
     });
   },
 
@@ -88,8 +92,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const { state, quest, usedIds } = get();
     if (!state || !quest) return;
 
+    const gameMode = useGameModeStore.getState().mode;
+
     // Check ending conditions
-    if (state.day >= 20 || state.crew <= 0 || state.curse >= 15) {
+    // In expedition mode: day limit + crew/curse death
+    // In free roam: only crew/curse death (no day limit)
+    const dayLimitReached = gameMode === "expedition" && state.day >= 20;
+    if (dayLimitReached || state.crew <= 0 || state.curse >= 15) {
       const idx = quest.endings.findIndex(e => e.req(state));
       set({ endingIndex: idx >= 0 ? idx : quest.endings.length - 1, screen: "ending" });
       get().clearSave();
@@ -138,7 +147,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const newUsed = new Set(usedIds);
     newUsed.add(enc.id);
 
-    // Update map position for enhanced mode
+    // Update map position
     if (mapState) {
       // Calculate reveal radius from base + artifact bonuses
       let revealRadius = 3;

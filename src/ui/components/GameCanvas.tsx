@@ -3,7 +3,6 @@ import { SCENES } from "../../renderer/scenes";
 import { ParticleSystem } from "../../renderer/particles";
 import { getShipVisualState } from "../../renderer/ship-variants";
 import { getAtmosphere, drawFogOverlay } from "../../renderer/atmosphere";
-import { useVariantStore } from "../../engine/variant";
 import { useGameStore } from "../../engine/state";
 import { useLocaleStore, getT } from "../../i18n";
 import type { SceneId } from "../../engine/types";
@@ -18,7 +17,6 @@ interface Props {
 
 export function GameCanvas({ scene, curse = 0, day = 0, enemyType }: Props) {
   const locale = useLocaleStore(s => s.locale);
-  const variant = useVariantStore(s => s.variant);
   const state = useGameStore(s => s.state);
   const ref = useRef<HTMLCanvasElement>(null);
   const frameRef = useRef(0);
@@ -34,9 +32,9 @@ export function GameCanvas({ scene, curse = 0, day = 0, enemyType }: Props) {
     ps.clear();
     let id: number;
 
-    // Build scene opts
+    // Build scene opts - always use enhanced visuals
     const opts: SceneOpts = { curse, enemyType };
-    if (variant === "enhanced" && state) {
+    if (state) {
       opts.shipVisual = getShipVisualState(state);
       opts.atmosphere = getAtmosphere(day);
     }
@@ -51,11 +49,11 @@ export function GameCanvas({ scene, curse = 0, day = 0, enemyType }: Props) {
       ps.update();
       ps.draw(ctx);
 
-      // Weather overlay for enhanced mode
+      // Weather overlay
       if (opts.atmosphere) {
         drawFogOverlay(ctx, W, H, f, opts.atmosphere.weather);
 
-        // Rain particles for enhanced mode
+        // Rain particles
         if (opts.atmosphere.weather === "rain" && f % 3 === 0) {
           ps.emit(3, { x: 0, y: -5, w: W, h: 1, color: "rgba(150,180,220,0.3)", size: 1, life: 25, vxRange: [0.3, 0.8], vyRange: [3, 5] });
         }
@@ -78,7 +76,7 @@ export function GameCanvas({ scene, curse = 0, day = 0, enemyType }: Props) {
 
     draw();
     return () => cancelAnimationFrame(id);
-  }, [scene, curse, day, enemyType, locale, variant, state]);
+  }, [scene, curse, day, enemyType, locale, state]);
 
   return (
     <canvas

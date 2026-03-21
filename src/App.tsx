@@ -5,7 +5,6 @@ import { getCursedGalleon } from "./quests/cursed-galleon";
 import { checkAndUnlockAchievements, type Achievement } from "./engine/achievements";
 import { saveRun } from "./engine/history";
 import { TitleScreen } from "./ui/components/TitleScreen";
-import { SailingScreen } from "./ui/components/SailingScreen";
 import { MapScreen } from "./ui/components/MapScreen";
 import { EncounterScreen } from "./ui/components/EncounterScreen";
 import { EndingScreen } from "./ui/components/EndingScreen";
@@ -16,16 +15,14 @@ import { SettingsModal } from "./ui/components/SettingsModal";
 import { audioManager } from "./audio/audio-manager";
 import { useLocaleStore } from "./i18n";
 import { useT } from "./i18n";
-import { useVariantStore } from "./engine/variant";
 
 function rand(a: number, b: number) {
   return Math.floor(Math.random() * (b - a + 1)) + a;
 }
 
 export default function App() {
-  const { screen, state, quest, endingIndex, setQuest, mapState } = useGameStore();
+  const { screen, state, quest, endingIndex, setQuest } = useGameStore();
   const locale = useLocaleStore(s => s.locale);
-  const variant = useVariantStore(s => s.variant);
   const t = useT();
   const [glitch, setGlitch] = useState(false);
   const [muted, setMuted] = useState(false);
@@ -172,7 +169,7 @@ export default function App() {
           className="w-full flex flex-col items-center"
         >
           {screen === "title" && <TitleScreen />}
-          {screen === "sailing" && (variant === "enhanced" && mapState ? <MapScreen /> : <SailingScreen />)}
+          {screen === "sailing" && <MapScreen />}
           {screen === "encounter" && <EncounterScreen />}
           {screen === "ending" && <EndingScreen />}
         </motion.div>

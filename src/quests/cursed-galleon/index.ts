@@ -8,11 +8,11 @@ import { endingsEn } from "./endings-en";
 const questData: Record<Locale, { title: string; description: string }> = {
   uk: {
     title: "ЧОРНИЙ ПРИЛИВ",
-    description: "20 днів. Один корабель. Кожен вибір — наслідок. Море пам'ятає все.",
+    description: "Один корабель. Кожен вибір має наслідки. Море пам'ятає все.",
   },
   en: {
     title: "BLACK TIDE",
-    description: "20 days. One ship. Every choice has consequences. The sea remembers everything.",
+    description: "One ship. Every choice has consequences. The sea remembers everything.",
   },
 };
 

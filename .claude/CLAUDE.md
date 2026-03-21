@@ -20,6 +20,7 @@ src/
   engine/             # Quest-agnostic game engine
     types.ts          # Core interfaces (Quest, Encounter, Choice, GameState, DelayedEffect)
     state.ts          # Zustand store with save/load (localStorage)
+    game-mode.ts      # Game mode store: "expedition" (20-day) vs "free_roam" (no limit)
     effects.ts        # Effect value resolution (fixed/range)
     encounter-picker.ts  # Weighted encounter selection with location priority
     items.ts          # 10 artifact definitions with passive effects
@@ -27,7 +28,6 @@ src/
     achievements.ts   # 14 achievements with check/unlock logic
     achievements-i18n.ts # Locale-aware achievement titles/descriptions
     history.ts        # Run history tracking (last 20 voyages)
-    variant.ts        # Zustand store for game variant (classic/enhanced), persisted
   renderer/           # Visual layer
     sprites.ts        # Pixel art sprite definitions + drawing
     particles.ts      # Particle system for weather/combat/ambient effects
@@ -39,14 +39,13 @@ src/
   audio/
     audio-manager.ts  # Procedural ambient per scene + SFX oscillators
   ui/components/      # React components
-    GameCanvas.tsx     # Canvas with scene rendering + particle overlay
-    StatsBar.tsx       # Animated stat display (gold, crew, day, curse)
+    GameCanvas.tsx     # Canvas with scene rendering + particle overlay (always uses enhanced visuals)
+    StatsBar.tsx       # Animated stat display (gold, crew, day, curse) - game-mode-aware
     InventoryBar.tsx   # Compact artifact inventory display
     ChoiceCard.tsx     # Animated choice buttons with keyboard hints
     TypewriterText.tsx # Character-by-character text reveal
-    TitleScreen.tsx    # Title + new game / continue
-    SailingScreen.tsx  # Between-encounter sailing view (Classic mode)
-    MapScreen.tsx      # World map sailing view (Enhanced mode)
+    TitleScreen.tsx    # Title + game mode selector + new game / continue
+    MapScreen.tsx      # World map sailing view (always shown)
     EncounterScreen.tsx # Encounter with choices + result
     EndingScreen.tsx   # Game ending with journey log
     AchievementToast.tsx # Animated toast notification for new achievements
@@ -66,6 +65,13 @@ _legacy/
   pirate-game.jsx     # Original single-file game (reference)
 ```
 
+## Game Modes
+Two game modes, selected on title screen:
+- **Expedition** (`expedition`): Classic 20-day voyage. Game ends at day 20, crew=0, or curse=15.
+- **Free Roam** (`free_roam`): No day limit. Player explores freely. Game ends only on crew=0 or curse=15.
+
+Mode stored in `useGameModeStore` (Zustand), persisted to localStorage. Saved with game state so loading restores the correct mode.
+
 ## i18n System
 - **Locale store**: Zustand store in `src/i18n/index.ts`, persisted to localStorage
 - **Auto-detection**: Defaults to browser language (uk/en)
@@ -75,7 +81,7 @@ _legacy/
 - **Language toggle**: In Settings modal
 
 ## Game Mechanics
-- **Stats**: gold, crew, karma, curse, day (max 20)
+- **Stats**: gold, crew, karma, curse, day
 - **Flags**: Set<string> tracking player choices for consequence encounters
 - **Inventory**: string[] of artifact IDs with passive per-day effects
 - **Encounter picker**: Location-bound > consequence (60%) > normal. Filters by player map position
@@ -88,10 +94,19 @@ _legacy/
 - **Achievements**: 14 unlockable, checked on game end, stored in localStorage
 - **Run history**: Last 20 completed games with stats
 
+## Visual System
+Always-on enhanced visuals (no classic/simple mode):
+- **Dynamic ship**: 6 conditional overlays (tattered sail, cannons, curse glow, gold trim, ghost sails)
+- **Atmosphere**: Time-of-day (dawn/day/dusk/night) deterministic from day number, weather (clear/overcast/foggy/rain) seeded from day
+- **World map**: 16x10 Caribbean grid with fog of war, 9 named locations (bilingual), terrain types (deep/water/shallow/land/port/reef/cave/wreck)
+- **Route system**: Named locations connected by route graph. Player picks destination from 2-3 revealed adjacent locations. Ship follows planned route with dashed line + pulsing diamond marker
+- **Fog of war**: Reveals 3x3 area around player (bonus from artifacts like cursed_compass), persisted in save
+- **Map movement**: Route-based (ship advances along planned route each encounter), falls back to terrain-matching if no route set
+
 ## Inventory System
 10 artifacts with rarity (common/rare/cursed), passive per-day stat effects, reveal radius bonuses, and encounter unlocks.
 Items are gained/lost via `item`/`loseItem` in Effects. Choices can be gated with `requires_item`.
-InventoryBar component shown on sailing, map, and encounter screens.
+InventoryBar component shown on map and encounter screens.
 
 ## Audio System
 Fully procedural, no audio files needed:
@@ -99,24 +114,15 @@ Fully procedural, no audio files needed:
 - **SFX**: click, coin, curse, wave, thunder, crewLoss, encounter
 - **Crossfade**: 1.5s fade between scene ambient tracks
 
-## Enhanced Mode (Variant B)
-Opt-in visual enhancement mode, toggled on title screen:
-- **Dynamic ship**: 6 conditional overlays (tattered sail, cannons, curse glow, gold trim, ghost sails)
-- **Atmosphere**: Time-of-day (dawn/day/dusk/night) deterministic from day number, weather (clear/overcast/foggy/rain) seeded from day
-- **World map**: 16x10 Caribbean grid with fog of war, 9 named locations (bilingual), terrain types (deep/water/shallow/land/port/reef/cave/wreck)
-- **Route system**: Named locations connected by route graph. Player picks destination from 2-3 revealed adjacent locations. Ship follows planned route with dashed line + pulsing diamond marker
-- **Fog of war**: Reveals 3x3 area around player (bonus from artifacts like cursed_compass), persisted in save
-- **Map movement**: Route-based (ship advances along planned route each encounter), falls back to terrain-matching if no route set
-- Classic mode remains unchanged
-
 ## Key Design Decisions
+- Desktop-first design
 - Canvas 2D (not PixiJS) for scene rendering to keep bundle small
 - All audio synthesized via Web Audio API (zero audio file dependencies)
 - Font loaded via @font-face from Google Fonts CDN
 - Tailwind custom theme: `--font-game` for "Press Start 2P"
 - PWA with service worker for offline play
 - i18n without external library (simple Zustand store + translation objects)
-- Enhanced mode is a rendering layer on top, not a separate game engine
+- Map mode is the only mode (no classic/simple variant)
 
 ## Build & Deploy
 ```bash
