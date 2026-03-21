@@ -116,14 +116,14 @@ export default function App() {
           <>
             <button
               onClick={() => setShowHistory(true)}
-              className="font-game text-[9px] text-white/25 hover:text-white/50 transition-colors bg-transparent border-none cursor-pointer"
+              className="font-game text-[12px] text-white/50 hover:text-white/80 transition-colors bg-transparent border-none cursor-pointer"
               title={t("historyTitle")}
             >
               📜
             </button>
             <button
               onClick={() => setShowAchievements(true)}
-              className="font-game text-[9px] text-white/25 hover:text-white/50 transition-colors bg-transparent border-none cursor-pointer"
+              className="font-game text-[12px] text-white/50 hover:text-white/80 transition-colors bg-transparent border-none cursor-pointer"
               title={t("achievementsTitle")}
             >
               🏆
@@ -132,14 +132,14 @@ export default function App() {
         )}
         <button
           onClick={() => setShowSettings(true)}
-          className="font-game text-[9px] text-white/25 hover:text-white/50 transition-colors bg-transparent border-none cursor-pointer"
+          className="font-game text-[12px] text-white/50 hover:text-white/80 transition-colors bg-transparent border-none cursor-pointer"
           title={t("settingsTitle")}
         >
           ⚙️
         </button>
         <button
           onClick={toggleMute}
-          className="font-game text-[10px] text-white/25 hover:text-white/50 transition-colors bg-transparent border-none cursor-pointer"
+          className="font-game text-[12px] text-white/50 hover:text-white/80 transition-colors bg-transparent border-none cursor-pointer"
         >
           {muted ? "🔇" : "🔊"}
         </button>
