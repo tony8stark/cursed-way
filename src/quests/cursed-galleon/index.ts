@@ -1,5 +1,6 @@
 import type { Quest } from "../../engine/types";
 import type { Locale } from "../../i18n";
+import { defaultReps } from "../../engine/factions";
 import { encounters } from "./encounters";
 import { encountersEn } from "./encounters-en";
 import { questlineEncounters } from "./questlines";
@@ -37,6 +38,7 @@ export function getCursedGalleon(locale: Locale): Quest {
       inventory: [],
       delayedEffects: [],
       visitedLocations: new Set(),
+      factionReps: defaultReps(),
     },
   };
 }

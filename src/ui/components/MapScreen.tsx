@@ -8,6 +8,7 @@ import { drawWorldMap } from "../../renderer/world-map";
 import { getConnectedLocations } from "../../renderer/map-data";
 import { InventoryBar } from "./InventoryBar";
 import { useObjectiveStore, getObjective } from "../../engine/objectives";
+import { FactionBar } from "./FactionBar";
 
 export function MapScreen() {
   const { state, sail, setDestination, mapState } = useGameStore();
@@ -93,6 +94,7 @@ export function MapScreen() {
       {/* Right: Sidebar with stats, inventory, navigation */}
       <div className="w-[260px] shrink-0 flex flex-col gap-3">
         <StatsBar state={state} />
+        <FactionBar reps={state.factionReps} />
         <InventoryBar inventory={state.inventory} />
 
         {/* Objective progress */}

@@ -30,6 +30,7 @@ src/
     achievements-i18n.ts # Locale-aware achievement titles/descriptions
     history.ts        # Run history tracking (last 20 voyages)
     objectives.ts     # 6 run objectives (treasure_hunter, curse_breaker, explorer, trade_baron, redeemer, cartographer)
+    factions.ts       # 3 factions (Crown, Brethren, Guild) with reputation system
   renderer/           # Visual layer
     sprites.ts        # Pixel art sprite definitions + drawing
     particles.ts      # Particle system for weather/combat/ambient effects
@@ -93,6 +94,7 @@ Mode stored in `useGameModeStore` (Zustand), persisted to localStorage. Saved wi
 - **Effects**: gold, crew, karma, curse, item gain/loss, map reveal, chain to next encounter, delayed encounter
 - **Delayed effects**: Scheduled encounters trigger N days later, with hint text shown on map
 - **Objectives**: 6 run objectives for Free Roam mode (treasure_hunter, curse_breaker, explorer, trade_baron, redeemer, cartographer). Player picks one on title screen. Progress tracked via progress bar in sidebar. Completing objective unlocks special ending + option to end voyage or keep sailing.
+- **Factions**: 3 factions (Crown, Brethren, Guild) with rep [-10, +10], 7 tiers each. Origins grant starting rep bonuses. Choices affect rep via `rep` field in Effects. FactionBar shows in sidebar on map and encounter screens.
 - **Endings**: Priority-ordered, first matching condition wins (+ objective_complete ending)
 - **Curse system**: Affects UI (glitch effects, zalgo text, scanlines at curse >= 8)
 - **Save system**: Auto-saves to localStorage after each encounter

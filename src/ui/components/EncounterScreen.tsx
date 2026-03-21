@@ -10,6 +10,7 @@ import { useT } from "../../i18n";
 import type { Choice } from "../../engine/types";
 import { InventoryBar } from "./InventoryBar";
 import { useObjectiveStore, getObjective } from "../../engine/objectives";
+import { FactionBar } from "./FactionBar";
 
 export function EncounterScreen() {
   const { state, encounter, result, makeChoice, continueSailing, mapState } = useGameStore();
@@ -127,6 +128,7 @@ export function EncounterScreen() {
       {/* Right: Stats sidebar + encounter text */}
       <div className="w-[280px] shrink-0 flex flex-col gap-3">
         <StatsBar state={state} />
+        <FactionBar reps={state.factionReps} />
         <InventoryBar inventory={state.inventory} />
 
         {/* Compact objective indicator */}

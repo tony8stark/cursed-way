@@ -6,8 +6,8 @@ export const encounters: Encounter[] = [
     id: "merchant_spice", scene: "open_sea", phase: "early", title: "Торговець спеціями",
     text: "Купець з Мадагаскару. Пахне корицею і кардамоном. Пропонує обмін.",
     choices: [
-      { text: "⚔️ Абордаж", eff: { gold: [25, 60], crew: [-2, 0], karma: -2, curse: 1 }, msg: "Трюм наш. Торговець дивиться з ненавистю." },
-      { text: "💰 Купити спецій (−15)", eff: { gold: -15, crew: 0, karma: 1, curse: 0 }, msg: "Спеції зігріють у холодні ночі. Мораль росте.", flag: "has_spices" },
+      { text: "⚔️ Абордаж", eff: { gold: [25, 60], crew: [-2, 0], karma: -2, curse: 1, rep: { guild: -2, brethren: 1 } }, msg: "Трюм наш. Торговець дивиться з ненавистю." },
+      { text: "💰 Купити спецій (−15)", eff: { gold: -15, crew: 0, karma: 1, curse: 0, rep: { guild: 1 } }, msg: "Спеції зігріють у холодні ночі. Мораль росте.", flag: "has_spices" },
       { text: "📜 Запитати про слухи", eff: { gold: 0, crew: 0, karma: 0, curse: 0 }, msg: "Шепоче про затонулий храм на схід, де золото ніхто не бере — бо воно кусається.", flag: "knows_temple" },
     ],
   },
@@ -15,8 +15,8 @@ export const encounters: Encounter[] = [
     id: "merchant_weapons", scene: "open_sea", phase: "early", title: "Контрабандист зброї",
     text: "Нідерландський шлюп під фальшивим прапором. Борт обвішаний мушкетами.",
     choices: [
-      { text: "💰 Купити зброю (−25)", eff: { gold: -25, crew: 0, karma: 0, curse: 0 }, msg: "Команда озброєна. Наступний бій буде легшим.", flag: "armed" },
-      { text: "⚔️ Забрати силою", eff: { gold: [10, 30], crew: [-1, 0], karma: -2, curse: 0 }, msg: "Контрабандист поклявся помститися. Тепер він — ваш ворог.", flag: "arms_dealer_enemy" },
+      { text: "💰 Купити зброю (−25)", eff: { gold: -25, crew: 0, karma: 0, curse: 0, rep: { brethren: 1 } }, msg: "Команда озброєна. Наступний бій буде легшим.", flag: "armed" },
+      { text: "⚔️ Забрати силою", eff: { gold: [10, 30], crew: [-1, 0], karma: -2, curse: 0, rep: { brethren: -1, guild: -1 } }, msg: "Контрабандист поклявся помститися. Тепер він — ваш ворог.", flag: "arms_dealer_enemy" },
       { text: "🤝 Обмін інформацією", eff: { gold: 0, crew: 0, karma: 0, curse: 0 }, msg: "Розповідає про британський конвой через два дні.", flag: "knows_convoy" },
       { text: "🗝️ [Контрабандист] Старі зв'язки", eff: { gold: -10, crew: 0, karma: 0, curse: 0 }, msg: "Ви знаєте рукостискання. Половина ціни, без питань. На додачу кидає бочку пороху.", flag: "armed", requires_flag: "origin_smuggler" },
       { text: "⚓ [Флот] Стара комісія", eff: { gold: 0, crew: 0, karma: 0, curse: 0 }, msg: "Він блідне. Скидає зброю за борт і тікає. Ви вилучаєте непоганий пістолет.", flag: "armed", requires_flag: "origin_navy" },
@@ -26,8 +26,8 @@ export const encounters: Encounter[] = [
     id: "merchant_silk", scene: "open_sea", phase: "early", title: "Китайська джонка",
     text: "Величний корабель з багряними вітрилами. Шовк, порцеляна, чай.",
     choices: [
-      { text: "🤝 Торгувати чесно", eff: { gold: [5, 20], crew: 0, karma: 2, curse: 0, item: "cursed_compass" }, msg: "Капітан дарує компас, що 'показує не північ, а те, що шукаєш'." },
-      { text: "⚔️ Абордаж", eff: { gold: [40, 80], crew: [-3, -1], karma: -3, curse: 2 }, msg: "Джонка горить. Серед шовку — сувій з невідомими символами. Він пульсує." },
+      { text: "🤝 Торгувати чесно", eff: { gold: [5, 20], crew: 0, karma: 2, curse: 0, item: "cursed_compass", rep: { guild: 2 } }, msg: "Капітан дарує компас, що 'показує не північ, а те, що шукаєш'." },
+      { text: "⚔️ Абордаж", eff: { gold: [40, 80], crew: [-3, -1], karma: -3, curse: 2, rep: { guild: -3, brethren: 1 } }, msg: "Джонка горить. Серед шовку — сувій з невідомими символами. Він пульсує." },
       { text: "🍵 Чай з капітаном", eff: { gold: 0, crew: 1, karma: 1, curse: 0 }, msg: "Колишній пірат. Один з ваших лишається, але двоє його людей просяться до вас.", flag: "chinese_allies" },
     ],
   },
@@ -188,7 +188,7 @@ export const encounters: Encounter[] = [
     id: "navy_patrol", scene: "combat", title: "Патрульний корвет",
     text: "Британський прапор. 20 гармат. Вас помітили.",
     choices: [
-      { text: "⚔️ Бій!", eff: { gold: [0, 50], crew: [-4, -2], karma: -1, curse: 0 }, msg: s => s.flags?.has("armed") ? "Зброя контрабандиста рішає бій!" : "Кривавий бій. Ледь вижили." },
+      { text: "⚔️ Бій!", eff: { gold: [0, 50], crew: [-4, -2], karma: -1, curse: 0, rep: { crown: -3, brethren: 2 } }, msg: s => s.flags?.has("armed") ? "Зброя контрабандиста рішає бій!" : "Кривавий бій. Ледь вижили." },
       { text: "💨 Тікати", eff: { gold: 0, crew: 0, karma: 0, curse: 0 }, msg: s => s.crew >= 6 ? "Повні вітрила! Корвет не встигає." : "Замало рук. Ледь відірвались." },
       { text: "🏳️ Прикинутись торговцем", eff: { gold: [-10, 0], crew: 0, karma: 0, curse: 0 }, msg: s => s.flags?.has("arms_dealer_enemy") ? "На борту — контрабандист! Він впізнає вас. Доводиться тікати під обстрілом." : "Фальшиві документи працюють. Серце б'ється годину." },
     ],
@@ -197,8 +197,8 @@ export const encounters: Encounter[] = [
     id: "pirate_rival", scene: "combat", phase: "mid", weight: 1.2, title: "Чорний Баррет",
     text: "Піратський бриг. Капітан — відомий головоріз. Кричить пропозицію.",
     choices: [
-      { text: "⚔️ Бій", eff: { gold: [20, 70], crew: [-3, -1], karma: 0, curse: 0 }, msg: "Баррет б'ється як демон. Але ви — кращі." },
-      { text: "🤝 Об'єднатися", eff: { gold: 0, crew: [2, 4], karma: 0, curse: 0 }, msg: "Два кораблі. Ненадійний союзник, але поки вигідний.", flag: "barret_alliance" },
+      { text: "⚔️ Бій", eff: { gold: [20, 70], crew: [-3, -1], karma: 0, curse: 0, rep: { brethren: -1 } }, msg: "Баррет б'ється як демон. Але ви — кращі." },
+      { text: "🤝 Об'єднатися", eff: { gold: 0, crew: [2, 4], karma: 0, curse: 0, rep: { brethren: 2, crown: -1 } }, msg: "Два кораблі. Ненадійний союзник, але поки вигідний.", flag: "barret_alliance" },
       { text: "🍺 Ром і розмова", eff: { gold: -5, crew: 0, karma: 1, curse: 0 }, msg: "Баррет — балакучий п'яниця. Розповідає про острів, де пропадають кораблі.", flag: "knows_bermuda" },
       { text: "🔥 [Бунтівник] 'Я вбив свого капітана. Хочеш побачити як?'", eff: { gold: [10, 30], crew: 0, karma: -1, curse: 0 }, msg: "Баррет замовкає. Вивчає ваше обличчя. 'Вірю.' Кидає мішок золота на палубу і швидко відпливає. Репутація має свої переваги.", requires_flag: "origin_mutineer" },
     ],
@@ -208,8 +208,8 @@ export const encounters: Encounter[] = [
     text: "Три торговці під охороною фрегата. Головний приз — головний ризик.",
     requires: s => s.flags?.has("knows_convoy"),
     choices: [
-      { text: "⚔️ Всіх разом!", eff: { gold: [50, 120], crew: [-5, -2], karma: -2, curse: 0 }, msg: s => s.flags?.has("barret_alliance") ? "З Барретом — це полювання. Конвой здається." : "Один проти чотирьох. Божевілля. Але золота — на три життя." },
-      { text: "🎯 Тільки останнього", eff: { gold: [20, 40], crew: [-1, 0], karma: -1, curse: 0 }, msg: "Відставший торговець — легка здобич." },
+      { text: "⚔️ Всіх разом!", eff: { gold: [50, 120], crew: [-5, -2], karma: -2, curse: 0, rep: { crown: -3, brethren: 3, guild: -2 } }, msg: s => s.flags?.has("barret_alliance") ? "З Барретом — це полювання. Конвой здається." : "Один проти чотирьох. Божевілля. Але золота — на три життя." },
+      { text: "🎯 Тільки останнього", eff: { gold: [20, 40], crew: [-1, 0], karma: -1, curse: 0, rep: { crown: -1, guild: -1 } }, msg: "Відставший торговець — легка здобич." },
       { text: "👀 Розвідка", eff: { gold: 0, crew: 0, karma: 0, curse: 0 }, msg: "Запам'ятовуєте маршрут. Наступного разу.", flag: "convoy_route" },
     ],
   },
@@ -217,7 +217,7 @@ export const encounters: Encounter[] = [
     id: "spanish_galleon", scene: "combat", phase: "mid", weight: 1.2, title: "Іспанський галеон!",
     text: "Золотий прапор Кастилії. Величезний корабель. Повільний, але з 40 гарматами.",
     choices: [
-      { text: "⚔️ Атака на світанку", eff: { gold: [40, 100], crew: [-4, -2], karma: -1, curse: 0 }, msg: s => s.flags?.has("has_guide") ? "Провідник знає рифи — заманюєте галеон на мілину. Легка здобич!" : "Лобова атака. Гармати б'ють страшно. Але абордаж — ваша стихія." },
+      { text: "⚔️ Атака на світанку", eff: { gold: [40, 100], crew: [-4, -2], karma: -1, curse: 0, rep: { crown: -2, brethren: 2 } }, msg: s => s.flags?.has("has_guide") ? "Провідник знає рифи — заманюєте галеон на мілину. Легка здобич!" : "Лобова атака. Гармати б'ють страшно. Але абордаж — ваша стихія." },
       { text: "🏴 Підняти іспанський прапор", eff: { gold: 0, crew: 0, karma: -1, curse: 0 }, msg: "Підходите впритул. Коли розуміють — пізно. Але якщо хтось вижив і впізнає...", flag: "spanish_disguise" },
       { text: "💨 Обійти стороною", eff: { gold: 0, crew: 0, karma: 0, curse: 0 }, msg: "Не кожен бій варто починати. Мудрість — теж зброя." },
     ],
@@ -304,8 +304,8 @@ export const encounters: Encounter[] = [
     id: "port_tortuga", scene: "port", title: "Тортуга",
     text: "Піратська столиця. Все — за правильну ціну.",
     choices: [
-      { text: "🔧 Ремонт (−20)", eff: { gold: -20, crew: 0, karma: 0, curse: 0 }, msg: "Корпус, щогла, гармати — як нові.", flag: "ship_repaired" },
-      { text: "📢 Набрати людей (−10)", eff: { gold: -10, crew: [2, 4], karma: 0, curse: 0 }, msg: "Нові обличчя, нові руки, нові проблеми." },
+      { text: "🔧 Ремонт (−20)", eff: { gold: -20, crew: 0, karma: 0, curse: 0, rep: { guild: 1 } }, msg: "Корпус, щогла, гармати — як нові.", flag: "ship_repaired" },
+      { text: "📢 Набрати людей (−10)", eff: { gold: -10, crew: [2, 4], karma: 0, curse: 0, rep: { brethren: 1 } }, msg: "Нові обличчя, нові руки, нові проблеми." },
       {
         text: "🗣️ Таверна (−5)", eff: { gold: -5, crew: 0, karma: 0, curse: 0 },
         msg: s => {
@@ -322,8 +322,8 @@ export const encounters: Encounter[] = [
     text: "Губернатор пропонує помилування піратам.",
     requires: s => s.day > 10,
     choices: [
-      { text: "📜 Прийняти помилування", eff: { gold: -30, crew: -2, karma: 4, curse: -3 }, msg: "Частина золота як 'податок'. Двоє йдуть. Але тепер ви — легальні." },
-      { text: "🏴 Пограбувати порт", eff: { gold: [30, 60], crew: [-2, 0], karma: -4, curse: 2 }, msg: "Нассау горить. Ваше ім'я знає кожен." },
+      { text: "📜 Прийняти помилування", eff: { gold: -30, crew: -2, karma: 4, curse: -3, rep: { crown: 4, brethren: -3 } }, msg: "Частина золота як 'податок'. Двоє йдуть. Але тепер ви — легальні." },
+      { text: "🏴 Пограбувати порт", eff: { gold: [30, 60], crew: [-2, 0], karma: -4, curse: 2, rep: { crown: -4, brethren: 3 } }, msg: "Нассау горить. Ваше ім'я знає кожен." },
       { text: "💨 Повз", eff: { gold: 0, crew: 0, karma: 0, curse: 0 }, msg: "Закон — не для вас." },
     ],
   },
@@ -404,8 +404,8 @@ export const encounters: Encounter[] = [
       : "Торговий корабель тікає на всіх вітрилах. Вони вас впізнали.",
     requires: s => s.day >= 8 && s.day <= 14 && (s.karma >= 3 || s.karma <= -2),
     choices: [
-      { text: "🤝 Мирна зустріч", eff: { gold: [10, 25], crew: 0, karma: 1, curse: 0 }, msg: "Торгівля без крові. Інформація в подарунок.", flag: "merchant_contact" },
-      { text: "🏴 Використати довіру", eff: { gold: [30, 50], crew: 0, karma: -3, curse: 1 }, msg: "Обеззброєні. Легка здобич. Але слава йде попереду." },
+      { text: "🤝 Мирна зустріч", eff: { gold: [10, 25], crew: 0, karma: 1, curse: 0, rep: { guild: 2, crown: 1 } }, msg: "Торгівля без крові. Інформація в подарунок.", flag: "merchant_contact" },
+      { text: "🏴 Використати довіру", eff: { gold: [30, 50], crew: 0, karma: -3, curse: 1, rep: { guild: -3, crown: -1 } }, msg: "Обеззброєні. Легка здобич. Але слава йде попереду." },
       { text: "💬 Обмінятися новинами", eff: { gold: 0, crew: 0, karma: 0, curse: 0 }, msg: s => s.curse >= 5 ? "Капітан блідне: 'Я бачу тінь за вами. Тікайте з цих вод.'" : "Війна між Англією та Іспанією. Конвої змінюють маршрути." },
     ],
   },

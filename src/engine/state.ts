@@ -9,6 +9,7 @@ import { ARTIFACTS } from "./items";
 import { useGameModeStore } from "./game-mode";
 import { useOriginStore, getOrigin } from "./origins";
 import { useObjectiveStore } from "./objectives";
+import { defaultReps, originRepBonuses, applyRepChanges } from "./factions";
 
 type Screen = "title" | "sailing" | "encounter" | "ending";
 
@@ -61,6 +62,7 @@ function serialize(state: GameState, mapState: MapState | null, mapSeed: number 
     inventory: state.inventory,
     delayedEffects: state.delayedEffects,
     visitedLocations: [...(state.visitedLocations ?? [])],
+    factionReps: state.factionReps,
     objectiveId: useObjectiveStore.getState().objectiveId ?? undefined,
     gameMode: useGameModeStore.getState().mode,
     mapSeed: mapSeed ?? undefined,
@@ -91,6 +93,7 @@ function deserialize(data: SerializedGameState): { state: GameState; mapState: M
       inventory: data.inventory ?? [],
       delayedEffects: data.delayedEffects ?? [],
       visitedLocations: new Set(data.visitedLocations ?? []),
+      factionReps: data.factionReps ?? defaultReps(),
     },
     mapState: mapData ? deserializeMap(mapData) : null,
     mapSeed: mapSeed ?? null,
@@ -138,6 +141,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
       inventory: [...(quest.initialState.inventory ?? []), ...(origin.items ?? [])],
       delayedEffects: [...(quest.initialState.delayedEffects ?? [])],
       visitedLocations: new Set<string>(),
+      factionReps: applyRepChanges(
+        quest.initialState.factionReps ?? defaultReps(),
+        originRepBonuses(useOriginStore.getState().origin),
+      ),
     };
     set({
       state,
@@ -307,6 +314,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
       inventory: [...state.inventory],
       delayedEffects: [...state.delayedEffects],
       visitedLocations: new Set(state.visitedLocations),
+      factionReps: choice.eff.rep
+        ? applyRepChanges(state.factionReps, choice.eff.rep)
+        : { ...state.factionReps },
     };
 
     // Handle item gain
@@ -354,6 +364,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (choice.eff.item) {
       const def = ARTIFACTS[choice.eff.item];
       sum.push(`+${def?.icon ?? "?"}`);
+    }
+    // Faction rep changes
+    if (choice.eff.rep) {
+      const r = choice.eff.rep;
+      if (r.crown && r.crown > 0) sum.push(`+${r.crown}👑`);
+      if (r.crown && r.crown < 0) sum.push(`${r.crown}👑`);
+      if (r.brethren && r.brethren > 0) sum.push(`+${r.brethren}☠️`);
+      if (r.brethren && r.brethren < 0) sum.push(`${r.brethren}☠️`);
+      if (r.guild && r.guild > 0) sum.push(`+${r.guild}⚖️`);
+      if (r.guild && r.guild < 0) sum.push(`${r.guild}⚖️`);
     }
 
     const title = typeof encounter.title === "function" ? encounter.title(state) : encounter.title;

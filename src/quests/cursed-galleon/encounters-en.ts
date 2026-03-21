@@ -6,8 +6,8 @@ export const encountersEn: Encounter[] = [
     id: "merchant_spice", scene: "open_sea", phase: "early", title: "Spice Merchant",
     text: "A trader from Madagascar. Smells of cinnamon and cardamom. Offers a deal.",
     choices: [
-      { text: "⚔️ Board them", eff: { gold: [25, 60], crew: [-2, 0], karma: -2, curse: 1 }, msg: "The hold is ours. The merchant watches with hatred." },
-      { text: "💰 Buy spices (−15)", eff: { gold: -15, crew: 0, karma: 1, curse: 0 }, msg: "Spices will warm the cold nights. Morale rises.", flag: "has_spices" },
+      { text: "⚔️ Board them", eff: { gold: [25, 60], crew: [-2, 0], karma: -2, curse: 1, rep: { guild: -2, brethren: 1 } }, msg: "The hold is ours. The merchant watches with hatred." },
+      { text: "💰 Buy spices (−15)", eff: { gold: -15, crew: 0, karma: 1, curse: 0, rep: { guild: 1 } }, msg: "Spices will warm the cold nights. Morale rises.", flag: "has_spices" },
       { text: "📜 Ask about rumors", eff: { gold: 0, crew: 0, karma: 0, curse: 0 }, msg: "Whispers of a sunken temple to the east, where gold goes untouched — because it bites.", flag: "knows_temple" },
     ],
   },
@@ -15,8 +15,8 @@ export const encountersEn: Encounter[] = [
     id: "merchant_weapons", scene: "open_sea", phase: "early", title: "Arms Smuggler",
     text: "A Dutch sloop under a false flag. Its hull bristles with muskets.",
     choices: [
-      { text: "💰 Buy weapons (−25)", eff: { gold: -25, crew: 0, karma: 0, curse: 0 }, msg: "The crew is armed. The next fight will be easier.", flag: "armed" },
-      { text: "⚔️ Take by force", eff: { gold: [10, 30], crew: [-1, 0], karma: -2, curse: 0 }, msg: "The smuggler swore revenge. Now he's your enemy.", flag: "arms_dealer_enemy" },
+      { text: "💰 Buy weapons (−25)", eff: { gold: -25, crew: 0, karma: 0, curse: 0, rep: { brethren: 1 } }, msg: "The crew is armed. The next fight will be easier.", flag: "armed" },
+      { text: "⚔️ Take by force", eff: { gold: [10, 30], crew: [-1, 0], karma: -2, curse: 0, rep: { brethren: -1, guild: -1 } }, msg: "The smuggler swore revenge. Now he's your enemy.", flag: "arms_dealer_enemy" },
       { text: "🤝 Trade information", eff: { gold: 0, crew: 0, karma: 0, curse: 0 }, msg: "He tells of a British convoy passing in two days.", flag: "knows_convoy" },
       { text: "🗝️ [Smuggler] Use your old contacts", eff: { gold: -10, crew: 0, karma: 0, curse: 0 }, msg: "You know the handshake. Half price, no questions. He throws in a keg of powder.", flag: "armed", requires_flag: "origin_smuggler" },
       { text: "⚓ [Navy] Flash your old commission", eff: { gold: 0, crew: 0, karma: 0, curse: 0 }, msg: "He goes pale. Dumps the weapons overboard and flees. You fish out a fine pistol.", flag: "armed", requires_flag: "origin_navy" },
@@ -26,8 +26,8 @@ export const encountersEn: Encounter[] = [
     id: "merchant_silk", scene: "open_sea", phase: "early", title: "Chinese Junk",
     text: "A majestic ship with crimson sails. Silk, porcelain, tea.",
     choices: [
-      { text: "🤝 Trade fairly", eff: { gold: [5, 20], crew: 0, karma: 2, curse: 0, item: "cursed_compass" }, msg: "The captain gifts a compass that 'points not north, but to what you seek'." },
-      { text: "⚔️ Board them", eff: { gold: [40, 80], crew: [-3, -1], karma: -3, curse: 2 }, msg: "The junk burns. Among the silk — a scroll with unknown symbols. It pulses." },
+      { text: "🤝 Trade fairly", eff: { gold: [5, 20], crew: 0, karma: 2, curse: 0, item: "cursed_compass", rep: { guild: 2 } }, msg: "The captain gifts a compass that 'points not north, but to what you seek'." },
+      { text: "⚔️ Board them", eff: { gold: [40, 80], crew: [-3, -1], karma: -3, curse: 2, rep: { guild: -3, brethren: 1 } }, msg: "The junk burns. Among the silk — a scroll with unknown symbols. It pulses." },
       { text: "🍵 Tea with the captain", eff: { gold: 0, crew: 1, karma: 1, curse: 0 }, msg: "A former pirate. One of yours stays, but two of his crew ask to join you.", flag: "chinese_allies" },
     ],
   },
@@ -188,7 +188,7 @@ export const encountersEn: Encounter[] = [
     id: "navy_patrol", scene: "combat", title: "Navy Corvette",
     text: "British flag. 20 guns. They've spotted you.",
     choices: [
-      { text: "⚔️ Fight!", eff: { gold: [0, 50], crew: [-4, -2], karma: -1, curse: 0 }, msg: s => s.flags?.has("armed") ? "The smuggler's weapons decide the battle!" : "A bloody fight. Barely survived." },
+      { text: "⚔️ Fight!", eff: { gold: [0, 50], crew: [-4, -2], karma: -1, curse: 0, rep: { crown: -3, brethren: 2 } }, msg: s => s.flags?.has("armed") ? "The smuggler's weapons decide the battle!" : "A bloody fight. Barely survived." },
       { text: "💨 Run", eff: { gold: 0, crew: 0, karma: 0, curse: 0 }, msg: s => s.crew >= 6 ? "Full sails! The corvette can't keep up." : "Not enough hands. Barely broke away." },
       { text: "🏳️ Pose as a merchant", eff: { gold: [-10, 0], crew: 0, karma: 0, curse: 0 }, msg: s => s.flags?.has("arms_dealer_enemy") ? "The smuggler is aboard! He recognizes you. You flee under fire." : "Forged papers work. Your heart pounds for an hour." },
     ],
@@ -197,8 +197,8 @@ export const encountersEn: Encounter[] = [
     id: "pirate_rival", scene: "combat", phase: "mid", weight: 1.2, title: "Black Barrett",
     text: "A pirate brig. The captain is a notorious cutthroat. He shouts an offer.",
     choices: [
-      { text: "⚔️ Fight", eff: { gold: [20, 70], crew: [-3, -1], karma: 0, curse: 0 }, msg: "Barrett fights like a demon. But you're better." },
-      { text: "🤝 Join forces", eff: { gold: 0, crew: [2, 4], karma: 0, curse: 0 }, msg: "Two ships. An unreliable ally, but useful for now.", flag: "barret_alliance" },
+      { text: "⚔️ Fight", eff: { gold: [20, 70], crew: [-3, -1], karma: 0, curse: 0, rep: { brethren: -1 } }, msg: "Barrett fights like a demon. But you're better." },
+      { text: "🤝 Join forces", eff: { gold: 0, crew: [2, 4], karma: 0, curse: 0, rep: { brethren: 2, crown: -1 } }, msg: "Two ships. An unreliable ally, but useful for now.", flag: "barret_alliance" },
       { text: "🍺 Rum and a chat", eff: { gold: -5, crew: 0, karma: 1, curse: 0 }, msg: "Barrett is a chatty drunk. Tells of an island where ships vanish.", flag: "knows_bermuda" },
       { text: "🔥 [Mutineer] 'I killed my last captain. Want to see how?'", eff: { gold: [10, 30], crew: 0, karma: -1, curse: 0 }, msg: "Barrett goes quiet. Studies your face. 'I believe you.' He tosses a sack of gold to your deck and sails away fast. Reputation has its uses.", requires_flag: "origin_mutineer" },
     ],
@@ -208,8 +208,8 @@ export const encountersEn: Encounter[] = [
     text: "Three merchants escorted by a frigate. The grand prize — the grand risk.",
     requires: s => s.flags?.has("knows_convoy"),
     choices: [
-      { text: "⚔️ Take them all!", eff: { gold: [50, 120], crew: [-5, -2], karma: -2, curse: 0 }, msg: s => s.flags?.has("barret_alliance") ? "With Barrett, it's a hunt. The convoy surrenders." : "One against four. Madness. But gold enough for three lifetimes." },
-      { text: "🎯 Pick off the straggler", eff: { gold: [20, 40], crew: [-1, 0], karma: -1, curse: 0 }, msg: "The trailing merchant — easy prey." },
+      { text: "⚔️ Take them all!", eff: { gold: [50, 120], crew: [-5, -2], karma: -2, curse: 0, rep: { crown: -3, brethren: 3, guild: -2 } }, msg: s => s.flags?.has("barret_alliance") ? "With Barrett, it's a hunt. The convoy surrenders." : "One against four. Madness. But gold enough for three lifetimes." },
+      { text: "🎯 Pick off the straggler", eff: { gold: [20, 40], crew: [-1, 0], karma: -1, curse: 0, rep: { crown: -1, guild: -1 } }, msg: "The trailing merchant — easy prey." },
       { text: "👀 Reconnoiter", eff: { gold: 0, crew: 0, karma: 0, curse: 0 }, msg: "You memorize the route. Next time.", flag: "convoy_route" },
     ],
   },
@@ -217,7 +217,7 @@ export const encountersEn: Encounter[] = [
     id: "spanish_galleon", scene: "combat", phase: "mid", weight: 1.2, title: "Spanish Galleon!",
     text: "The golden flag of Castile. A massive ship. Slow, but with 40 cannons.",
     choices: [
-      { text: "⚔️ Dawn attack", eff: { gold: [40, 100], crew: [-4, -2], karma: -1, curse: 0 }, msg: s => s.flags?.has("has_guide") ? "The guide knows the reefs — you lure the galleon onto the shallows. Easy prey!" : "Head-on assault. The cannons are devastating. But boarding is your element." },
+      { text: "⚔️ Dawn attack", eff: { gold: [40, 100], crew: [-4, -2], karma: -1, curse: 0, rep: { crown: -2, brethren: 2 } }, msg: s => s.flags?.has("has_guide") ? "The guide knows the reefs — you lure the galleon onto the shallows. Easy prey!" : "Head-on assault. The cannons are devastating. But boarding is your element." },
       { text: "🏴 Raise the Spanish flag", eff: { gold: 0, crew: 0, karma: -1, curse: 0 }, msg: "You approach point-blank. By the time they realize — too late. But if someone survived and recognized you...", flag: "spanish_disguise" },
       { text: "💨 Sail around", eff: { gold: 0, crew: 0, karma: 0, curse: 0 }, msg: "Not every fight is worth starting. Wisdom is a weapon too." },
     ],
@@ -304,8 +304,8 @@ export const encountersEn: Encounter[] = [
     id: "port_tortuga", scene: "port", title: "Tortuga",
     text: "The pirate capital. Everything has its price.",
     choices: [
-      { text: "🔧 Repairs (−20)", eff: { gold: -20, crew: 0, karma: 0, curse: 0 }, msg: "Hull, mast, cannons — good as new.", flag: "ship_repaired" },
-      { text: "📢 Recruit (−10)", eff: { gold: -10, crew: [2, 4], karma: 0, curse: 0 }, msg: "New faces, new hands, new problems." },
+      { text: "🔧 Repairs (−20)", eff: { gold: -20, crew: 0, karma: 0, curse: 0, rep: { guild: 1 } }, msg: "Hull, mast, cannons — good as new.", flag: "ship_repaired" },
+      { text: "📢 Recruit (−10)", eff: { gold: -10, crew: [2, 4], karma: 0, curse: 0, rep: { brethren: 1 } }, msg: "New faces, new hands, new problems." },
       {
         text: "🗣️ Tavern (−5)", eff: { gold: -5, crew: 0, karma: 0, curse: 0 },
         msg: s => {
@@ -322,8 +322,8 @@ export const encountersEn: Encounter[] = [
     text: "The governor offers pardons to pirates.",
     requires: s => s.day > 10,
     choices: [
-      { text: "📜 Accept the pardon", eff: { gold: -30, crew: -2, karma: 4, curse: -3 }, msg: "Part of the gold as 'tax'. Two leave. But now you're legitimate." },
-      { text: "🏴 Raid the port", eff: { gold: [30, 60], crew: [-2, 0], karma: -4, curse: 2 }, msg: "Nassau burns. Your name is known to all." },
+      { text: "📜 Accept the pardon", eff: { gold: -30, crew: -2, karma: 4, curse: -3, rep: { crown: 4, brethren: -3 } }, msg: "Part of the gold as 'tax'. Two leave. But now you're legitimate." },
+      { text: "🏴 Raid the port", eff: { gold: [30, 60], crew: [-2, 0], karma: -4, curse: 2, rep: { crown: -4, brethren: 3 } }, msg: "Nassau burns. Your name is known to all." },
       { text: "💨 Sail on", eff: { gold: 0, crew: 0, karma: 0, curse: 0 }, msg: "The law isn't for you." },
     ],
   },
@@ -404,8 +404,8 @@ export const encountersEn: Encounter[] = [
       : "A merchant ship flees at full sail. They recognized you.",
     requires: s => s.day >= 8 && s.day <= 14 && (s.karma >= 3 || s.karma <= -2),
     choices: [
-      { text: "🤝 Peaceful meeting", eff: { gold: [10, 25], crew: 0, karma: 1, curse: 0 }, msg: "Trade without blood. Information as a gift.", flag: "merchant_contact" },
-      { text: "🏴 Exploit their trust", eff: { gold: [30, 50], crew: 0, karma: -3, curse: 1 }, msg: "Unarmed. Easy prey. But reputation travels fast." },
+      { text: "🤝 Peaceful meeting", eff: { gold: [10, 25], crew: 0, karma: 1, curse: 0, rep: { guild: 2, crown: 1 } }, msg: "Trade without blood. Information as a gift.", flag: "merchant_contact" },
+      { text: "🏴 Exploit their trust", eff: { gold: [30, 50], crew: 0, karma: -3, curse: 1, rep: { guild: -3, crown: -1 } }, msg: "Unarmed. Easy prey. But reputation travels fast." },
       { text: "💬 Exchange news", eff: { gold: 0, crew: 0, karma: 0, curse: 0 }, msg: s => s.curse >= 5 ? "The captain pales: 'I see a shadow behind you. Flee these waters.'" : "War between England and Spain. Convoys changing routes." },
     ],
   },

@@ -18,6 +18,7 @@ export interface GameState {
   inventory: string[];
   delayedEffects: DelayedEffect[];
   visitedLocations: Set<string>;
+  factionReps: import("./factions").FactionReps;
 }
 
 export interface SerializedGameState {
@@ -32,6 +33,7 @@ export interface SerializedGameState {
   inventory?: string[];
   delayedEffects?: DelayedEffect[];
   visitedLocations?: string[];
+  factionReps?: import("./factions").FactionReps;
   objectiveId?: string;
   gameMode?: import("../engine/game-mode").GameMode;
   mapSeed?: number;
@@ -71,6 +73,7 @@ export interface Effects {
     encounterId: string;
     hint?: string;
   };
+  rep?: Partial<import("./factions").FactionReps>; // faction reputation changes
 }
 
 export interface Choice {
