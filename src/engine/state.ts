@@ -21,6 +21,7 @@ interface GameStore {
   state: GameState | null;
   encounter: Encounter | null;
   result: string | null;
+  pendingChain: string | null; // next encounter id to chain into (player must click continue)
   usedIds: Set<string>;
   quest: Quest | null;
   endingIndex: number | null;
@@ -105,6 +106,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   state: null,
   encounter: null,
   result: null,
+  pendingChain: null,
   usedIds: new Set(),
   quest: null,
   endingIndex: null,
@@ -152,6 +154,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       screen: "sailing",
       encounter: null,
       result: null,
+      pendingChain: null,
       endingIndex: null,
       mapState: createMapState(genMap.startPos),
       mapSeed: genMap.seed,
@@ -389,20 +392,23 @@ export const useGameStore = create<GameStore>((set, get) => ({
       set({ state: ns, result: msg });
     }
 
-    // Handle chain effect: trigger next encounter after brief pause
+    // Store pending chain encounter (will trigger when player clicks continue)
     if (choice.eff.chain) {
-      const { quest } = get();
-      const chainEnc = quest?.encounters.find(e => e.id === choice.eff.chain);
-      if (chainEnc) {
-        setTimeout(() => {
-          set({ encounter: chainEnc, result: null });
-        }, 1500);
-      }
+      set({ pendingChain: choice.eff.chain });
     }
   },
 
   continueSailing: () => {
-    set({ screen: "sailing", encounter: null, result: null });
+    const { pendingChain, quest } = get();
+    // If there's a chained encounter waiting, show it instead of sailing
+    if (pendingChain && quest) {
+      const chainEnc = quest.encounters.find(e => e.id === pendingChain);
+      if (chainEnc) {
+        set({ encounter: chainEnc, result: null, pendingChain: null });
+        return;
+      }
+    }
+    set({ screen: "sailing", encounter: null, result: null, pendingChain: null });
   },
 
   setDestination: (pos) => {
@@ -449,6 +455,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         screen: "sailing",
         encounter: null,
         result: null,
+        pendingChain: null,
         endingIndex: null,
       });
       return true;

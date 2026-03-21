@@ -54,6 +54,7 @@ const translations = {
     curseHint3: "Р̶Е̷А̷Л̸Ь̵Н̸І̸С̷Т̸Ь̵ ̵Т̷Р̸І̶Щ̷И̸Т̵Ь̷",
     // Encounter
     continueButton: "ПЛИВТИ ДАЛІ →",
+    continueChain: "ДАЛІ →",
     cantAfford: "(замало 💰)",
     // Ending
     journal: "ЖУРНАЛ",
@@ -115,6 +116,7 @@ const translations = {
     curseHint2: "Shadows move on their own",
     curseHint3: "R̶E̷A̷L̸I̵T̸Y̵ ̵C̷R̸A̶C̷K̸S̵",
     continueButton: "SAIL ON →",
+    continueChain: "CONTINUE →",
     cantAfford: "(not enough 💰)",
     journal: "LOG",
     dayPrefix: "D",

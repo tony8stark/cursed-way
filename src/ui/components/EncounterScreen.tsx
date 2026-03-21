@@ -13,7 +13,7 @@ import { useObjectiveStore, getObjective } from "../../engine/objectives";
 import { FactionBar } from "./FactionBar";
 
 export function EncounterScreen() {
-  const { state, encounter, result, makeChoice, continueSailing, mapState } = useGameStore();
+  const { state, encounter, result, pendingChain, makeChoice, continueSailing, mapState } = useGameStore();
   const t = useT();
   const objectiveId = useObjectiveStore(s => s.objectiveId);
   const objectiveDef = objectiveId ? getObjective(objectiveId) : null;
@@ -116,9 +116,13 @@ export function EncounterScreen() {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={handleContinue}
-              className="game-btn font-game text-[11px] text-[#40c0f0] border-2 border-[#40c0f0] bg-transparent px-6 py-3.5 cursor-pointer transition-all duration-200 hover:bg-[#40c0f0] hover:text-[#0a0a1a]"
+              className={`game-btn font-game text-[11px] border-2 bg-transparent px-6 py-3.5 cursor-pointer transition-all duration-200 ${
+                pendingChain
+                  ? "text-[#f0c040] border-[#f0c040] hover:bg-[#f0c040] hover:text-[#0a0a1a]"
+                  : "text-[#40c0f0] border-[#40c0f0] hover:bg-[#40c0f0] hover:text-[#0a0a1a]"
+              }`}
             >
-              {t("continueButton")}
+              {pendingChain ? t("continueChain") : t("continueButton")}
             </motion.button>
             <span className="font-game text-[8px] text-white/20 ml-3">[Space]</span>
           </motion.div>
