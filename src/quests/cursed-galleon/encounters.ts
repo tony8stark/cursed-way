@@ -3,7 +3,7 @@ import type { Encounter } from "../../engine/types";
 export const encounters: Encounter[] = [
   // ── SEA / TRADE ──
   {
-    id: "merchant_spice", scene: "open_sea", title: "Торговець спеціями",
+    id: "merchant_spice", scene: "open_sea", phase: "early", title: "Торговець спеціями",
     text: "Купець з Мадагаскару. Пахне корицею і кардамоном. Пропонує обмін.",
     choices: [
       { text: "⚔️ Абордаж", eff: { gold: [25, 60], crew: [-2, 0], karma: -2, curse: 1 }, msg: "Трюм наш. Торговець дивиться з ненавистю." },
@@ -12,7 +12,7 @@ export const encounters: Encounter[] = [
     ],
   },
   {
-    id: "merchant_weapons", scene: "open_sea", title: "Контрабандист зброї",
+    id: "merchant_weapons", scene: "open_sea", phase: "early", title: "Контрабандист зброї",
     text: "Нідерландський шлюп під фальшивим прапором. Борт обвішаний мушкетами.",
     choices: [
       { text: "💰 Купити зброю (−25)", eff: { gold: -25, crew: 0, karma: 0, curse: 0 }, msg: "Команда озброєна. Наступний бій буде легшим.", flag: "armed" },
@@ -23,7 +23,7 @@ export const encounters: Encounter[] = [
     ],
   },
   {
-    id: "merchant_silk", scene: "open_sea", title: "Китайська джонка",
+    id: "merchant_silk", scene: "open_sea", phase: "early", title: "Китайська джонка",
     text: "Величний корабель з багряними вітрилами. Шовк, порцеляна, чай.",
     choices: [
       { text: "🤝 Торгувати чесно", eff: { gold: [5, 20], crew: 0, karma: 2, curse: 0, item: "cursed_compass" }, msg: "Капітан дарує компас, що 'показує не північ, а те, що шукаєш'." },
@@ -32,7 +32,7 @@ export const encounters: Encounter[] = [
     ],
   },
   {
-    id: "floating_cargo", scene: "open_sea", title: "Плавучий вантаж",
+    id: "floating_cargo", scene: "open_sea", phase: "early", title: "Плавучий вантаж",
     text: "Бочки рому дрейфують після аварії. Десятки бочок.",
     choices: [
       { text: "🍺 Підібрати", eff: { gold: [10, 25], crew: 1, karma: 0, curse: 0 }, msg: "Ром — валюта Карибів. Команда радіє." },
@@ -194,7 +194,7 @@ export const encounters: Encounter[] = [
     ],
   },
   {
-    id: "pirate_rival", scene: "combat", title: "Чорний Баррет",
+    id: "pirate_rival", scene: "combat", phase: "mid", weight: 1.2, title: "Чорний Баррет",
     text: "Піратський бриг. Капітан — відомий головоріз. Кричить пропозицію.",
     choices: [
       { text: "⚔️ Бій", eff: { gold: [20, 70], crew: [-3, -1], karma: 0, curse: 0 }, msg: "Баррет б'ється як демон. Але ви — кращі." },
@@ -214,7 +214,7 @@ export const encounters: Encounter[] = [
     ],
   },
   {
-    id: "spanish_galleon", scene: "combat", title: "Іспанський галеон!",
+    id: "spanish_galleon", scene: "combat", phase: "mid", weight: 1.2, title: "Іспанський галеон!",
     text: "Золотий прапор Кастилії. Величезний корабель. Повільний, але з 40 гарматами.",
     choices: [
       { text: "⚔️ Атака на світанку", eff: { gold: [40, 100], crew: [-4, -2], karma: -1, curse: 0 }, msg: s => s.flags?.has("has_guide") ? "Провідник знає рифи — заманюєте галеон на мілину. Легка здобич!" : "Лобова атака. Гармати б'ють страшно. Але абордаж — ваша стихія." },
@@ -224,7 +224,7 @@ export const encounters: Encounter[] = [
   },
   // ── SUPERNATURAL ──
   {
-    id: "sirens_song", scene: "ethereal", title: "Спів у тумані",
+    id: "sirens_song", scene: "ethereal", family: "setpiece", phase: ["mid", "late"], weight: 0.7, exclusivityGroup: "supernatural_sirens", title: "Спів у тумані",
     text: "Мелодія без джерела. Команда завмирає. Хтось крокує до борту.",
     choices: [
       { text: "🔇 Воск у вуха", eff: { gold: 0, crew: 0, karma: 0, curse: 0 }, msg: "Працює. Але мелодія була красивою." },
@@ -244,7 +244,7 @@ export const encounters: Encounter[] = [
     ],
   },
   {
-    id: "ghost_ship", scene: "combat", enemyType: "ghost", title: "Корабель-привид",
+    id: "ghost_ship", scene: "combat", enemyType: "ghost", family: "setpiece", phase: ["mid", "late"], weight: 0.7, exclusivityGroup: "supernatural_ghost", title: "Корабель-привид",
     text: "Гнилий галеон без прапора. На палубі — скелети, що рухаються.",
     choices: [
       { text: "💀 На борт!", eff: { gold: [30, 80], crew: [-2, 0], karma: 0, curse: 4 }, msg: "Скелети б'ються мовчки. У трюмі — карта до місця, якого не існує.", flag: "ghost_map" },
@@ -253,7 +253,7 @@ export const encounters: Encounter[] = [
     ],
   },
   {
-    id: "kraken_attack", scene: "kraken", title: "КРАКЕН!",
+    id: "kraken_attack", scene: "kraken", family: "setpiece", phase: ["mid", "late"], weight: 0.7, exclusivityGroup: "supernatural_kraken", title: "КРАКЕН!",
     text: "Вода закипає. Щупальця товщиною зі щоглу обхоплюють корабель.",
     choices: [
       { text: "⚔️ Рубати!", eff: { gold: 0, crew: [-4, -2], karma: 0, curse: 0 }, msg: s => s.flags?.has("armed") ? "Зброя рубає щупальця! Кракен відступає." : "Сокири проти м'яса. Довгий бій." },
@@ -661,7 +661,7 @@ export const encounters: Encounter[] = [
 
   // Pure narrative encounters
   {
-    id: "dream_sequence", scene: "ethereal", title: "Сон капітана",
+    id: "dream_sequence", scene: "ethereal", family: "ambient", phase: "mid", exclusivityGroup: "dream", title: "Сон капітана",
     text: "Снится: ви під водою. Дихаєте. Місто з перламутру.",
     requires: s => s.curse >= 5,
     choices: [
@@ -700,7 +700,7 @@ export const encounters: Encounter[] = [
 
   // Chain encounters
   {
-    id: "merchant_mysterious", scene: "port", title: "Таємничий торговець",
+    id: "merchant_mysterious", scene: "port", family: "quest", exclusivityGroup: "mysterious_merchant", title: "Таємничий торговець",
     text: "Зникає в тінях, щойно ви відвертаєтесь. Пропонує 'те, чого бажаєте найбільше'.",
     choices: [
       { text: "💰 'Золото'", eff: { chain: "merchant_gold_test" }, msg: "Посміхається..." },
@@ -748,7 +748,7 @@ export const encounters: Encounter[] = [
 
   // ── LATE-GAME CLIMAX (days 17-19) ──
   {
-    id: "final_reckoning", scene: "ethereal", title: "Голос моря",
+    id: "final_reckoning", scene: "ethereal", family: "setpiece", phase: "late", weight: 0.8, title: "Голос моря",
     text: s => {
       if (s.curse >= 10) return "Море говорить вашим голосом. 'Час обирати. Залишитися чи повернутися?'";
       if (s.karma >= 5) return "Золоте сяйво на горизонті. Берег? Чи щось більше?";
@@ -763,7 +763,7 @@ export const encounters: Encounter[] = [
     ],
   },
   {
-    id: "sea_judges", scene: "ethereal", title: "Суд морів",
+    id: "sea_judges", scene: "ethereal", family: "setpiece", phase: "late", weight: 0.8, title: "Суд морів",
     text: s => {
       const crimes = [s.flags?.has("village_curse") && "село", s.flags?.has("arms_dealer_enemy") && "зброяр", s.flags?.has("port_royal_enemy") && "Порт-Ройял"].filter(Boolean);
       return crimes.length > 0
@@ -886,7 +886,7 @@ export const encounters: Encounter[] = [
     ],
   },
   {
-    id: "old_friend", scene: "port", title: "Старий знайомий",
+    id: "old_friend", scene: "port", family: "quest", exclusivityGroup: "old_friend", title: "Старий знайомий",
     text: "Людина з минулого. Посміхається. 'Маю справу. Зустрінемось через три дні на рифах.'",
     choices: [
       { text: "🤝 Погодитися", eff: { gold: 0, crew: 0, karma: 0, curse: 0, delay: { daysLater: 3, encounterId: "old_friend_trap" } }, msg: "'Не запізнюйся.' Зникає в натовпі.", flag: "old_friend_deal" },

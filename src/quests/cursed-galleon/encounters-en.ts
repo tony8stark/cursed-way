@@ -3,7 +3,7 @@ import type { Encounter } from "../../engine/types";
 export const encountersEn: Encounter[] = [
   // ── SEA / TRADE ──
   {
-    id: "merchant_spice", scene: "open_sea", title: "Spice Merchant",
+    id: "merchant_spice", scene: "open_sea", phase: "early", title: "Spice Merchant",
     text: "A trader from Madagascar. Smells of cinnamon and cardamom. Offers a deal.",
     choices: [
       { text: "⚔️ Board them", eff: { gold: [25, 60], crew: [-2, 0], karma: -2, curse: 1 }, msg: "The hold is ours. The merchant watches with hatred." },
@@ -12,7 +12,7 @@ export const encountersEn: Encounter[] = [
     ],
   },
   {
-    id: "merchant_weapons", scene: "open_sea", title: "Arms Smuggler",
+    id: "merchant_weapons", scene: "open_sea", phase: "early", title: "Arms Smuggler",
     text: "A Dutch sloop under a false flag. Its hull bristles with muskets.",
     choices: [
       { text: "💰 Buy weapons (−25)", eff: { gold: -25, crew: 0, karma: 0, curse: 0 }, msg: "The crew is armed. The next fight will be easier.", flag: "armed" },
@@ -23,7 +23,7 @@ export const encountersEn: Encounter[] = [
     ],
   },
   {
-    id: "merchant_silk", scene: "open_sea", title: "Chinese Junk",
+    id: "merchant_silk", scene: "open_sea", phase: "early", title: "Chinese Junk",
     text: "A majestic ship with crimson sails. Silk, porcelain, tea.",
     choices: [
       { text: "🤝 Trade fairly", eff: { gold: [5, 20], crew: 0, karma: 2, curse: 0, item: "cursed_compass" }, msg: "The captain gifts a compass that 'points not north, but to what you seek'." },
@@ -32,7 +32,7 @@ export const encountersEn: Encounter[] = [
     ],
   },
   {
-    id: "floating_cargo", scene: "open_sea", title: "Floating Cargo",
+    id: "floating_cargo", scene: "open_sea", phase: "early", title: "Floating Cargo",
     text: "Barrels of rum drifting after a wreck. Dozens of them.",
     choices: [
       { text: "🍺 Pick them up", eff: { gold: [10, 25], crew: 1, karma: 0, curse: 0 }, msg: "Rum is the currency of the Caribbean. The crew rejoices." },
@@ -194,7 +194,7 @@ export const encountersEn: Encounter[] = [
     ],
   },
   {
-    id: "pirate_rival", scene: "combat", title: "Black Barrett",
+    id: "pirate_rival", scene: "combat", phase: "mid", weight: 1.2, title: "Black Barrett",
     text: "A pirate brig. The captain is a notorious cutthroat. He shouts an offer.",
     choices: [
       { text: "⚔️ Fight", eff: { gold: [20, 70], crew: [-3, -1], karma: 0, curse: 0 }, msg: "Barrett fights like a demon. But you're better." },
@@ -214,7 +214,7 @@ export const encountersEn: Encounter[] = [
     ],
   },
   {
-    id: "spanish_galleon", scene: "combat", title: "Spanish Galleon!",
+    id: "spanish_galleon", scene: "combat", phase: "mid", weight: 1.2, title: "Spanish Galleon!",
     text: "The golden flag of Castile. A massive ship. Slow, but with 40 cannons.",
     choices: [
       { text: "⚔️ Dawn attack", eff: { gold: [40, 100], crew: [-4, -2], karma: -1, curse: 0 }, msg: s => s.flags?.has("has_guide") ? "The guide knows the reefs — you lure the galleon onto the shallows. Easy prey!" : "Head-on assault. The cannons are devastating. But boarding is your element." },
@@ -224,7 +224,7 @@ export const encountersEn: Encounter[] = [
   },
   // ── SUPERNATURAL ──
   {
-    id: "sirens_song", scene: "ethereal", title: "Song in the Fog",
+    id: "sirens_song", scene: "ethereal", family: "setpiece", phase: ["mid", "late"], weight: 0.7, exclusivityGroup: "supernatural_sirens", title: "Song in the Fog",
     text: "A melody with no source. The crew freezes. Someone steps toward the rail.",
     choices: [
       { text: "🔇 Wax in ears", eff: { gold: 0, crew: 0, karma: 0, curse: 0 }, msg: "It works. But the melody was beautiful." },
@@ -244,7 +244,7 @@ export const encountersEn: Encounter[] = [
     ],
   },
   {
-    id: "ghost_ship", scene: "combat", enemyType: "ghost", title: "Ghost Ship",
+    id: "ghost_ship", scene: "combat", enemyType: "ghost", family: "setpiece", phase: ["mid", "late"], weight: 0.7, exclusivityGroup: "supernatural_ghost", title: "Ghost Ship",
     text: "A rotting galleon with no flag. On the deck — skeletons that move.",
     choices: [
       { text: "💀 Board it!", eff: { gold: [30, 80], crew: [-2, 0], karma: 0, curse: 4 }, msg: "The skeletons fight in silence. In the hold — a map to a place that shouldn't exist.", flag: "ghost_map" },
@@ -253,7 +253,7 @@ export const encountersEn: Encounter[] = [
     ],
   },
   {
-    id: "kraken_attack", scene: "kraken", title: "KRAKEN!",
+    id: "kraken_attack", scene: "kraken", family: "setpiece", phase: ["mid", "late"], weight: 0.7, exclusivityGroup: "supernatural_kraken", title: "KRAKEN!",
     text: "The water boils. Tentacles thick as the mast coil around the ship.",
     choices: [
       { text: "⚔️ Hack away!", eff: { gold: 0, crew: [-4, -2], karma: 0, curse: 0 }, msg: s => s.flags?.has("armed") ? "The weapons sever the tentacles! The Kraken retreats." : "Axes against flesh. A long fight." },
@@ -661,7 +661,7 @@ export const encountersEn: Encounter[] = [
 
   // Pure narrative encounters
   {
-    id: "dream_sequence", scene: "ethereal", title: "Captain's Dream",
+    id: "dream_sequence", scene: "ethereal", family: "ambient", phase: "mid", exclusivityGroup: "dream", title: "Captain's Dream",
     text: "A dream: you are underwater. Breathing. A city of mother-of-pearl.",
     requires: s => s.curse >= 5,
     choices: [
@@ -700,7 +700,7 @@ export const encountersEn: Encounter[] = [
 
   // Chain encounters
   {
-    id: "merchant_mysterious", scene: "port", title: "Mysterious Merchant",
+    id: "merchant_mysterious", scene: "port", family: "quest", exclusivityGroup: "mysterious_merchant", title: "Mysterious Merchant",
     text: "Vanishes into shadows the moment you look away. Offers 'what you desire most'.",
     choices: [
       { text: "💰 'Gold'", eff: { chain: "merchant_gold_test" }, msg: "He smiles..." },
@@ -748,7 +748,7 @@ export const encountersEn: Encounter[] = [
 
   // ── LATE-GAME CLIMAX (days 17-19) ──
   {
-    id: "final_reckoning", scene: "ethereal", title: "Voice of the Sea",
+    id: "final_reckoning", scene: "ethereal", family: "setpiece", phase: "late", weight: 0.8, title: "Voice of the Sea",
     text: s => {
       if (s.curse >= 10) return "The sea speaks in your voice. 'Time to choose. Stay or return?'";
       if (s.karma >= 5) return "Golden glow on the horizon. Shore? Or something greater?";
@@ -763,7 +763,7 @@ export const encountersEn: Encounter[] = [
     ],
   },
   {
-    id: "sea_judges", scene: "ethereal", title: "Court of the Seas",
+    id: "sea_judges", scene: "ethereal", family: "setpiece", phase: "late", weight: 0.8, title: "Court of the Seas",
     text: s => {
       const crimes = [s.flags?.has("village_curse") && "the village", s.flags?.has("arms_dealer_enemy") && "the arms dealer", s.flags?.has("port_royal_enemy") && "Port Royal"].filter(Boolean);
       return crimes.length > 0
@@ -886,7 +886,7 @@ export const encountersEn: Encounter[] = [
     ],
   },
   {
-    id: "old_friend", scene: "port", title: "Old Acquaintance",
+    id: "old_friend", scene: "port", family: "quest", exclusivityGroup: "old_friend", title: "Old Acquaintance",
     text: "A face from the past. Smiling. 'Got a deal. Meet me at the reefs in three days.'",
     choices: [
       { text: "🤝 Agree", eff: { gold: 0, crew: 0, karma: 0, curse: 0, delay: { daysLater: 3, encounterId: "old_friend_trap" } }, msg: "'Don't be late.' Disappears into the crowd.", flag: "old_friend_deal" },
