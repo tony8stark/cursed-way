@@ -29,6 +29,7 @@ export function getCursedGalleon(locale: Locale): Quest {
       karma: 0,
       curse: 0,
       day: 1,
+      watch: 0,
       flags: new Set(),
       log: [],
       inventory: [],

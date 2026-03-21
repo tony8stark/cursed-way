@@ -36,7 +36,7 @@ export function GameCanvas({ scene, curse = 0, day = 0, enemyType }: Props) {
     const opts: SceneOpts = { curse, enemyType };
     if (state) {
       opts.shipVisual = getShipVisualState(state);
-      opts.atmosphere = getAtmosphere(day);
+      opts.atmosphere = getAtmosphere(day, state.watch);
     }
 
     const draw = () => {

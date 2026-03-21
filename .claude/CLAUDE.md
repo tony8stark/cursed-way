@@ -81,7 +81,8 @@ Mode stored in `useGameModeStore` (Zustand), persisted to localStorage. Saved wi
 - **Language toggle**: In Settings modal
 
 ## Game Mechanics
-- **Stats**: gold, crew, karma, curse, day
+- **Stats**: gold, crew, karma, curse, day, watch
+- **Watches**: 4 watches per day (dawn 🌅, day ☀️, dusk 🌆, night 🌙). Each sail/encounter = 1 watch. Day increments when all 4 watches spent. Passive artifact effects apply once per day (at dawn). Atmosphere visuals (sky/water colors, weather) tied to current watch.
 - **Flags**: Set<string> tracking player choices for consequence encounters
 - **Inventory**: string[] of artifact IDs with passive per-day effects
 - **Encounter picker**: Location-bound > consequence (60%) > normal. Filters by player map position

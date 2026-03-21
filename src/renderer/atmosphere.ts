@@ -41,7 +41,14 @@ const PALETTES: Record<TimeOfDay, AtmospherePalette> = {
   },
 };
 
-function getTimeOfDay(day: number): TimeOfDay {
+const WATCH_TO_TIME: TimeOfDay[] = ["dawn", "day", "dusk", "night"];
+
+function getTimeOfDay(day: number, watch?: number): TimeOfDay {
+  // If watch is provided, use it directly
+  if (watch !== undefined && watch >= 0 && watch <= 3) {
+    return WATCH_TO_TIME[watch];
+  }
+  // Legacy fallback for day-based time
   if (day <= 5) return "dawn";
   if (day <= 10) return "day";
   if (day <= 15) return "dusk";
@@ -64,8 +71,8 @@ function getWeather(day: number, encounterId?: string): WeatherType {
   return "rain";
 }
 
-export function getAtmosphere(day: number, encounterId?: string): AtmosphereState {
-  const time = getTimeOfDay(day);
+export function getAtmosphere(day: number, watch?: number, encounterId?: string): AtmosphereState {
+  const time = getTimeOfDay(day, watch);
   const weather = getWeather(day, encounterId);
   return {
     time,

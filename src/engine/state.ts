@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import type { GameState, Encounter, Choice, LogEntry, SerializedGameState, Quest } from "./types";
+import type { GameState, Watch, Encounter, Choice, LogEntry, SerializedGameState, Quest } from "./types";
 import { resolveValue } from "./effects";
 import { pickEncounter } from "./encounter-picker";
 import { type MapState, createMapState, revealAround, serializeMap, deserializeMap } from "../renderer/world-map";
@@ -32,6 +32,17 @@ interface GameStore {
 
 const SAVE_KEY = "cursed-way-save";
 
+/** Advance watch by 1, rolling over to next day when all 4 watches are spent */
+function advanceWatch(state: { day: number; watch: Watch }): { day: number; watch: Watch; newDay: boolean } {
+  const nextWatch = ((state.watch + 1) % 4) as Watch;
+  const newDay = nextWatch === 0; // rolled over from night(3) to dawn(0)
+  return {
+    day: newDay ? state.day + 1 : state.day,
+    watch: nextWatch,
+    newDay,
+  };
+}
+
 function serialize(state: GameState, mapState: MapState | null): SerializedGameState {
   return {
     ...state,
@@ -50,7 +61,13 @@ function deserialize(data: SerializedGameState): { state: GameState; mapState: M
     useGameModeStore.getState().setMode(gameMode);
   }
   return {
-    state: { ...rest, flags: new Set(data.flags), inventory: data.inventory ?? [], delayedEffects: data.delayedEffects ?? [] },
+    state: {
+      ...rest,
+      watch: (data.watch ?? 0) as Watch,
+      flags: new Set(data.flags),
+      inventory: data.inventory ?? [],
+      delayedEffects: data.delayedEffects ?? [],
+    },
     mapState: mapData ? deserializeMap(mapData) : null,
   };
 }
@@ -70,8 +87,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
   startGame: () => {
     const { quest } = get();
     if (!quest) return;
-    const state = {
+    const state: GameState = {
       ...quest.initialState,
+      watch: 0 as Watch, // Start at dawn
       flags: new Set(quest.initialState.flags),
       log: [],
       inventory: [...(quest.initialState.inventory ?? [])],
@@ -105,26 +123,32 @@ export const useGameStore = create<GameStore>((set, get) => ({
       return;
     }
 
-    // Low crew penalties: morale drops, risk of losing gold
-    if (state.crew <= 2 && state.crew > 0) {
-      state.karma = Math.round((state.karma - 0.5) * 10) / 10;
-    }
+    // Advance watch (each sail action = 1 watch)
+    const { day: newDay, watch: newWatch, newDay: isDayTransition } = advanceWatch(state);
 
-    // Apply passive artifact effects
-    if (state.inventory.length > 0) {
-      for (const itemId of state.inventory) {
-        const def = ARTIFACTS[itemId];
-        if (def?.passive) {
-          (state as unknown as Record<string, number>)[def.passive.stat] += def.passive.perDay;
-        }
+    // Apply daily effects only at dawn (new day transition)
+    if (isDayTransition) {
+      // Low crew penalties: morale drops
+      if (state.crew <= 2 && state.crew > 0) {
+        state.karma = Math.round((state.karma - 0.5) * 10) / 10;
       }
-      state.crew = Math.max(0, Math.round(state.crew));
-      state.curse = Math.max(0, state.curse);
-      state.gold = Math.max(0, Math.round(state.gold));
+
+      // Apply passive artifact effects (once per day)
+      if (state.inventory.length > 0) {
+        for (const itemId of state.inventory) {
+          const def = ARTIFACTS[itemId];
+          if (def?.passive) {
+            (state as unknown as Record<string, number>)[def.passive.stat] += def.passive.perDay;
+          }
+        }
+        state.crew = Math.max(0, Math.round(state.crew));
+        state.curse = Math.max(0, state.curse);
+        state.gold = Math.max(0, Math.round(state.gold));
+      }
     }
 
     // Check for triggered delayed effects
-    const triggered = state.delayedEffects.filter(d => d.triggerDay <= state.day + 1);
+    const triggered = state.delayedEffects.filter(d => d.triggerDay <= newDay);
     if (triggered.length > 0) {
       const delayed = triggered[0];
       const forcedEnc = quest.encounters.find(e => e.id === delayed.encounterId);
@@ -134,7 +158,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           encounter: forcedEnc,
           result: null,
           screen: "encounter",
-          state: { ...state, day: state.day + 1, delayedEffects: remaining },
+          state: { ...state, day: newDay, watch: newWatch, delayedEffects: remaining },
         });
         setTimeout(() => get().save(), 0);
         return;
@@ -184,7 +208,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       encounter: enc,
       result: null,
       screen: "encounter",
-      state: { ...state, day: state.day + 1 },
+      state: { ...state, day: newDay, watch: newWatch },
       mapState: mapState ? { ...mapState } : null,
     });
 

@@ -4,12 +4,15 @@ export interface DelayedEffect {
   hint?: string;
 }
 
+export type Watch = 0 | 1 | 2 | 3; // 0=dawn, 1=day, 2=dusk, 3=night
+
 export interface GameState {
   gold: number;
   crew: number;
   karma: number;
   curse: number;
   day: number;
+  watch: Watch;
   flags: Set<string>;
   log: LogEntry[];
   inventory: string[];
@@ -22,6 +25,7 @@ export interface SerializedGameState {
   karma: number;
   curse: number;
   day: number;
+  watch?: Watch;
   flags: string[];
   log: LogEntry[];
   inventory?: string[];

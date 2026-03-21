@@ -7,6 +7,9 @@ interface Props {
   state: GameState;
 }
 
+const WATCH_ICONS = ["🌅", "☀️", "🌆", "🌙"] as const;
+const WATCH_COLORS = ["#f0a040", "#f0e040", "#f06040", "#4040a0"] as const;
+
 function StatBox({ label, value, color, warning }: { label: string; value: string | number; color: string; warning?: boolean }) {
   return (
     <motion.div
@@ -37,6 +40,9 @@ export function StatsBar({ state }: Props) {
     ? (cr > 0.5 ? `${state.day}̷/̶2̸0̷` : `${state.day}/20`)
     : String(state.day);
 
+  const watchIcon = WATCH_ICONS[state.watch] ?? "🌅";
+  const watchColor = WATCH_COLORS[state.watch] ?? "#c8c8d8";
+
   return (
     <div className="flex gap-1.5 flex-wrap mb-3">
       <StatBox label={t("gold")} value={state.gold} color="#f0c040" />
@@ -45,6 +51,11 @@ export function StatsBar({ state }: Props) {
         label={t("day")}
         value={dayDisplay}
         color={cr > 0.5 ? "#8020c0" : "#c8c8d8"}
+      />
+      <StatBox
+        label={t("watch")}
+        value={watchIcon}
+        color={watchColor}
       />
       <AnimatePresence>
         {state.curse > 0 && (
