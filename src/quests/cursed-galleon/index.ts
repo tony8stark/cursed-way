@@ -2,6 +2,8 @@ import type { Quest } from "../../engine/types";
 import type { Locale } from "../../i18n";
 import { encounters } from "./encounters";
 import { encountersEn } from "./encounters-en";
+import { questlineEncounters } from "./questlines";
+import { questlineEncountersEn } from "./questlines-en";
 import { endings } from "./endings";
 import { endingsEn } from "./endings-en";
 
@@ -21,7 +23,7 @@ export function getCursedGalleon(locale: Locale): Quest {
     id: "cursed-galleon",
     title: questData[locale].title,
     description: questData[locale].description,
-    encounters: locale === "en" ? encountersEn : encounters,
+    encounters: locale === "en" ? [...encountersEn, ...questlineEncountersEn] : [...encounters, ...questlineEncounters],
     endings: locale === "en" ? endingsEn : endings,
     initialState: {
       gold: 30,
