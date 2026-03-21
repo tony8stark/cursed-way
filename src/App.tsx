@@ -91,7 +91,7 @@ export default function App() {
 
   return (
     <div
-      className="min-h-screen flex flex-col items-center px-3 py-4 font-game text-[#c8c8d8] transition-all duration-500 overflow-hidden relative"
+      className="min-h-screen flex flex-col items-center px-6 py-4 font-game text-[#c8c8d8] transition-all duration-500 overflow-hidden relative"
       style={{
         background: glitch
           ? `linear-gradient(${Math.random() * 360}deg, #1a0a2e, #0a1a1a)`

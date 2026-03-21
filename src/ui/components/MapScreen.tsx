@@ -66,115 +66,125 @@ export function MapScreen() {
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="w-full max-w-[600px]"
+      className="w-full max-w-[1100px] flex gap-4"
     >
-      <StatsBar state={state} />
-      <InventoryBar inventory={state.inventory} />
+      {/* Left: Map canvas (takes most space) */}
+      <div className="flex-1 min-w-0">
+        <canvas
+          ref={canvasRef}
+          width={520}
+          height={300}
+          className="w-full rounded border-2 transition-colors duration-500"
+          style={{
+            imageRendering: "pixelated",
+            borderColor: state.curse > 10 ? "#8020c0" : "#1a3a5e",
+          }}
+        />
+      </div>
 
-      <canvas
-        ref={canvasRef}
-        width={420}
-        height={240}
-        className="w-full max-w-[840px] rounded border-2 transition-colors duration-500"
-        style={{
-          imageRendering: "pixelated",
-          borderColor: state.curse > 10 ? "#8020c0" : "#1a3a5e",
-        }}
-      />
+      {/* Right: Sidebar with stats, inventory, navigation */}
+      <div className="w-[260px] shrink-0 flex flex-col gap-3">
+        <StatsBar state={state} />
+        <InventoryBar inventory={state.inventory} />
 
-      <div className="text-center mt-4">
-        {destinations.length > 0 ? (
-          <div className="flex flex-col gap-2">
-            <div className="font-game text-[9px] text-white/40 mb-1">
-              {t("chooseDestination")}
+        {/* Navigation panel */}
+        <div className="rounded border border-white/10 bg-black/30 px-3 py-3">
+          {destinations.length > 0 ? (
+            <div className="flex flex-col gap-2">
+              <div className="font-game text-[8px] text-white/40 mb-1">
+                {t("chooseDestination")}
+              </div>
+              {destinations.map(d => (
+                <motion.button
+                  key={`${d.pos[0]},${d.pos[1]}`}
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
+                  onClick={() => handleSetDestination(d.pos)}
+                  className="game-btn font-game text-[9px] px-3 py-2 border bg-transparent cursor-pointer transition-all duration-200 text-left"
+                  style={{ color: "#40c0f0", borderColor: "#40c0f0" }}
+                  onMouseOver={e => {
+                    e.currentTarget.style.background = "#40c0f0";
+                    e.currentTarget.style.color = "#0a0a1a";
+                  }}
+                  onMouseOut={e => {
+                    e.currentTarget.style.background = "transparent";
+                    e.currentTarget.style.color = "#40c0f0";
+                  }}
+                >
+                  {d.icon} {d.name[locale]}
+                </motion.button>
+              ))}
             </div>
-            {destinations.map(d => (
-              <motion.button
-                key={`${d.pos[0]},${d.pos[1]}`}
-                whileHover={{ scale: 1.03 }}
-                whileTap={{ scale: 0.97 }}
-                onClick={() => handleSetDestination(d.pos)}
-                className="game-btn font-game text-[10px] px-4 py-2.5 border bg-transparent cursor-pointer transition-all duration-200"
-                style={{ color: "#40c0f0", borderColor: "#40c0f0" }}
-                onMouseOver={e => {
-                  e.currentTarget.style.background = "#40c0f0";
-                  e.currentTarget.style.color = "#0a0a1a";
-                }}
-                onMouseOut={e => {
-                  e.currentTarget.style.background = "transparent";
-                  e.currentTarget.style.color = "#40c0f0";
-                }}
-              >
-                {d.icon} {d.name[locale]}
-              </motion.button>
-            ))}
-          </div>
-        ) : (
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={handleSail}
-            className="game-btn font-game text-[12px] px-6 py-3.5 border-2 bg-transparent cursor-pointer transition-all duration-200"
-            style={{
-              color: cr > 0.6 ? "#8020c0" : "#40c0f0",
-              borderColor: cr > 0.6 ? "#8020c0" : "#40c0f0",
-            }}
-            onMouseOver={e => {
-              const el = e.currentTarget;
-              el.style.background = cr > 0.6 ? "#8020c0" : "#40c0f0";
-              el.style.color = "#0a0a1a";
-            }}
-            onMouseOut={e => {
-              const el = e.currentTarget;
-              el.style.background = "transparent";
-              el.style.color = cr > 0.6 ? "#8020c0" : "#40c0f0";
-            }}
-          >
-            {isEnRoute ? t("enRoute") : (cr > 0.6 ? t("sailGlitch") : t("sailContinue"))}
-          </motion.button>
-        )}
-
-        {state.delayedEffects
-          .filter(d => d.hint && d.triggerDay - state.day <= 2)
-          .map((d, i) => (
-            <motion.div
-              key={`hint-${i}`}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: [0.3, 0.6, 0.3] }}
-              transition={{ duration: 3, repeat: Infinity }}
-              className="mt-2 font-game text-[8px] text-yellow-400/50"
+          ) : (
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={handleSail}
+              className="game-btn font-game text-[11px] w-full px-4 py-3 border-2 bg-transparent cursor-pointer transition-all duration-200"
+              style={{
+                color: cr > 0.6 ? "#8020c0" : "#40c0f0",
+                borderColor: cr > 0.6 ? "#8020c0" : "#40c0f0",
+              }}
+              onMouseOver={e => {
+                const el = e.currentTarget;
+                el.style.background = cr > 0.6 ? "#8020c0" : "#40c0f0";
+                el.style.color = "#0a0a1a";
+              }}
+              onMouseOut={e => {
+                const el = e.currentTarget;
+                el.style.background = "transparent";
+                el.style.color = cr > 0.6 ? "#8020c0" : "#40c0f0";
+              }}
             >
-              {d.hint}
-            </motion.div>
-          ))}
+              {isEnRoute ? t("enRoute") : (cr > 0.6 ? t("sailGlitch") : t("sailContinue"))}
+            </motion.button>
+          )}
+        </div>
 
-        {state.curse > 0 && state.curse < 5 && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="mt-3 font-game text-[9px] text-[#8020c0]/50"
-          >
-            {t("curseHint1")}
-          </motion.div>
-        )}
-        {state.curse >= 5 && state.curse < 10 && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="mt-3 font-game text-[9px] text-[#8020c0]/70"
-          >
-            {t("curseHint2")}
-          </motion.div>
-        )}
-        {state.curse >= 10 && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="mt-3 font-game text-[9px] text-[#8020c0]"
-          >
-            {t("curseHint3")}
-          </motion.div>
-        )}
+        {/* Hints & delayed effects */}
+        <div className="flex flex-col gap-1.5">
+          {state.delayedEffects
+            .filter(d => d.hint && d.triggerDay - state.day <= 2)
+            .map((d, i) => (
+              <motion.div
+                key={`hint-${i}`}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: [0.3, 0.6, 0.3] }}
+                transition={{ duration: 3, repeat: Infinity }}
+                className="font-game text-[7px] text-yellow-400/50 px-1"
+              >
+                {d.hint}
+              </motion.div>
+            ))}
+
+          {state.curse > 0 && state.curse < 5 && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="font-game text-[8px] text-[#8020c0]/50 px-1"
+            >
+              {t("curseHint1")}
+            </motion.div>
+          )}
+          {state.curse >= 5 && state.curse < 10 && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="font-game text-[8px] text-[#8020c0]/70 px-1"
+            >
+              {t("curseHint2")}
+            </motion.div>
+          )}
+          {state.curse >= 10 && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="font-game text-[8px] text-[#8020c0] px-1"
+            >
+              {t("curseHint3")}
+            </motion.div>
+          )}
+        </div>
       </div>
     </motion.div>
   );

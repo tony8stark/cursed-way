@@ -20,8 +20,6 @@ export function EncounterScreen() {
     }
   }, [encounter?.scene]);
 
-  // encounter SFX removed — splash already plays on sail action
-
   const handleChoice = useCallback((choice: Choice) => {
     audioManager.playSFX("click");
 
@@ -76,36 +74,15 @@ export function EncounterScreen() {
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="w-full max-w-[600px]"
+      className="w-full max-w-[1100px] flex gap-4"
     >
-      <StatsBar state={state} />
-      <InventoryBar inventory={state.inventory} />
-      <GameCanvas scene={scene} curse={state.curse} day={state.day} enemyType={encounter.enemyType} />
+      {/* Left: Scene canvas */}
+      <div className="flex-1 min-w-0 flex flex-col gap-3">
+        <GameCanvas scene={scene} curse={state.curse} day={state.day} enemyType={encounter.enemyType} />
 
-      <div className="mt-3.5">
-        <motion.div
-          initial={{ x: -20, opacity: 0 }}
-          animate={{ x: 0, opacity: 1 }}
-          className="mb-2"
-        >
-          <span
-            className="font-game text-[12px]"
-            style={{ color: encounter.requires ? "#8020c0" : "#f0c040" }}
-          >
-            {title}
-          </span>
-        </motion.div>
-
-        <div className="mb-4 leading-[2.4]">
-          <TypewriterText
-            text={text}
-            speed={25}
-            className="font-game text-[10px] text-[#c8c8d8]"
-          />
-        </div>
-
+        {/* Choices below canvas */}
         {!result ? (
-          <div className="flex flex-col gap-2.5">
+          <div className="flex flex-col gap-2">
             {encounter.choices
               .filter(ch => !ch.requires_item || state.inventory.includes(ch.requires_item))
               .map((ch, i) => (
@@ -123,7 +100,7 @@ export function EncounterScreen() {
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
           >
-            <div className="bg-white/[0.04] border border-white/[0.12] rounded px-3.5 py-3 mb-4 leading-[2.4]">
+            <div className="bg-white/[0.04] border border-white/[0.12] rounded px-3.5 py-3 mb-3 leading-[2.4]">
               <TypewriterText
                 text={result}
                 speed={20}
@@ -142,6 +119,36 @@ export function EncounterScreen() {
             <span className="font-game text-[8px] text-white/20 ml-3">[Space]</span>
           </motion.div>
         )}
+      </div>
+
+      {/* Right: Stats sidebar + encounter text */}
+      <div className="w-[280px] shrink-0 flex flex-col gap-3">
+        <StatsBar state={state} />
+        <InventoryBar inventory={state.inventory} />
+
+        {/* Encounter narrative */}
+        <div className="rounded border border-white/10 bg-black/30 px-3 py-3 flex-1">
+          <motion.div
+            initial={{ x: -20, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            className="mb-3"
+          >
+            <span
+              className="font-game text-[11px]"
+              style={{ color: encounter.requires ? "#8020c0" : "#f0c040" }}
+            >
+              {title}
+            </span>
+          </motion.div>
+
+          <div className="leading-[2.4]">
+            <TypewriterText
+              text={text}
+              speed={25}
+              className="font-game text-[9px] text-[#c8c8d8]"
+            />
+          </div>
+        </div>
       </div>
     </motion.div>
   );

@@ -81,9 +81,9 @@ export function GameCanvas({ scene, curse = 0, day = 0, enemyType }: Props) {
   return (
     <canvas
       ref={ref}
-      width={380}
-      height={210}
-      className="w-full max-w-[760px] rounded border-2 transition-colors duration-500"
+      width={520}
+      height={300}
+      className="w-full rounded border-2 transition-colors duration-500"
       style={{
         imageRendering: "pixelated",
         borderColor: curse > 10 ? "#8020c0" : "#2a2a5e",
