@@ -1,13 +1,15 @@
 import { motion } from "framer-motion";
-import { GameCanvas } from "./GameCanvas";
 import { useGameStore } from "../../engine/state";
-import { useT } from "../../i18n";
+import { useT, useLocaleStore } from "../../i18n";
 import { useGameModeStore, type GameMode } from "../../engine/game-mode";
+import { useOriginStore, ORIGINS } from "../../engine/origins";
 
 export function TitleScreen() {
   const { startGame, load } = useGameStore();
   const t = useT();
+  const locale = useLocaleStore(s => s.locale);
   const { mode, setMode } = useGameModeStore();
+  const { origin, setOrigin } = useOriginStore();
   const hasSave = !!localStorage.getItem("cursed-way-save");
   const [line1, line2] = t("gameTitle").split("\n");
 
@@ -16,17 +18,19 @@ export function TitleScreen() {
     { code: "free_roam", label: t("modeFreeRoam"), desc: t("modeFreeRoamDesc") },
   ];
 
+  const selectedOrigin = ORIGINS.find(o => o.id === origin)!;
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="text-center mt-10 max-w-[600px] mx-auto"
+      className="text-center mt-6 max-w-[700px] mx-auto"
     >
       <motion.div
         initial={{ y: -20 }}
         animate={{ y: 0 }}
         transition={{ duration: 0.8 }}
-        className="text-[11px] text-[#f0c040] mb-4 tracking-[2px] font-game"
+        className="text-[11px] text-[#f0c040] mb-3 tracking-[2px] font-game"
       >
         ☠ ☠ ☠
       </motion.div>
@@ -43,17 +47,8 @@ export function TitleScreen() {
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 0.5 }}
-        className="my-6"
-      >
-        <GameCanvas scene="open_sea" curse={0} day={0} />
-      </motion.div>
-
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.7 }}
-        className="mb-6 leading-[2.5]"
+        transition={{ delay: 0.4 }}
+        className="mb-4 leading-[2.5]"
       >
         <span className="font-game text-[10px] text-[#c8c8d8]">
           {t("tagline1")}
@@ -64,11 +59,54 @@ export function TitleScreen() {
         </span>
       </motion.div>
 
+      {/* Origin selector */}
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.5 }}
+        className="mb-4"
+      >
+        <div className="font-game text-[8px] text-white/40 mb-2">
+          {t("chooseOrigin")}
+        </div>
+        <div className="flex justify-center gap-2 flex-wrap">
+          {ORIGINS.map(o => (
+            <button
+              key={o.id}
+              onClick={() => setOrigin(o.id)}
+              className={`font-game text-[8px] px-3 py-2 rounded border transition-all duration-200 text-left min-w-[140px] ${
+                origin === o.id
+                  ? "border-[#f0c040] text-[#f0c040] bg-[#f0c040]/10"
+                  : "border-white/10 text-white/25 hover:text-white/40 hover:border-white/20"
+              }`}
+            >
+              <div>{o.icon} {o.name[locale]}</div>
+            </button>
+          ))}
+        </div>
+        {/* Selected origin description */}
+        <motion.div
+          key={origin}
+          initial={{ opacity: 0, y: 5 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mt-2 font-game text-[7px] text-white/40 leading-[2] max-w-[400px] mx-auto"
+        >
+          {selectedOrigin.desc[locale]}
+          <div className="mt-1 text-[#f0c040]/40">
+            {selectedOrigin.bonuses.gold ? `💰${selectedOrigin.bonuses.gold > 0 ? "+" : ""}${selectedOrigin.bonuses.gold}` : ""}
+            {selectedOrigin.bonuses.crew ? ` 👥${selectedOrigin.bonuses.crew > 0 ? "+" : ""}${selectedOrigin.bonuses.crew}` : ""}
+            {selectedOrigin.bonuses.karma ? ` ⚖️${selectedOrigin.bonuses.karma > 0 ? "+" : ""}${selectedOrigin.bonuses.karma}` : ""}
+            {selectedOrigin.bonuses.curse ? ` ☠️+${selectedOrigin.bonuses.curse}` : ""}
+            {selectedOrigin.items?.length ? ` 🎒${selectedOrigin.items.join(", ")}` : ""}
+          </div>
+        </motion.div>
+      </motion.div>
+
       {/* Game mode selector */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 0.8 }}
+        transition={{ delay: 0.6 }}
         className="flex justify-center gap-3 mb-5"
       >
         {modes.map(m => (
@@ -96,7 +134,7 @@ export function TitleScreen() {
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.9 }}
+        transition={{ delay: 0.7 }}
         className="flex flex-col items-center gap-3"
       >
         <button

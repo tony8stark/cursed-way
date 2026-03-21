@@ -18,6 +18,8 @@ export const encounters: Encounter[] = [
       { text: "💰 Купити зброю (−25)", eff: { gold: -25, crew: 0, karma: 0, curse: 0 }, msg: "Команда озброєна. Наступний бій буде легшим.", flag: "armed" },
       { text: "⚔️ Забрати силою", eff: { gold: [10, 30], crew: [-1, 0], karma: -2, curse: 0 }, msg: "Контрабандист поклявся помститися. Тепер він — ваш ворог.", flag: "arms_dealer_enemy" },
       { text: "🤝 Обмін інформацією", eff: { gold: 0, crew: 0, karma: 0, curse: 0 }, msg: "Розповідає про британський конвой через два дні.", flag: "knows_convoy" },
+      { text: "🗝️ [Контрабандист] Старі зв'язки", eff: { gold: -10, crew: 0, karma: 0, curse: 0 }, msg: "Ви знаєте рукостискання. Половина ціни, без питань. На додачу кидає бочку пороху.", flag: "armed", requires_flag: "origin_smuggler" },
+      { text: "⚓ [Флот] Стара комісія", eff: { gold: 0, crew: 0, karma: 0, curse: 0 }, msg: "Він блідне. Скидає зброю за борт і тікає. Ви вилучаєте непоганий пістолет.", flag: "armed", requires_flag: "origin_navy" },
     ],
   },
   {
@@ -198,6 +200,7 @@ export const encounters: Encounter[] = [
       { text: "⚔️ Бій", eff: { gold: [20, 70], crew: [-3, -1], karma: 0, curse: 0 }, msg: "Баррет б'ється як демон. Але ви — кращі." },
       { text: "🤝 Об'єднатися", eff: { gold: 0, crew: [2, 4], karma: 0, curse: 0 }, msg: "Два кораблі. Ненадійний союзник, але поки вигідний.", flag: "barret_alliance" },
       { text: "🍺 Ром і розмова", eff: { gold: -5, crew: 0, karma: 1, curse: 0 }, msg: "Баррет — балакучий п'яниця. Розповідає про острів, де пропадають кораблі.", flag: "knows_bermuda" },
+      { text: "🔥 [Бунтівник] 'Я вбив свого капітана. Хочеш побачити як?'", eff: { gold: [10, 30], crew: 0, karma: -1, curse: 0 }, msg: "Баррет замовкає. Вивчає ваше обличчя. 'Вірю.' Кидає мішок золота на палубу і швидко відпливає. Репутація має свої переваги.", requires_flag: "origin_mutineer" },
     ],
   },
   {
@@ -227,6 +230,7 @@ export const encounters: Encounter[] = [
       { text: "🔇 Воск у вуха", eff: { gold: 0, crew: 0, karma: 0, curse: 0 }, msg: "Працює. Але мелодія була красивою." },
       { text: "🎵 Слухати", eff: { gold: 0, crew: [-2, -1], karma: 0, curse: 3 }, msg: "Двоє стрибають за борт із посмішкою." },
       { text: "🎶 Заспівати у відповідь", eff: { gold: 0, crew: 0, karma: 0, curse: 2 }, msg: "Жіночий голос: 'Цікавий. Ми ще зустрінемося.' У тумані — очі.", flag: "siren_contact" },
+      { text: "📖 [Вчений] Прочитати Гімн Скування", eff: { gold: 0, crew: 0, karma: 0, curse: -1 }, msg: "Ви знаєте цю мелодію. Сторінка 47 Забороненого Кодексу. Ви вимовляєте контр-вірш. Спів обривається. Приголомшена тиша. Потім: 'Ти... знаєш старі слова.' Повага в голосі.", flag: "siren_contact", requires_flag: "origin_scholar" },
     ],
   },
   {

@@ -49,7 +49,7 @@ export function EncounterScreen() {
         return;
       }
       if (!encounter || !state) return;
-      const available = encounter.choices.filter(ch => !ch.requires_item || state.inventory.includes(ch.requires_item));
+      const available = encounter.choices.filter(ch => (!ch.requires_item || state.inventory.includes(ch.requires_item)) && (!ch.requires_flag || state.flags.has(ch.requires_flag)));
       const idx = parseInt(e.key) - 1;
       if (idx >= 0 && idx < available.length) {
         const ch = available[idx];
@@ -84,7 +84,7 @@ export function EncounterScreen() {
         {!result ? (
           <div className="flex flex-col gap-2">
             {encounter.choices
-              .filter(ch => !ch.requires_item || state.inventory.includes(ch.requires_item))
+              .filter(ch => (!ch.requires_item || state.inventory.includes(ch.requires_item)) && (!ch.requires_flag || state.flags.has(ch.requires_flag)))
               .map((ch, i) => (
               <ChoiceCard
                 key={i}

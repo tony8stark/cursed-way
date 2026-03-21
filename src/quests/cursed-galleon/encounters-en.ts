@@ -18,6 +18,8 @@ export const encountersEn: Encounter[] = [
       { text: "💰 Buy weapons (−25)", eff: { gold: -25, crew: 0, karma: 0, curse: 0 }, msg: "The crew is armed. The next fight will be easier.", flag: "armed" },
       { text: "⚔️ Take by force", eff: { gold: [10, 30], crew: [-1, 0], karma: -2, curse: 0 }, msg: "The smuggler swore revenge. Now he's your enemy.", flag: "arms_dealer_enemy" },
       { text: "🤝 Trade information", eff: { gold: 0, crew: 0, karma: 0, curse: 0 }, msg: "He tells of a British convoy passing in two days.", flag: "knows_convoy" },
+      { text: "🗝️ [Smuggler] Use your old contacts", eff: { gold: -10, crew: 0, karma: 0, curse: 0 }, msg: "You know the handshake. Half price, no questions. He throws in a keg of powder.", flag: "armed", requires_flag: "origin_smuggler" },
+      { text: "⚓ [Navy] Flash your old commission", eff: { gold: 0, crew: 0, karma: 0, curse: 0 }, msg: "He goes pale. Dumps the weapons overboard and flees. You fish out a fine pistol.", flag: "armed", requires_flag: "origin_navy" },
     ],
   },
   {
@@ -198,6 +200,7 @@ export const encountersEn: Encounter[] = [
       { text: "⚔️ Fight", eff: { gold: [20, 70], crew: [-3, -1], karma: 0, curse: 0 }, msg: "Barrett fights like a demon. But you're better." },
       { text: "🤝 Join forces", eff: { gold: 0, crew: [2, 4], karma: 0, curse: 0 }, msg: "Two ships. An unreliable ally, but useful for now.", flag: "barret_alliance" },
       { text: "🍺 Rum and a chat", eff: { gold: -5, crew: 0, karma: 1, curse: 0 }, msg: "Barrett is a chatty drunk. Tells of an island where ships vanish.", flag: "knows_bermuda" },
+      { text: "🔥 [Mutineer] 'I killed my last captain. Want to see how?'", eff: { gold: [10, 30], crew: 0, karma: -1, curse: 0 }, msg: "Barrett goes quiet. Studies your face. 'I believe you.' He tosses a sack of gold to your deck and sails away fast. Reputation has its uses.", requires_flag: "origin_mutineer" },
     ],
   },
   {
@@ -227,6 +230,7 @@ export const encountersEn: Encounter[] = [
       { text: "🔇 Wax in ears", eff: { gold: 0, crew: 0, karma: 0, curse: 0 }, msg: "It works. But the melody was beautiful." },
       { text: "🎵 Listen", eff: { gold: 0, crew: [-2, -1], karma: 0, curse: 3 }, msg: "Two leap overboard with smiles on their faces." },
       { text: "🎶 Sing back", eff: { gold: 0, crew: 0, karma: 0, curse: 2 }, msg: "A woman's voice: 'Interesting. We'll meet again.' In the fog — eyes.", flag: "siren_contact" },
+      { text: "📖 [Scholar] Recite the Binding Hymn", eff: { gold: 0, crew: 0, karma: 0, curse: -1 }, msg: "You know this melody. Page 47 of the Forbidden Codex. You speak the counter-verse. The song falters. A stunned silence. Then: 'You... know the old words.' Respect in the voice.", flag: "siren_contact", requires_flag: "origin_scholar" },
     ],
   },
   {

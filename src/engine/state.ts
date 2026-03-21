@@ -7,6 +7,7 @@ import { findNearestCell, getTerrainForScene, computeRoute, setActiveMap } from 
 import { generateMap } from "../renderer/map-generator";
 import { ARTIFACTS } from "./items";
 import { useGameModeStore } from "./game-mode";
+import { useOriginStore, getOrigin } from "./origins";
 
 type Screen = "title" | "sailing" | "encounter" | "ending";
 
@@ -112,12 +113,21 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const genMap = generateMap();
     setActiveMap(genMap);
 
+    // Apply origin bonuses
+    const origin = getOrigin(useOriginStore.getState().origin);
+    const baseFlags = new Set(quest.initialState.flags);
+    for (const f of origin.flags) baseFlags.add(f);
+
     const state: GameState = {
       ...quest.initialState,
+      gold: quest.initialState.gold + (origin.bonuses.gold ?? 0),
+      crew: quest.initialState.crew + (origin.bonuses.crew ?? 0),
+      karma: quest.initialState.karma + (origin.bonuses.karma ?? 0),
+      curse: quest.initialState.curse + (origin.bonuses.curse ?? 0),
       watch: 0 as Watch, // Start at dawn
-      flags: new Set(quest.initialState.flags),
+      flags: baseFlags,
       log: [],
-      inventory: [...(quest.initialState.inventory ?? [])],
+      inventory: [...(quest.initialState.inventory ?? []), ...(origin.items ?? [])],
       delayedEffects: [...(quest.initialState.delayedEffects ?? [])],
     };
     set({

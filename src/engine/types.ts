@@ -76,6 +76,7 @@ export interface Choice {
   msg: string | ((state: GameState) => string);
   flag?: string | ((state: GameState) => string | null);
   requires_item?: string;  // only show if player has this item
+  requires_flag?: string;  // only show if player has this flag (e.g. origin flags)
   hidden?: boolean;         // don't show stat changes in log
 }
 

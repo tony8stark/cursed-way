@@ -77,6 +77,8 @@ const translations = {
     modeExpeditionDesc: "20 днів. Виживи.",
     modeFreeRoam: "ВІЛЬНЕ ПЛАВАННЯ",
     modeFreeRoamDesc: "Без ліміту. Досліджуй.",
+    // Origin
+    chooseOrigin: "ХТО ВИ?",
     // Map
     mapTitle: "КАРТА",
     chooseDestination: "КУДИ ПЛИВЕМО?",
@@ -122,6 +124,7 @@ const translations = {
     modeExpeditionDesc: "20 days. Survive.",
     modeFreeRoam: "FREE ROAM",
     modeFreeRoamDesc: "No limit. Explore.",
+    chooseOrigin: "WHO ARE YOU?",
     mapTitle: "MAP",
     chooseDestination: "WHERE TO?",
     enRoute: "EN ROUTE",
