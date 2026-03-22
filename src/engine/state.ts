@@ -11,6 +11,7 @@ import { useOriginStore, getOrigin } from "./origins";
 import { useObjectiveStore } from "./objectives";
 import { defaultReps, originRepBonuses, applyRepChanges } from "./factions";
 import { checkLocationQuest } from "./location-quests";
+import { NPCS } from "./npcs";
 
 type Screen = "title" | "sailing" | "encounter" | "ending";
 
@@ -450,7 +451,35 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
     if (choice.flag) {
       const f = typeof choice.flag === "function" ? choice.flag(state) : choice.flag;
-      if (f) ns.flags.add(f);
+      if (f) {
+        ns.flags.add(f);
+        // Auto-track NPC meeting when a metFlag is set
+        if (!encounter.npc) {
+          const matchedNpc = Object.values(NPCS).find(n => n.metFlag === f);
+          if (matchedNpc && !state.flags.has(`met_npc_${matchedNpc.id}`)) {
+            ns.flags.add(`met_npc_${matchedNpc.id}`);
+            const encTitle = typeof encounter.title === "function" ? encounter.title(state) : encounter.title;
+            ns.npcMeetings.push({
+              npcId: matchedNpc.id,
+              day: state.day,
+              encounterId: encounter.id,
+              encounterTitle: encTitle,
+            });
+          }
+        }
+      }
+    }
+
+    // Track NPC meeting if encounter has an npc field
+    if (encounter.npc && !state.flags.has(`met_npc_${encounter.npc}`)) {
+      ns.flags.add(`met_npc_${encounter.npc}`);
+      const encTitle = typeof encounter.title === "function" ? encounter.title(state) : encounter.title;
+      ns.npcMeetings.push({
+        npcId: encounter.npc,
+        day: state.day,
+        encounterId: encounter.id,
+        encounterTitle: encTitle,
+      });
     }
 
     // Auto-flag combat actions for achievement tracking

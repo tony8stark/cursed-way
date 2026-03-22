@@ -123,6 +123,7 @@ export interface Encounter {
   choices: Choice[];
   enemyType?: "ghost" | "enemy";
   location?: string; // "x,y" key - only triggers at this map cell
+  npc?: string;      // NPC id - shows portrait in encounter screen
 
   // Storylet metadata (all optional for backward compat)
   family?: StoryletFamily;         // content category, default "ambient"

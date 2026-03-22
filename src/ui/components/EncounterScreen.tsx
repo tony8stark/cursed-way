@@ -1,4 +1,4 @@
-import { useEffect, useCallback } from "react";
+import { useEffect, useCallback, useMemo } from "react";
 import { motion } from "framer-motion";
 import { GameCanvas } from "./GameCanvas";
 import { StatsBar } from "./StatsBar";
@@ -11,6 +11,8 @@ import type { Choice } from "../../engine/types";
 import { InventoryBar } from "./InventoryBar";
 import { useObjectiveStore, getObjective } from "../../engine/objectives";
 import { FactionBar } from "./FactionBar";
+import { NPCPortraitDisplay } from "./NPCPortrait";
+import { NPCS } from "../../engine/npcs";
 
 export function EncounterScreen() {
   const { state, encounter, result, pendingChain, makeChoice, continueSailing, mapState } = useGameStore();
@@ -70,6 +72,25 @@ export function EncounterScreen() {
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
   }, [encounter, result, state, handleChoice, handleContinue]);
+
+  // Detect NPC: explicit field, encounter ID pattern, or choice flag match
+  const npcId = useMemo(() => {
+    if (!encounter) return null;
+    if (encounter.npc) return encounter.npc;
+    // Match encounter ID patterns to NPC IDs
+    const id = encounter.id;
+    if (id.startsWith("npc_bones")) return "first_mate_bones";
+    if (id.startsWith("npc_vega")) return "pirate_queen";
+    if (id.startsWith("npc_kojo")) return "bosun";
+    // Check if any choice sets a flag matching an NPC metFlag
+    for (const ch of encounter.choices) {
+      if (typeof ch.flag === "string") {
+        const npc = Object.values(NPCS).find(n => n.metFlag === ch.flag);
+        if (npc) return npc.id;
+      }
+    }
+    return null;
+  }, [encounter]);
 
   if (!state || !encounter) return null;
 
@@ -162,6 +183,9 @@ export function EncounterScreen() {
             </div>
           );
         })()}
+
+        {/* NPC portrait (if encounter involves an NPC) */}
+        {npcId && <NPCPortraitDisplay npcId={npcId} />}
 
         {/* Encounter narrative */}
         <div className="rounded border border-white/10 bg-black/30 px-3 py-3 flex-1">
