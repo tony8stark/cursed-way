@@ -200,7 +200,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           }
         }
         state.crew = Math.max(0, Math.round(state.crew));
-        state.curse = Math.max(0, state.curse);
+        state.curse = Math.max(0, Math.round(state.curse));
         state.gold = Math.max(0, Math.round(state.gold));
       }
     }
@@ -312,7 +312,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       gold: Math.max(0, state.gold + gd),
       crew: Math.max(0, state.crew + cd),
       karma: Math.round((state.karma + (choice.eff.karma || 0)) * 10) / 10,
-      curse: Math.max(0, state.curse + (choice.eff.curse || 0)),
+      curse: Math.max(0, Math.round(state.curse + (choice.eff.curse || 0))),
       log: [...state.log],
       inventory: [...state.inventory],
       delayedEffects: [...state.delayedEffects],

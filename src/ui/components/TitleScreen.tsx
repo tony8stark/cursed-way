@@ -68,7 +68,7 @@ export function TitleScreen() {
         transition={{ delay: 0.5 }}
         className="mb-4"
       >
-        <div className="font-game text-[8px] text-white/40 mb-2">
+        <div className="font-game text-[8px] text-white/55 mb-2">
           {t("chooseOrigin")}
         </div>
         <div className="flex justify-center gap-2 flex-wrap">
@@ -79,7 +79,7 @@ export function TitleScreen() {
               className={`font-game text-[8px] px-3 py-2 rounded border transition-all duration-200 text-left min-w-[140px] ${
                 origin === o.id
                   ? "border-[#f0c040] text-[#f0c040] bg-[#f0c040]/10"
-                  : "border-white/10 text-white/25 hover:text-white/40 hover:border-white/20"
+                  : "border-white/15 text-white/45 hover:text-white/60 hover:border-white/30"
               }`}
             >
               <div>{o.icon} {o.name[locale]}</div>
@@ -91,10 +91,10 @@ export function TitleScreen() {
           key={origin}
           initial={{ opacity: 0, y: 5 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mt-2 font-game text-[7px] text-white/40 leading-[2] max-w-[400px] mx-auto"
+          className="mt-2 font-game text-[7px] text-white/60 leading-[2] max-w-[400px] mx-auto"
         >
           {selectedOrigin.desc[locale]}
-          <div className="mt-1 text-[#f0c040]/40">
+          <div className="mt-1 text-[#f0c040]/60">
             {selectedOrigin.bonuses.gold ? `💰${selectedOrigin.bonuses.gold > 0 ? "+" : ""}${selectedOrigin.bonuses.gold}` : ""}
             {selectedOrigin.bonuses.crew ? ` 👥${selectedOrigin.bonuses.crew > 0 ? "+" : ""}${selectedOrigin.bonuses.crew}` : ""}
             {selectedOrigin.bonuses.karma ? ` ⚖️${selectedOrigin.bonuses.karma > 0 ? "+" : ""}${selectedOrigin.bonuses.karma}` : ""}
@@ -120,7 +120,7 @@ export function TitleScreen() {
                 ? m.code === "free_roam"
                   ? "border-[#40f8a0] text-[#40f8a0] bg-[#40f8a0]/10"
                   : "border-[#f0c040] text-[#f0c040] bg-[#f0c040]/10"
-                : "border-white/10 text-white/25 hover:text-white/40 hover:border-white/20"
+                : "border-white/15 text-white/45 hover:text-white/60 hover:border-white/30"
             }`}
           >
             <div>{m.label}</div>
@@ -141,7 +141,7 @@ export function TitleScreen() {
           transition={{ delay: 0.65 }}
           className="mb-4"
         >
-          <div className="font-game text-[8px] text-white/40 mb-2">
+          <div className="font-game text-[8px] text-white/55 mb-2">
             {t("chooseObjective")}
           </div>
           <div className="flex justify-center gap-2 flex-wrap">
@@ -150,7 +150,7 @@ export function TitleScreen() {
               className={`font-game text-[8px] px-3 py-2 rounded border transition-all duration-200 text-left min-w-[130px] ${
                 !objectiveId
                   ? "border-[#40f8a0] text-[#40f8a0] bg-[#40f8a0]/10"
-                  : "border-white/10 text-white/25 hover:text-white/40 hover:border-white/20"
+                  : "border-white/15 text-white/45 hover:text-white/60 hover:border-white/30"
               }`}
             >
               <div>🌊 {t("objectiveNone")}</div>
@@ -165,7 +165,7 @@ export function TitleScreen() {
                 className={`font-game text-[8px] px-3 py-2 rounded border transition-all duration-200 text-left min-w-[130px] ${
                   objectiveId === obj.id
                     ? "border-[#f0c040] text-[#f0c040] bg-[#f0c040]/10"
-                    : "border-white/10 text-white/25 hover:text-white/40 hover:border-white/20"
+                    : "border-white/15 text-white/45 hover:text-white/60 hover:border-white/30"
                 }`}
               >
                 <div>{obj.icon} {obj.name[locale]}</div>

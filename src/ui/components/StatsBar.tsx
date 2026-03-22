@@ -11,6 +11,8 @@ const WATCH_ICONS = ["🌅", "☀️", "🌆", "🌙"] as const;
 const WATCH_COLORS = ["#f0a040", "#f0e040", "#f06040", "#4040a0"] as const;
 
 function StatBox({ label, value, color, warning }: { label: string; value: string | number; color: string; warning?: boolean }) {
+  const strVal = String(value);
+  const isLong = strVal.length > 3;
   return (
     <motion.div
       layout
@@ -19,10 +21,10 @@ function StatBox({ label, value, color, warning }: { label: string; value: strin
     >
       <div className="font-game text-[7px] text-white/40 leading-relaxed">{label}</div>
       <motion.div
-        key={String(value)}
+        key={strVal}
         initial={{ scale: 1.4, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
-        className="font-game text-[13px] leading-relaxed"
+        className={`font-game leading-relaxed ${isLong ? "text-[10px]" : "text-[13px]"}`}
         style={{ color: warning ? "#c02020" : color }}
       >
         {value}
@@ -45,8 +47,8 @@ export function StatsBar({ state }: Props) {
 
   return (
     <div className="flex gap-1.5 flex-wrap mb-3">
-      <StatBox label={t("gold")} value={state.gold} color="#f0c040" />
-      <StatBox label={t("crew")} value={state.crew} color="#40c0f0" warning={state.crew <= 3} />
+      <StatBox label={t("gold")} value={Math.round(state.gold)} color="#f0c040" />
+      <StatBox label={t("crew")} value={Math.round(state.crew)} color="#40c0f0" warning={state.crew <= 3} />
       <StatBox
         label={t("day")}
         value={dayDisplay}
@@ -67,7 +69,7 @@ export function StatsBar({ state }: Props) {
           >
             <StatBox
               label={cr > 0.6 ? t("curseGlitch") : t("curse")}
-              value={state.curse}
+              value={Math.round(state.curse)}
               color="#8020c0"
             />
           </motion.div>
