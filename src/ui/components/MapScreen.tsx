@@ -272,8 +272,9 @@ export function MapScreen() {
           {state.curse > 0 && state.curse < 5 && (
             <motion.div
               initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="font-game text-[8px] text-[#c878f0] px-1"
+              animate={{ opacity: [0.7, 1, 0.7] }}
+              transition={{ duration: 4, repeat: Infinity }}
+              className="font-game text-[8px] text-[#e0a0ff] px-1"
             >
               {t("curseHint1")}
             </motion.div>
@@ -281,8 +282,9 @@ export function MapScreen() {
           {state.curse >= 5 && state.curse < 10 && (
             <motion.div
               initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="font-game text-[8px] text-[#e060e0] px-1"
+              animate={{ opacity: [0.7, 1, 0.7] }}
+              transition={{ duration: 3, repeat: Infinity }}
+              className="font-game text-[8px] text-[#ff80e0] px-1"
             >
               {t("curseHint2")}
             </motion.div>
@@ -290,8 +292,9 @@ export function MapScreen() {
           {state.curse >= 10 && (
             <motion.div
               initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="font-game text-[8px] text-[#ff50ff] px-1"
+              animate={{ opacity: [0.8, 1, 0.8] }}
+              transition={{ duration: 2, repeat: Infinity }}
+              className="font-game text-[8px] text-[#ff60ff] px-1 drop-shadow-[0_0_6px_rgba(255,96,255,0.5)]"
             >
               {t("curseHint3")}
             </motion.div>
