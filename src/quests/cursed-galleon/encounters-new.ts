@@ -23,6 +23,7 @@ export const newEncounters: Encounter[] = [
   },
   {
     id: "port_slave_market", scene: "port", phase: "mid", family: "setpiece", weight: 0.8, title: "Невольничий ринок",
+    locationName: "Port Royal",
     text: "Порт-Ройял. Людей продають як худобу. Серед полонених бачите мореплавця з татуюванням Братства.",
     choices: [
       { text: "💰 Викупити (−20)", eff: { gold: -20, crew: 2, karma: 3, curse: 0, rep: { brethren: 3, crown: -1 } }, msg: "Двоє звільнених. Один виявляється навігатором, інший знає три мови. Вдячність у їхніх очах вартує більше за золото.", flag: "freed_captives" },

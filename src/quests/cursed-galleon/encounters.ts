@@ -516,7 +516,7 @@ export const encounters: Encounter[] = [
   // Havana (4,1) - smuggling hub
   {
     id: "havana_market", scene: "port", title: "Ринок Гавани",
-    location: "4,1",
+    locationName: "Havana",
     text: "Найбільший чорний ринок Карибів. Тут купують і продають все.",
     choices: [
       { text: "📜 Купити ліцензію (−40)", eff: { gold: -40, crew: 0, karma: 0, curse: 0, item: "trade_license" }, msg: "Фальшива, але переконлива. Торгуйте вільно." },
@@ -528,7 +528,7 @@ export const encounters: Encounter[] = [
   // Nassau (14,2) - pirate republic
   {
     id: "nassau_tavern", scene: "port", title: "Таверна Нассау",
-    location: "14,2",
+    locationName: "Nassau",
     text: "Піратська республіка. Тут закон один: хто сильніший, той правий.",
     choices: [
       { text: "🍺 Напоїти команду (−15)", eff: { gold: -15, crew: 1, karma: 0, curse: 0 }, msg: "Мораль на висоті. Двоє нових просяться на борт." },
@@ -540,7 +540,7 @@ export const encounters: Encounter[] = [
   // Tortuga (0,4) - freedom port
   {
     id: "tortuga_docks", scene: "port", title: "Причали Тортуги",
-    location: "0,4",
+    locationName: "Tortuga",
     text: "Домашній порт. Тут завжди можна знайти ремонт, провіант та неприємності.",
     choices: [
       { text: "🔧 Ремонт корабля (−20)", eff: { gold: -20, crew: 0, karma: 0, curse: 0 }, msg: "Корпус латаний, але тримає. Ще поплаваємо.", flag: "ship_repaired" },
@@ -552,7 +552,7 @@ export const encounters: Encounter[] = [
   // Port Royal (10,6) - British stronghold
   {
     id: "port_royal_fort", scene: "port", title: "Форт Порт-Роялу",
-    location: "10,6",
+    locationName: "Port Royal",
     text: "Британська фортеця. Ризиковано, але тут найкращі товари.",
     choices: [
       { text: "💊 Купити ліки (−35)", eff: { gold: -35, crew: 0, karma: 0, curse: 0, item: "medicine_chest" }, msg: "Справжні англійські ліки. Команда буде здоровішою." },
@@ -564,7 +564,7 @@ export const encounters: Encounter[] = [
   // Cartagena (5,8) - Spanish gold
   {
     id: "cartagena_treasury", scene: "port", title: "Скарбниця Картахени",
-    location: "5,8",
+    locationName: "Cartagena",
     text: "Іспанське золото стікає сюди з усієї Америки. Фортеця неприступна... майже.",
     choices: [
       { text: "🗝️ Шукати таємний хід", eff: { gold: [20, 60], crew: 0, karma: -1, curse: 0 }, msg: "Старий тунель під стіною. Вдалось вхопити мішок." },
@@ -576,7 +576,7 @@ export const encounters: Encounter[] = [
   // Shadow Cave (6,6) - dark magic
   {
     id: "shadow_cave_ritual", scene: "cave", title: "Ритуал у Печері Тіней",
-    location: "6,6",
+    locationName: "Shadow Cave",
     text: "Вогні на стінах. Шаман із кістяною маскою чекає.",
     choices: [
       { text: "🪆 Прийняти дар", eff: { gold: 0, crew: 0, karma: 0, curse: 3, item: "voodoo_doll" }, msg: "Лялька з вашим волоссям. Відчуваєте зв'язок з чимось давнім." },
@@ -588,7 +588,7 @@ export const encounters: Encounter[] = [
   // Mary's Wreck (8,3) - salvage
   {
     id: "marys_wreck_dive", scene: "underwater", title: "Уламки 'Святої Марії'",
-    location: "8,3",
+    locationName: "Mary's Wreck",
     text: "Скелет корабля на дні. Тут загинуло 200 душ. Золото блищить між ребрами корпусу.",
     choices: [
       { text: "🏊 Пірнути за золотом", eff: { gold: [30, 80], crew: [-2, 0], karma: 0, curse: 2 }, msg: "Золото є. Але щось тягне ногу. Ледь вирвалися." },
@@ -600,7 +600,7 @@ export const encounters: Encounter[] = [
   // Blood Reefs (7,2) - dangerous waters
   {
     id: "blood_reefs_passage", scene: "storm", title: "Рифи Крові",
-    location: "7,2",
+    locationName: "Blood Reefs",
     text: "Червона вода. Рифи розрізають дно кораблів, як ніж масло. Але тут ховається скарб.",
     choices: [
       { text: "⛵ Повільно лавірувати", eff: { gold: 0, crew: 0, karma: 0, curse: 0 }, msg: "Обережність рятує. Проходите без втрат." },
@@ -612,7 +612,7 @@ export const encounters: Encounter[] = [
   // Coral Reefs (13,8) - natural beauty
   {
     id: "coral_reefs_garden", scene: "underwater", title: "Коралові Сади",
-    location: "13,8",
+    locationName: "Coral Gardens",
     text: "Живі корали усіх кольорів. Риби-папуги, черепахи, і щось більше в глибині.",
     choices: [
       { text: "🐢 Спостерігати", eff: { gold: 0, crew: 0, karma: 2, curse: -1 }, msg: "Краса заспокоює. Прокляття слабшає перед природою." },

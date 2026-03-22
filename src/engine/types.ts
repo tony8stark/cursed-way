@@ -122,7 +122,8 @@ export interface Encounter {
   requires?: (state: GameState) => boolean;
   choices: Choice[];
   enemyType?: "ghost" | "enemy";
-  location?: string; // "x,y" key - only triggers at this map cell
+  location?: string; // deprecated: "x,y" key (ignored on procedural maps)
+  locationName?: string; // location name (en) - only triggers at named destination
   npc?: string;      // NPC id - shows portrait in encounter screen
 
   // Storylet metadata (all optional for backward compat)

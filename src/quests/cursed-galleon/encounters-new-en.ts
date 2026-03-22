@@ -23,6 +23,7 @@ export const newEncountersEn: Encounter[] = [
   },
   {
     id: "port_slave_market", scene: "port", phase: "mid", family: "setpiece", weight: 0.8, title: "The Slave Market",
+    locationName: "Port Royal",
     text: "Port Royal. People sold like cattle. Among the captives, you spot a sailor with a Brotherhood tattoo.",
     choices: [
       { text: "💰 Buy their freedom (−20)", eff: { gold: -20, crew: 2, karma: 3, curse: 0, rep: { brethren: 3, crown: -1 } }, msg: "Two freed. One turns out to be a navigator, the other speaks three languages. The gratitude in their eyes is worth more than gold.", flag: "freed_captives" },

@@ -262,7 +262,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const { mapState, recentFamilies, recentTags, recentIds, usedGroups } = get();
     const playerPos = mapState?.playerPos;
     const pickerCtx: PickerContext = { recentFamilies, recentTags, usedGroups, recentIds };
-    const enc = pickEncounter(quest.encounters, state, usedIds, playerPos ?? undefined, pickerCtx);
+    // Determine current location name for location-bound encounters
+    let currentLocationName: string | null = null;
+    if (mapState) {
+      const cells = getMapCells();
+      const pos = mapState.destination ?? mapState.playerPos;
+      const cell = cells[pos[1]]?.[pos[0]];
+      if (cell?.name) currentLocationName = cell.name.en;
+    }
+    const enc = pickEncounter(quest.encounters, state, usedIds, playerPos ?? undefined, pickerCtx, currentLocationName);
     const newUsed = new Set(usedIds);
     newUsed.add(enc.id);
 

@@ -73,10 +73,10 @@ export function pickEncounter(
   encounters: Encounter[],
   state: GameState,
   used: Set<string>,
-  playerPos?: [number, number],
+  _playerPos?: [number, number],
   context?: PickerContext,
+  currentLocationName?: string | null,
 ): Encounter {
-  const posKey = playerPos ? `${playerPos[0]},${playerPos[1]}` : null;
   const phase = getRunPhase(state);
   const recentFamilies = context?.recentFamilies ?? [];
   const recentTags = context?.recentTags ?? new Set<string>();
@@ -90,8 +90,10 @@ export function pickEncounter(
   const avail = enriched.filter(e => {
     if (used.has(e.id)) return false;
     if (e.requires && !e.requires(state)) return false;
-    // Location encounters only trigger at their map cell
-    if (e.location && posKey !== null && e.location !== posKey) return false;
+    // Location-named encounters only trigger at matching location
+    if (e.locationName && e.locationName !== currentLocationName) return false;
+    // Legacy coordinate-based location field - skip on procedural maps
+    if (e.location && !e.locationName) return false;
     // Exclusivity group check
     if (e.exclusivityGroup && usedGroups.has(e.exclusivityGroup)) return false;
     // Cooldown check: if encounter appeared recently, skip it
@@ -110,9 +112,9 @@ export function pickEncounter(
     return itemUnlocked[Math.floor(Math.random() * itemUnlocked.length)];
   }
 
-  // Priority 1: location-specific encounters at current position
-  if (posKey) {
-    const locationEnc = avail.filter(e => e.location === posKey);
+  // Priority 1: location-specific encounters at current location
+  if (currentLocationName) {
+    const locationEnc = avail.filter(e => e.locationName === currentLocationName);
     if (locationEnc.length > 0) {
       // Score even location encounters for best pick
       const scored = locationEnc.map(e => ({
@@ -124,13 +126,13 @@ export function pickEncounter(
   }
 
   // General pool: filter out location-bound encounters
-  const general = avail.filter(e => !e.location);
+  const general = avail.filter(e => !e.locationName && !e.location);
 
   if (general.length === 0) {
     // Fallback: reuse encounters if all used
     const fallback = enriched.filter(e => {
       if (e.requires && !e.requires(state)) return false;
-      if (e.location && posKey !== null && e.location !== posKey) return false;
+      if (e.locationName || e.location) return false; // skip location-bound
       return true;
     });
     return fallback[Math.floor(Math.random() * fallback.length)] || encounters[0];

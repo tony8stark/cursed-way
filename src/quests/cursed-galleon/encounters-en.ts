@@ -516,7 +516,7 @@ export const encountersEn: Encounter[] = [
   // Havana (4,1)
   {
     id: "havana_market", scene: "port", title: "Havana Market",
-    location: "4,1",
+    locationName: "Havana",
     text: "The biggest black market in the Caribbean. Everything is bought and sold here.",
     choices: [
       { text: "📜 Buy a license (-40)", eff: { gold: -40, crew: 0, karma: 0, curse: 0, item: "trade_license" }, msg: "Forged, but convincing. Trade freely." },
@@ -528,7 +528,7 @@ export const encountersEn: Encounter[] = [
   // Nassau (14,2)
   {
     id: "nassau_tavern", scene: "port", title: "Nassau Tavern",
-    location: "14,2",
+    locationName: "Nassau",
     text: "The pirate republic. One law here: might makes right.",
     choices: [
       { text: "🍺 Buy drinks for the crew (-15)", eff: { gold: -15, crew: 1, karma: 0, curse: 0 }, msg: "Morale soars. Two newcomers ask to join." },
@@ -540,7 +540,7 @@ export const encountersEn: Encounter[] = [
   // Tortuga (0,4)
   {
     id: "tortuga_docks", scene: "port", title: "Tortuga Docks",
-    location: "0,4",
+    locationName: "Tortuga",
     text: "Home port. Repairs, provisions, and trouble are always available here.",
     choices: [
       { text: "🔧 Repair the ship (-20)", eff: { gold: -20, crew: 0, karma: 0, curse: 0 }, msg: "Patched but holding. We sail on.", flag: "ship_repaired" },
@@ -552,7 +552,7 @@ export const encountersEn: Encounter[] = [
   // Port Royal (10,6)
   {
     id: "port_royal_fort", scene: "port", title: "Port Royal Fort",
-    location: "10,6",
+    locationName: "Port Royal",
     text: "British fortress. Risky, but the best goods are here.",
     choices: [
       { text: "💊 Buy medicine (-35)", eff: { gold: -35, crew: 0, karma: 0, curse: 0, item: "medicine_chest" }, msg: "Proper English medicine. The crew will stay healthier." },
@@ -564,7 +564,7 @@ export const encountersEn: Encounter[] = [
   // Cartagena (5,8)
   {
     id: "cartagena_treasury", scene: "port", title: "Cartagena Treasury",
-    location: "5,8",
+    locationName: "Cartagena",
     text: "Spanish gold flows here from all the Americas. The fortress is impregnable... almost.",
     choices: [
       { text: "🗝️ Find the secret passage", eff: { gold: [20, 60], crew: 0, karma: -1, curse: 0 }, msg: "An old tunnel under the wall. You grab a sack." },
@@ -576,7 +576,7 @@ export const encountersEn: Encounter[] = [
   // Shadow Cave (6,6)
   {
     id: "shadow_cave_ritual", scene: "cave", title: "Shadow Cave Ritual",
-    location: "6,6",
+    locationName: "Shadow Cave",
     text: "Firelight on the walls. A shaman in a bone mask waits.",
     choices: [
       { text: "🪆 Accept the gift", eff: { gold: 0, crew: 0, karma: 0, curse: 3, item: "voodoo_doll" }, msg: "A doll made with your hair. You feel a connection to something ancient." },
@@ -588,7 +588,7 @@ export const encountersEn: Encounter[] = [
   // Mary's Wreck (8,3)
   {
     id: "marys_wreck_dive", scene: "underwater", title: "Wreck of the Santa Maria",
-    location: "8,3",
+    locationName: "Mary's Wreck",
     text: "A ship's skeleton on the seabed. 200 souls perished here. Gold glints between the ribs of the hull.",
     choices: [
       { text: "🏊 Dive for gold", eff: { gold: [30, 80], crew: [-2, 0], karma: 0, curse: 2 }, msg: "Gold found. But something grabs your leg. Barely escaped." },
@@ -600,7 +600,7 @@ export const encountersEn: Encounter[] = [
   // Blood Reefs (7,2)
   {
     id: "blood_reefs_passage", scene: "storm", title: "Blood Reefs",
-    location: "7,2",
+    locationName: "Blood Reefs",
     text: "Red water. The reefs slice ship hulls like a knife through butter. But treasure hides here.",
     choices: [
       { text: "⛵ Navigate carefully", eff: { gold: 0, crew: 0, karma: 0, curse: 0 }, msg: "Caution saves. You pass without losses." },
@@ -612,7 +612,7 @@ export const encountersEn: Encounter[] = [
   // Coral Reefs (13,8)
   {
     id: "coral_reefs_garden", scene: "underwater", title: "Coral Gardens",
-    location: "13,8",
+    locationName: "Coral Gardens",
     text: "Living corals of every color. Parrotfish, turtles, and something larger in the depths.",
     choices: [
       { text: "🐢 Observe", eff: { gold: 0, crew: 0, karma: 2, curse: -1 }, msg: "Beauty soothes. The curse weakens before nature." },
