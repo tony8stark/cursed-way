@@ -4,6 +4,23 @@ import tailwindcss from "@tailwindcss/vite";
 import { VitePWA } from "vite-plugin-pwa";
 
 export default defineConfig({
+  build: {
+    rolldownOptions: {
+      output: {
+        manualChunks(id: string) {
+          if (id.includes("node_modules/react") || id.includes("node_modules/framer-motion") || id.includes("node_modules/zustand")) {
+            return "vendor";
+          }
+          if (id.includes("/quests/cursed-galleon/")) {
+            return "quest-data";
+          }
+          if (id.includes("/renderer/location-pools") || id.includes("/renderer/map-generator") || id.includes("/renderer/world-map") || id.includes("/engine/npcs")) {
+            return "map-data";
+          }
+        },
+      },
+    },
+  },
   plugins: [
     react(),
     tailwindcss(),
