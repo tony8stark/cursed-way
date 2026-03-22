@@ -3,13 +3,14 @@ import type { GameState, Watch, Encounter, Choice, LogEntry, SerializedGameState
 import { resolveValue } from "./effects";
 import { pickEncounter, type PickerContext } from "./encounter-picker";
 import { type MapState, createMapState, revealAround, serializeMap, deserializeMap } from "../renderer/world-map";
-import { findNearestCell, getTerrainForScene, computeRoute, setActiveMap } from "../renderer/map-data";
+import { findNearestCell, getTerrainForScene, computeRoute, setActiveMap, getMapCells } from "../renderer/map-data";
 import { generateMap } from "../renderer/map-generator";
 import { ARTIFACTS } from "./items";
 import { useGameModeStore } from "./game-mode";
 import { useOriginStore, getOrigin } from "./origins";
 import { useObjectiveStore } from "./objectives";
 import { defaultReps, originRepBonuses, applyRepChanges } from "./factions";
+import { checkLocationQuest } from "./location-quests";
 
 type Screen = "title" | "sailing" | "encounter" | "ending";
 
@@ -68,6 +69,7 @@ function serialize(state: GameState, mapState: MapState | null, mapSeed: number 
     factionReps: state.factionReps,
     artifactLog: state.artifactLog,
     npcMeetings: state.npcMeetings,
+    locationVisits: state.locationVisits,
     objectiveId: useObjectiveStore.getState().objectiveId ?? undefined,
     gameMode: useGameModeStore.getState().mode,
     mapSeed: mapSeed ?? undefined,
@@ -101,6 +103,7 @@ function deserialize(data: SerializedGameState): { state: GameState; mapState: M
       factionReps: data.factionReps ?? defaultReps(),
       artifactLog: data.artifactLog ?? [],
       npcMeetings: data.npcMeetings ?? [],
+      locationVisits: data.locationVisits ?? {},
     },
     mapState: mapData ? deserializeMap(mapData) : null,
     mapSeed: mapSeed ?? null,
@@ -153,6 +156,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       visitedLocations: new Set<string>(),
       artifactLog: [],
       npcMeetings: [],
+      locationVisits: {},
       factionReps: applyRepChanges(
         quest.initialState.factionReps ?? defaultReps(),
         originRepBonuses(useOriginStore.getState().origin),
@@ -296,6 +300,46 @@ export const useGameStore = create<GameStore>((set, get) => ({
           const destKey = `${nextCell[0]},${nextCell[1]}`;
           newVisitedLocations.add(destKey);
 
+          // Track location visit count + check for location quests
+          const cells = getMapCells();
+          const cell = cells[nextCell[1]]?.[nextCell[0]];
+          if (cell?.name) {
+            const locName = cell.name.en; // quest system uses English names
+            const visits = (state.locationVisits[locName] ?? 0) + 1;
+            state.locationVisits[locName] = visits;
+
+            const lq = checkLocationQuest(locName, visits, usedIds);
+            if (lq) {
+              const questEnc = quest.encounters.find(e => e.id === lq.encounterId);
+              if (questEnc) {
+                const newUsedForLQ = new Set(usedIds);
+                newUsedForLQ.add(lq.id);
+                newUsedForLQ.add(questEnc.id);
+
+                newMapState.currentRoute = null;
+                newMapState.destination = null;
+                newMapState.routeProgress = 0;
+
+                set({
+                  usedIds: newUsedForLQ,
+                  encounter: questEnc,
+                  result: null,
+                  screen: "encounter",
+                  state: {
+                    ...state, day: newDay, watch: newWatch,
+                    gold, crew, karma, curse,
+                    flags: newFlags,
+                    visitedLocations: newVisitedLocations,
+                    locationVisits: { ...state.locationVisits },
+                  },
+                  mapState: newMapState,
+                });
+                setTimeout(() => get().save(), 0);
+                return;
+              }
+            }
+          }
+
           newMapState.currentRoute = null;
           newMapState.destination = null;
           newMapState.routeProgress = 0;
@@ -327,6 +371,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       delayedEffects: [...state.delayedEffects],
       log: [...state.log],
       factionReps: { ...state.factionReps },
+      locationVisits: { ...state.locationVisits },
     };
 
     set({
@@ -367,6 +412,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       visitedLocations: new Set(state.visitedLocations),
       artifactLog: [...(state.artifactLog ?? [])],
       npcMeetings: [...(state.npcMeetings ?? [])],
+      locationVisits: { ...(state.locationVisits ?? {}) },
       factionReps: choice.eff.rep
         ? applyRepChanges(state.factionReps, choice.eff.rep)
         : { ...state.factionReps },

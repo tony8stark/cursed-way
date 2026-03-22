@@ -102,6 +102,12 @@ const translations = {
     npcUnknown: "???",
     npcMetOn: "День {day}: {where}",
     npcJournalTitle: "Зустрічі",
+    // World map
+    worldMap: "КАРТА СВІТУ",
+    legendShip: "Корабель",
+    legendViewport: "Видима область",
+    worldMapTitle: "Карта",
+    openWorldMap: "Натисніть для перегляду карти світу",
   },
   en: {
     gameTitle: "BLACK\nTIDE",
@@ -160,6 +166,12 @@ const translations = {
     npcUnknown: "???",
     npcMetOn: "Day {day}: {where}",
     npcJournalTitle: "NPCs",
+    // World map
+    worldMap: "WORLD MAP",
+    legendShip: "Ship",
+    legendViewport: "Visible area",
+    worldMapTitle: "Map",
+    openWorldMap: "Click to view world map",
   },
 } as const;
 

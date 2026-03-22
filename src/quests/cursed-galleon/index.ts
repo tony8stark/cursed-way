@@ -7,6 +7,8 @@ import { questlineEncounters } from "./questlines";
 import { questlineEncountersEn } from "./questlines-en";
 import { newEncounters } from "./encounters-new";
 import { newEncountersEn } from "./encounters-new-en";
+import { locationQuestEncounters } from "./location-quest-encounters";
+import { locationQuestEncountersEn } from "./location-quest-encounters-en";
 import { endings } from "./endings";
 import { endingsEn } from "./endings-en";
 
@@ -27,8 +29,8 @@ export function getCursedGalleon(locale: Locale): Quest {
     title: questData[locale].title,
     description: questData[locale].description,
     encounters: locale === "en"
-      ? [...encountersEn, ...questlineEncountersEn, ...newEncountersEn]
-      : [...encounters, ...questlineEncounters, ...newEncounters],
+      ? [...encountersEn, ...questlineEncountersEn, ...newEncountersEn, ...locationQuestEncountersEn]
+      : [...encounters, ...questlineEncounters, ...newEncounters, ...locationQuestEncounters],
     endings: locale === "en" ? endingsEn : endings,
     initialState: {
       gold: 30,
@@ -45,6 +47,7 @@ export function getCursedGalleon(locale: Locale): Quest {
       factionReps: defaultReps(),
       artifactLog: [],
       npcMeetings: [],
+      locationVisits: {},
     },
   };
 }

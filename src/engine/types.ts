@@ -21,6 +21,7 @@ export interface GameState {
   factionReps: import("./factions").FactionReps;
   artifactLog: ArtifactLog[];
   npcMeetings: NPCMeeting[];
+  locationVisits: Record<string, number>;
 }
 
 export interface SerializedGameState {
@@ -38,6 +39,7 @@ export interface SerializedGameState {
   factionReps?: import("./factions").FactionReps;
   artifactLog?: ArtifactLog[];
   npcMeetings?: NPCMeeting[];
+  locationVisits?: Record<string, number>;
   objectiveId?: string;
   gameMode?: import("../engine/game-mode").GameMode;
   mapSeed?: number;

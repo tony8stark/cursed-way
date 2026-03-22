@@ -1,5 +1,5 @@
-import { useEffect, useRef } from "react";
-import { motion } from "framer-motion";
+import { useEffect, useRef, useState, useCallback } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { StatsBar } from "./StatsBar";
 import { useGameStore } from "../../engine/state";
 import { audioManager } from "../../audio/audio-manager";
@@ -9,6 +9,7 @@ import { getConnectedLocations } from "../../renderer/map-data";
 import { InventoryBar } from "./InventoryBar";
 import { useObjectiveStore, getObjective } from "../../engine/objectives";
 import { FactionBar } from "./FactionBar";
+import { WorldMapModal } from "./WorldMapModal";
 
 export function MapScreen() {
   const { state, sail, setDestination, mapState } = useGameStore();
@@ -16,10 +17,23 @@ export function MapScreen() {
   const locale = useLocaleStore(s => s.locale);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const frameRef = useRef(0);
+  const [showWorldMap, setShowWorldMap] = useState(false);
 
   useEffect(() => {
     audioManager.playAmbient("open_sea");
   }, []);
+
+  // ESC to close world map
+  const handleKeyDown = useCallback((e: KeyboardEvent) => {
+    if (e.key === "Escape" && showWorldMap) {
+      setShowWorldMap(false);
+    }
+  }, [showWorldMap]);
+
+  useEffect(() => {
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [handleKeyDown]);
 
   // Map animation loop
   useEffect(() => {
@@ -36,6 +50,11 @@ export function MapScreen() {
       ctx.fillStyle = "#f0c040";
       ctx.font = "bold 8px 'Press Start 2P', monospace";
       ctx.fillText(t("mapTitle"), 8, 14);
+
+      // World map hint (bottom-right)
+      ctx.fillStyle = "rgba(240,192,64,0.3)";
+      ctx.font = "bold 5px 'Press Start 2P', monospace";
+      ctx.fillText("🗺️ " + t("worldMapTitle"), c.width - 70, c.height - 6);
 
       id = requestAnimationFrame(draw);
     };
@@ -83,11 +102,13 @@ export function MapScreen() {
           ref={canvasRef}
           width={520}
           height={300}
-          className="w-full rounded border-2 transition-colors duration-500"
+          className="w-full rounded border-2 transition-colors duration-500 cursor-pointer"
           style={{
             imageRendering: "pixelated",
             borderColor: state.curse > 10 ? "#8020c0" : "#1a3a5e",
           }}
+          onClick={() => setShowWorldMap(true)}
+          title={t("openWorldMap")}
         />
       </div>
 
@@ -147,12 +168,10 @@ export function MapScreen() {
                 <button
                   onClick={() => {
                     audioManager.playSFX("coin");
-                    // Trigger ending via sail (objective complete = special ending)
                     const { state: currentState, quest } = useGameStore.getState();
                     if (currentState && quest) {
                       currentState.flags.add("objective_complete");
                       currentState.flags.add(`objective_${objectiveId}`);
-                      // Force ending check
                       const idx = quest.endings.findIndex(e => e.req(currentState));
                       useGameStore.setState({
                         endingIndex: idx >= 0 ? idx : quest.endings.length - 1,
@@ -279,6 +298,16 @@ export function MapScreen() {
           )}
         </div>
       </div>
+
+      {/* World map modal */}
+      <AnimatePresence>
+        {showWorldMap && mapState && (
+          <WorldMapModal
+            mapState={mapState}
+            onClose={() => setShowWorldMap(false)}
+          />
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 }

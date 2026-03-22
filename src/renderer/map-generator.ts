@@ -66,8 +66,8 @@ class SeededRandom {
 
 // ── Map generation ──
 
-export const GEN_MAP_W = 44;
-export const GEN_MAP_H = 26;
+export const GEN_MAP_W = 80;
+export const GEN_MAP_H = 50;
 
 export interface PlacedLocation {
   x: number;
@@ -107,15 +107,15 @@ function generateTerrain(cells: MapCell[][], rng: SeededRandom): void {
     }
   }
 
-  // Place 14-22 island seeds (more for bigger map)
-  const numIslands = rng.int(14, 22);
+  // Place 30-50 island seeds for the large map
+  const numIslands = rng.int(30, 50);
   const seeds: [number, number, number][] = []; // x, y, size
 
   for (let i = 0; i < numIslands; i++) {
     // Keep islands away from edges
-    const x = rng.int(2, W - 3);
-    const y = rng.int(2, H - 3);
-    const size = rng.int(1, 3);
+    const x = rng.int(3, W - 4);
+    const y = rng.int(3, H - 4);
+    const size = rng.int(1, 4);
     seeds.push([x, y, size]);
   }
 
@@ -272,12 +272,12 @@ function buildRoutes(locations: PlacedLocation[]): Record<string, string[]> {
       .map(o => ({ loc: o, d: dist(loc.x, loc.y, o.x, o.y) }))
       .sort((a, b) => a.d - b.d);
 
-    // Connect to 2-4 nearest (max distance 20 cells for bigger map)
+    // Connect to 2-4 nearest (max distance 25 cells for large map)
     const maxConnections = Math.min(4, others.length);
     let connected = 0;
     for (const other of others) {
       if (connected >= maxConnections) break;
-      if (other.d > 20) break;
+      if (other.d > 25) break;
       const otherKey = `${other.loc.x},${other.loc.y}`;
       if (!routes[key].includes(otherKey)) {
         routes[key].push(otherKey);
@@ -354,18 +354,18 @@ export function generateMap(seed?: number): GeneratedMap {
   // Generate terrain
   generateTerrain(cells, rng);
 
-  // Pick locations from pools (diverse mix for larger map)
-  const pickedPorts = rng.weightedPick(PORT_POOL, rng.int(7, 10));
-  const pickedSettlements = rng.weightedPick(SETTLEMENT_POOL, rng.int(2, 4));
-  const pickedInhabited = rng.weightedPick(INHABITED_ISLAND_POOL, rng.int(2, 4));
-  const pickedWild = rng.weightedPick(WILD_ISLAND_POOL, rng.int(3, 6));
-  const pickedPhantom = rng.weightedPick(PHANTOM_ISLAND_POOL, rng.int(1, 3));
-  const pickedUnderwater = rng.weightedPick(UNDERWATER_POOL, rng.int(2, 4));
-  const pickedCaves = rng.weightedPick(CAVE_POOL, rng.int(2, 3));
-  const pickedWrecks = rng.weightedPick(WRECK_POOL, rng.int(2, 4));
-  const pickedMysterious = rng.weightedPick(MYSTERIOUS_POOL, rng.int(1, 3));
-  const pickedReefs = rng.weightedPick(REEF_POOL, rng.int(1, 2));
-  const pickedLandmarks = rng.weightedPick(LANDMARK_POOL, rng.int(1, 3));
+  // Pick locations from pools (generous mix for 80x50 map)
+  const pickedPorts = rng.weightedPick(PORT_POOL, rng.int(12, 18));
+  const pickedSettlements = rng.weightedPick(SETTLEMENT_POOL, rng.int(5, 8));
+  const pickedInhabited = rng.weightedPick(INHABITED_ISLAND_POOL, rng.int(4, 7));
+  const pickedWild = rng.weightedPick(WILD_ISLAND_POOL, rng.int(6, 12));
+  const pickedPhantom = rng.weightedPick(PHANTOM_ISLAND_POOL, rng.int(3, 6));
+  const pickedUnderwater = rng.weightedPick(UNDERWATER_POOL, rng.int(4, 8));
+  const pickedCaves = rng.weightedPick(CAVE_POOL, rng.int(3, 6));
+  const pickedWrecks = rng.weightedPick(WRECK_POOL, rng.int(4, 8));
+  const pickedMysterious = rng.weightedPick(MYSTERIOUS_POOL, rng.int(3, 6));
+  const pickedReefs = rng.weightedPick(REEF_POOL, rng.int(3, 5));
+  const pickedLandmarks = rng.weightedPick(LANDMARK_POOL, rng.int(3, 5));
 
   const allPicked = [
     ...pickedPorts, ...pickedSettlements, ...pickedInhabited,
@@ -376,7 +376,7 @@ export function generateMap(seed?: number): GeneratedMap {
 
   // Place locations on map
   const placed: PlacedLocation[] = [];
-  const MIN_LOCATION_DIST = 5;
+  const MIN_LOCATION_DIST = 4;
 
   for (const template of allPicked) {
     const spot = findPlacementSpot(cells, template.terrain, placed, rng, MIN_LOCATION_DIST);
