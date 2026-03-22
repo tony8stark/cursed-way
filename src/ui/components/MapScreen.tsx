@@ -273,7 +273,7 @@ export function MapScreen() {
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="font-game text-[8px] text-[#8020c0]/50 px-1"
+              className="font-game text-[8px] text-[#c878f0] px-1"
             >
               {t("curseHint1")}
             </motion.div>
@@ -282,7 +282,7 @@ export function MapScreen() {
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="font-game text-[8px] text-[#8020c0]/70 px-1"
+              className="font-game text-[8px] text-[#e060e0] px-1"
             >
               {t("curseHint2")}
             </motion.div>
@@ -291,7 +291,7 @@ export function MapScreen() {
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="font-game text-[8px] text-[#8020c0] px-1"
+              className="font-game text-[8px] text-[#ff50ff] px-1"
             >
               {t("curseHint3")}
             </motion.div>
