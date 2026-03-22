@@ -96,6 +96,12 @@ const translations = {
     historyTitle: "Історія",
     achievementsTitle: "Досягнення",
     settingsTitle: "Налаштування",
+    // NPC Journal
+    npcJournal: "ЖУРНАЛ ЗУСТРІЧЕЙ",
+    npcsMet: "{0}/{1}",
+    npcUnknown: "???",
+    npcMetOn: "День {day}: {where}",
+    npcJournalTitle: "Зустрічі",
   },
   en: {
     gameTitle: "BLACK\nTIDE",
@@ -148,6 +154,12 @@ const translations = {
     historyTitle: "History",
     achievementsTitle: "Achievements",
     settingsTitle: "Settings",
+    // NPC Journal
+    npcJournal: "NPC JOURNAL",
+    npcsMet: "{0}/{1}",
+    npcUnknown: "???",
+    npcMetOn: "Day {day}: {where}",
+    npcJournalTitle: "NPCs",
   },
 } as const;
 

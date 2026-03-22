@@ -11,6 +11,7 @@ import { EndingScreen } from "./ui/components/EndingScreen";
 import { AchievementToast } from "./ui/components/AchievementToast";
 import { AchievementsPanel } from "./ui/components/AchievementsPanel";
 import { HistoryPanel } from "./ui/components/HistoryPanel";
+import { NPCJournal } from "./ui/components/NPCJournal";
 import { SettingsModal } from "./ui/components/SettingsModal";
 import { audioManager } from "./audio/audio-manager";
 import { useLocaleStore } from "./i18n";
@@ -31,6 +32,7 @@ export default function App() {
   const [showAchievements, setShowAchievements] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const [showNPCJournal, setShowNPCJournal] = useState(false);
   const endingSavedRef = useRef(false);
 
   // Load quest based on locale
@@ -115,6 +117,13 @@ export default function App() {
         {screen === "title" && (
           <>
             <button
+              onClick={() => setShowNPCJournal(true)}
+              className="font-game text-[12px] text-white/50 hover:text-white/80 transition-colors bg-transparent border-none cursor-pointer"
+              title={t("npcJournalTitle")}
+            >
+              📔
+            </button>
+            <button
               onClick={() => setShowHistory(true)}
               className="font-game text-[12px] text-white/50 hover:text-white/80 transition-colors bg-transparent border-none cursor-pointer"
               title={t("historyTitle")}
@@ -155,6 +164,7 @@ export default function App() {
       <AnimatePresence>
         {showAchievements && <AchievementsPanel onClose={() => setShowAchievements(false)} />}
         {showHistory && <HistoryPanel onClose={() => setShowHistory(false)} />}
+        {showNPCJournal && <NPCJournal onClose={() => setShowNPCJournal(false)} />}
         {showSettings && <SettingsModal onClose={() => setShowSettings(false)} />}
       </AnimatePresence>
 
