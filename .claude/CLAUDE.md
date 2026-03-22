@@ -52,7 +52,9 @@ src/
     ChoiceCard.tsx     # Animated choice buttons with keyboard hints
     TypewriterText.tsx # Character-by-character text reveal
     TitleScreen.tsx    # Title + game mode selector + new game / continue
-    MapScreen.tsx      # World map sailing view (always shown)
+    MapScreen.tsx      # World map sailing view with viewport + world map modal trigger
+    WorldMapModal.tsx   # Full world map overlay (click map to open, ESC to close)
+    NPCJournal.tsx     # NPC journal modal with pixel art portraits grouped by category
     EncounterScreen.tsx # Encounter with choices + result
     EndingScreen.tsx   # Game ending with journey log
     AchievementToast.tsx # Animated toast notification for new achievements
@@ -63,6 +65,8 @@ src/
     encounters.ts     # 75+ encounters (Ukrainian)
     encounters-en.ts  # 75+ encounters (English)
     encounters-new.ts # 30 new encounters (Ukrainian) - ports, underwater, mysterious, crew, exploration, combat
+    location-quest-encounters.ts    # 11 location quest encounters (Ukrainian)
+    location-quest-encounters-en.ts # 11 location quest encounters (English)
     encounters-new-en.ts # 30 new encounters (English)
     endings.ts        # 7 endings (Ukrainian)
     endings-en.ts     # 7 endings (English)
@@ -110,9 +114,11 @@ Mode stored in `useGameModeStore` (Zustand), persisted to localStorage. Saved wi
 Always-on enhanced visuals (no classic/simple mode):
 - **Dynamic ship**: 6 conditional overlays (tattered sail, cannons, curse glow, gold trim, ghost sails)
 - **Atmosphere**: Time-of-day (dawn/day/dusk/night) deterministic from day number, weather (clear/overcast/foggy/rain) seeded from day
-- **Procedural map**: 44x26 grid generated each run from seed. 14-22 island clusters with terrain (deep/water/shallow/land/port/reef/cave/wreck). 25-40 locations picked from pool of 130+ templates across 11 categories. Map seed saved for deterministic regeneration on load.
-- **Location pool**: 130+ bilingual location templates organized in 11 categories: port (22), settlement (10), inhabited island (10), wild island (15), phantom island (8), underwater (10), cave (8), wreck (10), mysterious (10), reef (6), landmark (6). Each run gets a unique combination.
-- **Route system**: Auto-built graph connecting nearby locations (2-3 nearest within 15 cells). Validated for full connectivity. Player picks destination from connected locations.
+- **Procedural map**: 80x50 grid (4000 cells) generated each run from seed. 30-50 island clusters with terrain (deep/water/shallow/land/port/reef/cave/wreck). 50-90 locations picked from pool of 130+ templates across 11 categories. Map seed saved for deterministic regeneration on load.
+- **Viewport system**: Local map shows a scrolling viewport centered on the player (14x12px cells). Camera follows ship position, clamped to map bounds.
+- **World map overlay**: Click the map canvas to open a full world map modal showing the entire 80x50 grid at minimap scale. Shows fog of war, route connections, viewport rectangle, ship position. Close with ESC or backdrop click.
+- **Location pool**: 130+ bilingual location templates organized in 11 categories: port (22), settlement (12), inhabited island (12), wild island (16), phantom island (10), underwater (10), cave (10), wreck (12), mysterious (11), reef (8), landmark (8). Each run gets a unique combination.
+- **Route system**: Auto-built graph connecting nearby locations (2-4 nearest within 25 cells). Validated for full connectivity. Player picks destination from connected locations.
 - **Fog of war**: Reveals 3x3 area around player (bonus from artifacts like cursed_compass), persisted in save
 - **Map movement**: Route-based (ship advances along planned route each encounter), falls back to terrain-matching if no route set
 
@@ -127,6 +133,7 @@ InventoryBar component shown on map and encounter screens with acquisition histo
 Each NPC has bilingual name/title, emoji icon, pixel art portrait (10x12 grid), and a `metFlag`.
 NPCs are tracked in GameState via `npcMeetings[]` with npcId, day, encounterId, encounterTitle.
 Portraits rendered via `drawNPCPortrait()` on Canvas 2D.
+**NPC Journal**: Modal panel (👤 button in top bar) showing all met NPCs grouped by category, with pixel art portraits rendered on canvas, bilingual names/titles, and meeting details. Shows X/32 progress counter.
 
 ## Location Quest System
 Difficulty-tiered quests bound to specific map locations with probability mechanics:
@@ -135,7 +142,10 @@ Difficulty-tiered quests bound to specific map locations with probability mechan
 - **Rare**: 10-15% base chance, 2-3 visits minimum
 - **Legendary**: 5% base chance, 3+ visits minimum
 Probability increases with each additional visit (capped at maxProbability).
-Checked via `checkLocationQuest()` when arriving at a named location.
+Probability increases with each visit. Visit counts tracked in `GameState.locationVisits`.
+Checked via `checkLocationQuest()` in `sail()` when arriving at a named destination.
+11 quest encounters (uk + en) with unique rewards including artifacts, faction rep, and gold.
+Quest IDs tracked in `usedIds` to prevent repeats.
 
 ## Audio System
 Fully procedural, no audio files needed:
