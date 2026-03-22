@@ -24,7 +24,9 @@ src/
     effects.ts        # Effect value resolution (fixed/range)
     encounter-picker.ts  # Storylet scheduler: weighted selection with phase/family/novelty scoring
     storylet-tagger.ts   # Auto-infers storylet metadata (family, tags, phase, weight) from encounter properties
-    items.ts          # 10 artifact definitions with passive effects
+    items.ts          # 10 artifact definitions with passive effects (ranges, not fixed)
+    npcs.ts           # 32 NPC definitions with pixel art portraits + canvas renderer
+    location-quests.ts # Difficulty-tiered quests (common/uncommon/rare/legendary) with multi-visit probability
     items-i18n.ts     # Bilingual artifact names/descriptions
     achievements.ts   # 14 achievements with check/unlock logic
     achievements-i18n.ts # Locale-aware achievement titles/descriptions
@@ -38,14 +40,15 @@ src/
     ship-variants.ts  # Layered ship drawing (6 conditional overlays based on game state)
     atmosphere.ts     # Time-of-day palettes (dawn/day/dusk/night) + weather overlays
     map-data.ts       # Active map state + accessors (terrain types, locations, routes)
-    map-generator.ts  # Procedural map generation: 30x18 grid, island clusters, location placement
+    map-generator.ts  # Procedural map generation: 44x26 grid, island clusters, location placement
+    location-pools.ts # 130+ location templates in 11 categories (port, settlement, island_wild, phantom, underwater, cave, wreck, mysterious, reef, landmark)
     world-map.ts      # World map renderer with fog of war, ship animation
   audio/
     audio-manager.ts  # Procedural ambient per scene + SFX oscillators
   ui/components/      # React components
     GameCanvas.tsx     # Canvas with scene rendering + particle overlay (always uses enhanced visuals)
     StatsBar.tsx       # Animated stat display (gold, crew, day, curse) - game-mode-aware
-    InventoryBar.tsx   # Compact artifact inventory display
+    InventoryBar.tsx   # Compact artifact inventory display with acquisition history tooltips
     ChoiceCard.tsx     # Animated choice buttons with keyboard hints
     TypewriterText.tsx # Character-by-character text reveal
     TitleScreen.tsx    # Title + game mode selector + new game / continue
@@ -59,6 +62,8 @@ src/
   quests/cursed-galleon/
     encounters.ts     # 75+ encounters (Ukrainian)
     encounters-en.ts  # 75+ encounters (English)
+    encounters-new.ts # 30 new encounters (Ukrainian) - ports, underwater, mysterious, crew, exploration, combat
+    encounters-new-en.ts # 30 new encounters (English)
     endings.ts        # 7 endings (Ukrainian)
     endings-en.ts     # 7 endings (English)
     index.ts          # Quest factory: getCursedGalleon(locale)
@@ -89,7 +94,7 @@ Mode stored in `useGameModeStore` (Zustand), persisted to localStorage. Saved wi
 - **Watches**: 4 watches per day (dawn 🌅, day ☀️, dusk 🌆, night 🌙). Each sail/encounter = 1 watch. Day increments when all 4 watches spent. Passive artifact effects apply once per day (at dawn). Atmosphere visuals (sky/water colors, weather) tied to current watch.
 - **Flags**: Set<string> tracking player choices for consequence encounters
 - **Inventory**: string[] of artifact IDs with passive per-day effects
-- **Storylet scheduler**: Weighted encounter selection using: phase fit (early/mid/late), family diversity (ambient/consequence/quest/relationship/setpiece), tag novelty (anti-repeat), base weight, exclusivity groups. Falls back to top-40% weighted random for variety. Auto-tagger infers metadata from encounter id/scene/requires for backward compat.
+- **Storylet scheduler**: Weighted encounter selection using: phase fit (early/mid/late), family diversity (ambient/consequence/quest/relationship/setpiece), tag novelty (anti-repeat with sliding window), base weight, exclusivity groups, cooldown enforcement. Falls back to top-40% weighted random for variety. Auto-tagger infers metadata from encounter id/scene/requires for backward compat.
 - **Encounter types**: Standard, chain (multi-step), location-bound, item-gated choices, delayed triggers
 - **Effects**: gold, crew, karma, curse, item gain/loss, map reveal, chain to next encounter, delayed encounter
 - **Delayed effects**: Scheduled encounters trigger N days later, with hint text shown on map
@@ -105,16 +110,32 @@ Mode stored in `useGameModeStore` (Zustand), persisted to localStorage. Saved wi
 Always-on enhanced visuals (no classic/simple mode):
 - **Dynamic ship**: 6 conditional overlays (tattered sail, cannons, curse glow, gold trim, ghost sails)
 - **Atmosphere**: Time-of-day (dawn/day/dusk/night) deterministic from day number, weather (clear/overcast/foggy/rain) seeded from day
-- **Procedural map**: 30x18 grid generated each run from seed. 8-14 island clusters with terrain (deep/water/shallow/land/port/reef/cave/wreck). 10-16 locations picked from pool of ~32 (12 ports, 12 exploration sites, 8 wild islands). Map seed saved for deterministic regeneration on load.
-- **Location pool**: Weighted selection from bilingual location templates. Ports (Tortuga weight 3, others 1-2), exploration (caves, wrecks, reefs), wild islands. Each run gets a unique combination.
+- **Procedural map**: 44x26 grid generated each run from seed. 14-22 island clusters with terrain (deep/water/shallow/land/port/reef/cave/wreck). 25-40 locations picked from pool of 130+ templates across 11 categories. Map seed saved for deterministic regeneration on load.
+- **Location pool**: 130+ bilingual location templates organized in 11 categories: port (22), settlement (10), inhabited island (10), wild island (15), phantom island (8), underwater (10), cave (8), wreck (10), mysterious (10), reef (6), landmark (6). Each run gets a unique combination.
 - **Route system**: Auto-built graph connecting nearby locations (2-3 nearest within 15 cells). Validated for full connectivity. Player picks destination from connected locations.
 - **Fog of war**: Reveals 3x3 area around player (bonus from artifacts like cursed_compass), persisted in save
 - **Map movement**: Route-based (ship advances along planned route each encounter), falls back to terrain-matching if no route set
 
 ## Inventory System
-10 artifacts with rarity (common/rare/cursed), passive per-day stat effects, reveal radius bonuses, and encounter unlocks.
+10 artifacts with rarity (common/rare/cursed), passive per-day stat effects (randomized ranges), reveal radius bonuses, and encounter unlocks.
 Items are gained/lost via `item`/`loseItem` in Effects. Choices can be gated with `requires_item`.
-InventoryBar component shown on map and encounter screens.
+InventoryBar component shown on map and encounter screens with acquisition history tooltips.
+**Artifact Log**: GameState tracks `artifactLog[]` with itemId, day, encounterId, encounterTitle for each acquisition.
+
+## NPC System
+32 NPCs across 7 categories: merchant, pirate, official, mystic, crew, civilian, supernatural.
+Each NPC has bilingual name/title, emoji icon, pixel art portrait (10x12 grid), and a `metFlag`.
+NPCs are tracked in GameState via `npcMeetings[]` with npcId, day, encounterId, encounterTitle.
+Portraits rendered via `drawNPCPortrait()` on Canvas 2D.
+
+## Location Quest System
+Difficulty-tiered quests bound to specific map locations with probability mechanics:
+- **Common**: 50-60% base chance, 1 visit minimum
+- **Uncommon**: 25-35% base chance, 1-2 visits minimum
+- **Rare**: 10-15% base chance, 2-3 visits minimum
+- **Legendary**: 5% base chance, 3+ visits minimum
+Probability increases with each additional visit (capped at maxProbability).
+Checked via `checkLocationQuest()` when arriving at a named location.
 
 ## Audio System
 Fully procedural, no audio files needed:

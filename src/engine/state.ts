@@ -30,6 +30,8 @@ interface GameStore {
   // Storylet scheduler context
   recentFamilies: string[];
   recentTags: Set<string>;
+  recentTagsList: string[][];
+  recentIds: string[];
   usedGroups: Set<string>;
 
   setQuest: (quest: Quest) => void;
@@ -64,6 +66,8 @@ function serialize(state: GameState, mapState: MapState | null, mapSeed: number 
     delayedEffects: state.delayedEffects,
     visitedLocations: [...(state.visitedLocations ?? [])],
     factionReps: state.factionReps,
+    artifactLog: state.artifactLog,
+    npcMeetings: state.npcMeetings,
     objectiveId: useObjectiveStore.getState().objectiveId ?? undefined,
     gameMode: useGameModeStore.getState().mode,
     mapSeed: mapSeed ?? undefined,
@@ -95,6 +99,8 @@ function deserialize(data: SerializedGameState): { state: GameState; mapState: M
       delayedEffects: data.delayedEffects ?? [],
       visitedLocations: new Set(data.visitedLocations ?? []),
       factionReps: data.factionReps ?? defaultReps(),
+      artifactLog: data.artifactLog ?? [],
+      npcMeetings: data.npcMeetings ?? [],
     },
     mapState: mapData ? deserializeMap(mapData) : null,
     mapSeed: mapSeed ?? null,
@@ -114,6 +120,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
   mapSeed: null,
   recentFamilies: [],
   recentTags: new Set(),
+  recentTagsList: [],
+  recentIds: [],
   usedGroups: new Set(),
 
   setQuest: (quest) => set({ quest }),
@@ -143,6 +151,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
       inventory: [...(quest.initialState.inventory ?? []), ...(origin.items ?? [])],
       delayedEffects: [...(quest.initialState.delayedEffects ?? [])],
       visitedLocations: new Set<string>(),
+      artifactLog: [],
+      npcMeetings: [],
       factionReps: applyRepChanges(
         quest.initialState.factionReps ?? defaultReps(),
         originRepBonuses(useOriginStore.getState().origin),
@@ -160,6 +170,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
       mapSeed: genMap.seed,
       recentFamilies: [],
       recentTags: new Set(),
+      recentTagsList: [],
+      recentIds: [],
       usedGroups: new Set(),
     });
   },
@@ -184,11 +196,19 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // Advance watch (each sail action = 1 watch)
     const { day: newDay, watch: newWatch, newDay: isDayTransition } = advanceWatch(state);
 
+    // Build immutable copy for daily effects
+    let gold = state.gold;
+    let crew = state.crew;
+    let karma = state.karma;
+    let curse = state.curse;
+    const newFlags = new Set(state.flags);
+    const newVisitedLocations = new Set(state.visitedLocations);
+
     // Apply daily effects only at dawn (new day transition)
     if (isDayTransition) {
       // Low crew penalties: morale drops
-      if (state.crew <= 2 && state.crew > 0) {
-        state.karma = Math.round((state.karma - 0.5) * 10) / 10;
+      if (crew <= 2 && crew > 0) {
+        karma = Math.round((karma - 0.5) * 10) / 10;
       }
 
       // Apply passive artifact effects (once per day)
@@ -196,12 +216,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
         for (const itemId of state.inventory) {
           const def = ARTIFACTS[itemId];
           if (def?.passive) {
-            (state as unknown as Record<string, number>)[def.passive.stat] += def.passive.perDay;
+            const stat = def.passive.stat;
+            const val = resolveValue(def.passive.perDay);
+            if (stat === "gold") gold += val;
+            else if (stat === "crew") crew += val;
+            else if (stat === "karma") karma += val;
+            else if (stat === "curse") curse += val;
           }
         }
-        state.crew = Math.max(0, Math.round(state.crew));
-        state.curse = Math.max(0, Math.round(state.curse));
-        state.gold = Math.max(0, Math.round(state.gold));
+        crew = Math.max(0, Math.round(crew));
+        curse = Math.max(0, Math.round(curse));
+        gold = Math.max(0, Math.round(gold));
       }
     }
 
@@ -216,16 +241,22 @@ export const useGameStore = create<GameStore>((set, get) => ({
           encounter: forcedEnc,
           result: null,
           screen: "encounter",
-          state: { ...state, day: newDay, watch: newWatch, delayedEffects: remaining },
+          state: {
+            ...state, day: newDay, watch: newWatch,
+            gold, crew, karma, curse,
+            flags: newFlags,
+            visitedLocations: newVisitedLocations,
+            delayedEffects: remaining,
+          },
         });
         setTimeout(() => get().save(), 0);
         return;
       }
     }
 
-    const { mapState, recentFamilies, recentTags, usedGroups } = get();
+    const { mapState, recentFamilies, recentTags, recentIds, usedGroups } = get();
     const playerPos = mapState?.playerPos;
-    const pickerCtx: PickerContext = { recentFamilies, recentTags, usedGroups };
+    const pickerCtx: PickerContext = { recentFamilies, recentTags, usedGroups, recentIds };
     const enc = pickEncounter(quest.encounters, state, usedIds, playerPos ?? undefined, pickerCtx);
     const newUsed = new Set(usedIds);
     newUsed.add(enc.id);
@@ -233,15 +264,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // Update storylet context for diversity tracking
     const encFamily = enc.family ?? "ambient";
     const newRecentFamilies = [...recentFamilies, encFamily].slice(-RECENT_WINDOW);
+    // Track tags as array-of-arrays so old entries rotate out
+    const recentTagsList = get().recentTagsList ?? [];
+    const newRecentTagsList = [...recentTagsList, enc.tags ?? []].slice(-RECENT_WINDOW);
     const newRecentTags = new Set<string>();
-    // Keep tags from last RECENT_WINDOW encounters (approximate via current + new)
-    if (enc.tags) enc.tags.forEach(t => newRecentTags.add(t));
-    recentTags.forEach(t => newRecentTags.add(t));
+    for (const tags of newRecentTagsList) {
+      for (const t of tags) newRecentTags.add(t);
+    }
     const newUsedGroups = new Set(usedGroups);
     if (enc.exclusivityGroup) newUsedGroups.add(enc.exclusivityGroup);
+    const newRecentIds = [...recentIds, enc.id].slice(-20); // track last 20 encounter ids
 
-    // Update map position
-    if (mapState) {
+    // Update map position (immutable copy)
+    let newMapState = mapState ? { ...mapState } : null;
+    if (newMapState) {
       // Calculate reveal radius from base + artifact bonuses
       let revealRadius = 3;
       for (const itemId of state.inventory) {
@@ -249,39 +285,49 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (def?.revealRadius) revealRadius += def.revealRadius;
       }
       // Route-based movement: advance along planned route
-      if (mapState.currentRoute && mapState.routeProgress < mapState.currentRoute.length) {
-        const nextCell = mapState.currentRoute[mapState.routeProgress];
-        mapState.playerPos = nextCell;
-        mapState.routeProgress++;
-        revealAround(mapState, nextCell[0], nextCell[1], revealRadius);
+      if (newMapState.currentRoute && newMapState.routeProgress < newMapState.currentRoute.length) {
+        const nextCell = newMapState.currentRoute[newMapState.routeProgress];
+        newMapState.playerPos = nextCell;
+        newMapState.routeProgress++;
+        revealAround(newMapState, nextCell[0], nextCell[1], revealRadius);
 
         // Arrived at destination?
-        if (mapState.routeProgress >= mapState.currentRoute.length) {
-          // Track visited location for objective progress
+        if (newMapState.routeProgress >= newMapState.currentRoute.length) {
           const destKey = `${nextCell[0]},${nextCell[1]}`;
-          state.visitedLocations.add(destKey);
+          newVisitedLocations.add(destKey);
 
-          mapState.currentRoute = null;
-          mapState.destination = null;
-          mapState.routeProgress = 0;
+          newMapState.currentRoute = null;
+          newMapState.destination = null;
+          newMapState.routeProgress = 0;
         }
       } else {
         // Fallback: terrain-matching (for when no route is set, e.g. first encounter)
         const terrains = getTerrainForScene(enc.scene);
-        const nearest = findNearestCell(mapState.playerPos[0], mapState.playerPos[1], terrains);
+        const nearest = findNearestCell(newMapState.playerPos[0], newMapState.playerPos[1], terrains);
         if (nearest) {
-          mapState.playerPos = nearest;
-          revealAround(mapState, nearest[0], nearest[1], revealRadius);
+          newMapState.playerPos = nearest;
+          revealAround(newMapState, nearest[0], nearest[1], revealRadius);
         }
       }
     }
 
     // Track curse peak for curse_breaker objective
-    if (state.curse >= 8 && !state.flags.has("curse_peaked_8")) {
-      state.flags.add("curse_peaked_8");
+    if (curse >= 8 && !newFlags.has("curse_peaked_8")) {
+      newFlags.add("curse_peaked_8");
     }
 
-    const updatedState = { ...state, day: newDay, watch: newWatch };
+    const updatedState: GameState = {
+      ...state,
+      day: newDay,
+      watch: newWatch,
+      gold, crew, karma, curse,
+      flags: newFlags,
+      visitedLocations: newVisitedLocations,
+      inventory: [...state.inventory],
+      delayedEffects: [...state.delayedEffects],
+      log: [...state.log],
+      factionReps: { ...state.factionReps },
+    };
 
     set({
       usedIds: newUsed,
@@ -289,9 +335,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
       result: null,
       screen: "encounter",
       state: updatedState,
-      mapState: mapState ? { ...mapState } : null,
+      mapState: newMapState,
       recentFamilies: newRecentFamilies,
       recentTags: newRecentTags,
+      recentTagsList: newRecentTagsList,
+      recentIds: newRecentIds,
       usedGroups: newUsedGroups,
     });
 
@@ -317,6 +365,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
       inventory: [...state.inventory],
       delayedEffects: [...state.delayedEffects],
       visitedLocations: new Set(state.visitedLocations),
+      artifactLog: [...(state.artifactLog ?? [])],
+      npcMeetings: [...(state.npcMeetings ?? [])],
       factionReps: choice.eff.rep
         ? applyRepChanges(state.factionReps, choice.eff.rep)
         : { ...state.factionReps },
@@ -326,6 +376,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (choice.eff.item) {
       ns.inventory.push(choice.eff.item);
       ns.flags.add(`has_${choice.eff.item}`);
+      const encTitle = typeof encounter.title === "function" ? encounter.title(state) : encounter.title;
+      ns.artifactLog.push({
+        itemId: choice.eff.item,
+        day: state.day,
+        encounterId: encounter.id,
+        encounterTitle: encTitle,
+      });
     }
     // Handle item loss
     if (choice.eff.loseItem) {

@@ -66,6 +66,7 @@ export interface PickerContext {
   recentFamilies?: string[];  // last N encounter families
   recentTags?: Set<string>;   // tags from last N encounters
   usedGroups?: Set<string>;   // exclusivity groups already used this run
+  recentIds?: string[];       // last N encounter ids for cooldown checks
 }
 
 export function pickEncounter(
@@ -80,6 +81,7 @@ export function pickEncounter(
   const recentFamilies = context?.recentFamilies ?? [];
   const recentTags = context?.recentTags ?? new Set<string>();
   const usedGroups = context?.usedGroups ?? new Set<string>();
+  const recentIds = context?.recentIds ?? [];
 
   // Enrich encounters with inferred storylet metadata
   const enriched = encounters.map(enrichEncounter);
@@ -92,6 +94,11 @@ export function pickEncounter(
     if (e.location && posKey !== null && e.location !== posKey) return false;
     // Exclusivity group check
     if (e.exclusivityGroup && usedGroups.has(e.exclusivityGroup)) return false;
+    // Cooldown check: if encounter appeared recently, skip it
+    if (e.cooldown && recentIds.includes(e.id)) {
+      const lastIdx = recentIds.lastIndexOf(e.id);
+      if (recentIds.length - lastIdx <= e.cooldown) return false;
+    }
     return true;
   });
 

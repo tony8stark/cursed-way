@@ -111,7 +111,7 @@ export function defaultReps(): FactionReps {
 /** Starting reputation bonuses by origin */
 export function originRepBonuses(originId: string): Partial<FactionReps> {
   switch (originId) {
-    case "navy": return { crown: 3, brethren: -2 };
+    case "navy_defector": return { crown: 3, brethren: -2 };
     case "smuggler": return { brethren: 2, guild: 1, crown: -1 };
     case "scholar": return { guild: 2 };
     case "mutineer": return { brethren: 3, crown: -3 };

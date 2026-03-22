@@ -57,8 +57,11 @@ export function EncounterScreen() {
       const idx = parseInt(e.key) - 1;
       if (idx >= 0 && idx < available.length) {
         const ch = available[idx];
-        const cost = ch.eff.gold && typeof ch.eff.gold === "number" && ch.eff.gold < 0
-          ? Math.abs(ch.eff.gold) : 0;
+        // Calculate worst-case cost: fixed negative or max of negative range
+        const g = ch.eff.gold;
+        let cost = 0;
+        if (typeof g === "number" && g < 0) cost = Math.abs(g);
+        else if (Array.isArray(g) && g[0] < 0) cost = Math.abs(Math.min(g[0], g[1]));
         if (cost <= state.gold) {
           handleChoice(ch);
         }
@@ -133,7 +136,7 @@ export function EncounterScreen() {
       <div className="w-[280px] shrink-0 flex flex-col gap-3">
         <StatsBar state={state} />
         <FactionBar reps={state.factionReps} />
-        <InventoryBar inventory={state.inventory} />
+        <InventoryBar inventory={state.inventory} artifactLog={state.artifactLog} />
 
         {/* Compact objective indicator */}
         {objectiveDef && state && (() => {

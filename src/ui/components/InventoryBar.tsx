@@ -1,9 +1,16 @@
 import { ARTIFACTS } from "../../engine/items";
 import { ITEM_NAMES } from "../../engine/items-i18n";
-import { useLocaleStore } from "../../i18n";
+import { useLocaleStore, useT } from "../../i18n";
+import type { ArtifactLog } from "../../engine/types";
 
-export function InventoryBar({ inventory }: { inventory: string[] }) {
+interface InventoryBarProps {
+  inventory: string[];
+  artifactLog?: ArtifactLog[];
+}
+
+export function InventoryBar({ inventory, artifactLog }: InventoryBarProps) {
   const locale = useLocaleStore(s => s.locale);
+  const t = useT();
 
   if (inventory.length === 0) return null;
 
@@ -12,6 +19,11 @@ export function InventoryBar({ inventory }: { inventory: string[] }) {
       {inventory.map((id, i) => {
         const def = ARTIFACTS[id];
         const name = ITEM_NAMES[id]?.[locale] ?? id;
+        // Find acquisition info
+        const logEntry = artifactLog?.find(l => l.itemId === id);
+        const tooltip = logEntry
+          ? `${name} (${t("day")} ${logEntry.day}: ${logEntry.encounterTitle})`
+          : name;
         return (
           <div
             key={`${id}-${i}`}
@@ -22,7 +34,7 @@ export function InventoryBar({ inventory }: { inventory: string[] }) {
                 : "#40c0f0",
               background: "rgba(0,0,0,0.3)",
             }}
-            title={name}
+            title={tooltip}
           >
             {def?.icon || "?"}
           </div>

@@ -95,7 +95,7 @@ export function MapScreen() {
       <div className="w-[260px] shrink-0 flex flex-col gap-3">
         <StatsBar state={state} />
         <FactionBar reps={state.factionReps} />
-        <InventoryBar inventory={state.inventory} />
+        <InventoryBar inventory={state.inventory} artifactLog={state.artifactLog} />
 
         {/* Objective progress */}
         {objectiveDef && objectiveProgress && (

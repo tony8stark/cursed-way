@@ -1082,4 +1082,30 @@ export const encountersEn: Encounter[] = [
       { text: "⚓ Ask him to stay", eff: { crew: 0, karma: 0 }, msg: s => s.flags.has("kojo_disappointed") ? "'Give me a reason.' You can't. He leaves at dawn." : "'I'll stay. But not because you asked. Because this ship is the first place I chose to be.' He smiles.", flag: "kojo_stays" },
     ],
   },
+
+  // ── ARTIFACT QUESTS (unlock encounters) ──
+
+  {
+    id: "treasure_map_complete", scene: "island", family: "quest", phase: "mid",
+    title: "The Map Shows the Way",
+    text: "The map fragment in your hands suddenly begins to glow. Lines shift and move, pointing to a skull-shaped rock. Something lies beneath.",
+    requires: s => s.inventory.includes("map_fragment"),
+    choices: [
+      { text: "⛏️ Dig!", eff: { gold: [80, 150], crew: 0, karma: 0, curse: 1, loseItem: "map_fragment" }, msg: "Captain Flint's chest. Gold, jewels, and a note: 'Whoever finds this is already cursed, same as me.'", flag: "flint_treasure" },
+      { text: "🗺️ Remember the spot", eff: { gold: 0, crew: 0, karma: 0, curse: 0 }, msg: "Not now. Too dangerous. But the location is burned into memory forever.", flag: "treasure_location_known" },
+      { text: "🔥 Burn the map", eff: { gold: 0, crew: 0, karma: 1, curse: -2, loseItem: "map_fragment" }, msg: "Fire takes the map. With it, part of the curse. The sea seems to sigh in relief." },
+    ],
+  },
+  {
+    id: "pearl_whispers", scene: "ethereal", family: "quest", phase: ["mid", "late"],
+    title: "Whispers of the Black Pearl",
+    text: "At night the pearl begins to whisper. An ancient, inhuman voice. It offers a bargain: knowledge in exchange for sacrifice.",
+    requires: s => s.inventory.includes("black_pearl") && s.day >= 5,
+    choices: [
+      { text: "👂 Listen", eff: { gold: 0, crew: 0, karma: 0, curse: 3 }, msg: "The pearl shows visions: a sunken city where gold flows like water. And something at its center that should not exist. Now you know where it is.", flag: "pearl_vision" },
+      { text: "🩸 Offer blood", eff: { gold: 0, crew: -1, karma: -2, curse: 2, item: "ancient_key" }, msg: "Blood touches the pearl and vanishes. A bone key appears on deck. One sailor falls and does not rise again.", flag: "pearl_sacrifice" },
+      { text: "🤫 Ignore it", eff: { gold: 0, crew: 0, karma: 0, curse: 0 }, msg: "The whispers fade. But the pearl is warmer than before. It waits." },
+      { text: "🌊 Throw it overboard", eff: { gold: 0, crew: 1, karma: 1, curse: -3, loseItem: "black_pearl" }, msg: "The pearl arcs into the waves. A scream no one hears. The crew exhales. That night, everyone sleeps soundly." },
+    ],
+  },
 ];

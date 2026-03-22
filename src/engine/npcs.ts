@@ -86,7 +86,6 @@ const GHOST_GLOW = "#aed6f1";
 const HAIR_BLACK = "#1c1c1c";
 const HAIR_BROWN = "#5d3a1a";
 const HAIR_RED = "#a04000";
-const HAIR_BLOND = "#d4ac0d";
 const HAIR_GRAY = "#95a5a6";
 const HAIR_WHITE = "#d5d8dc";
 

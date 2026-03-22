@@ -1,59 +1,20 @@
-import type { Locale } from "../i18n";
 import type { TerrainType, MapCell } from "./map-data";
+import {
+  type LocationTemplate,
+  PORT_POOL,
+  SETTLEMENT_POOL,
+  INHABITED_ISLAND_POOL,
+  WILD_ISLAND_POOL,
+  PHANTOM_ISLAND_POOL,
+  UNDERWATER_POOL,
+  CAVE_POOL,
+  WRECK_POOL,
+  MYSTERIOUS_POOL,
+  REEF_POOL,
+  LANDMARK_POOL,
+} from "./location-pools";
 
-// ── Location pool ──
-// Each run picks 12-18 from this pool
-
-export interface LocationTemplate {
-  name: Record<Locale, string>;
-  icon: string;
-  terrain: TerrainType; // what terrain to place at this location
-  weight: number;       // selection weight (higher = more likely to appear)
-}
-
-// Ports (always pick 5-7)
-const PORT_POOL: LocationTemplate[] = [
-  { name: { uk: "Тортуга", en: "Tortuga" }, icon: "🍺", terrain: "port", weight: 3 },
-  { name: { uk: "Гавана", en: "Havana" }, icon: "🏛️", terrain: "port", weight: 2 },
-  { name: { uk: "Нассау", en: "Nassau" }, icon: "🏴", terrain: "port", weight: 2 },
-  { name: { uk: "Порт-Роял", en: "Port Royal" }, icon: "⚓", terrain: "port", weight: 2 },
-  { name: { uk: "Картахена", en: "Cartagena" }, icon: "🏰", terrain: "port", weight: 2 },
-  { name: { uk: "Маракайбо", en: "Maracaibo" }, icon: "🏘️", terrain: "port", weight: 1.5 },
-  { name: { uk: "Санто-Домінго", en: "Santo Domingo" }, icon: "⛪", terrain: "port", weight: 1.5 },
-  { name: { uk: "Кінгстон", en: "Kingston" }, icon: "🏗️", terrain: "port", weight: 1 },
-  { name: { uk: "Барбадос", en: "Barbados" }, icon: "🌴", terrain: "port", weight: 1 },
-  { name: { uk: "Тринідад", en: "Trinidad" }, icon: "🛖", terrain: "port", weight: 1 },
-  { name: { uk: "Сент-Кіттс", en: "St. Kitts" }, icon: "🏝️", terrain: "port", weight: 1 },
-  { name: { uk: "Кюрасао", en: "Curacao" }, icon: "🎨", terrain: "port", weight: 1 },
-];
-
-// Exploration sites (pick 4-6)
-const EXPLORATION_POOL: LocationTemplate[] = [
-  { name: { uk: "Печера Тіней", en: "Shadow Cave" }, icon: "🕳️", terrain: "cave", weight: 2 },
-  { name: { uk: "Уламки Марії", en: "Mary's Wreck" }, icon: "💀", terrain: "wreck", weight: 2 },
-  { name: { uk: "Рифи Крові", en: "Blood Reefs" }, icon: "🩸", terrain: "reef", weight: 2 },
-  { name: { uk: "Коралові Сади", en: "Coral Gardens" }, icon: "🪸", terrain: "reef", weight: 1.5 },
-  { name: { uk: "Затонулий Храм", en: "Sunken Temple" }, icon: "🏛️", terrain: "wreck", weight: 1.5 },
-  { name: { uk: "Чортова Пащека", en: "Devil's Maw" }, icon: "🌋", terrain: "cave", weight: 1.5 },
-  { name: { uk: "Скелетний Острів", en: "Skeleton Isle" }, icon: "☠️", terrain: "cave", weight: 1 },
-  { name: { uk: "Мертвий Риф", en: "Dead Reef" }, icon: "🦴", terrain: "reef", weight: 1 },
-  { name: { uk: "Печера Ехо", en: "Echo Cave" }, icon: "🦇", terrain: "cave", weight: 1 },
-  { name: { uk: "Залізне Дно", en: "Iron Bottom" }, icon: "⚙️", terrain: "wreck", weight: 1 },
-  { name: { uk: "Китовий Цвинтар", en: "Whale Graveyard" }, icon: "🐋", terrain: "wreck", weight: 1 },
-  { name: { uk: "Сирена Скеля", en: "Siren Rock" }, icon: "🧜", terrain: "reef", weight: 1 },
-];
-
-// Wild islands (pick 3-5)
-const ISLAND_POOL: LocationTemplate[] = [
-  { name: { uk: "Острів Мавп", en: "Monkey Island" }, icon: "🐒", terrain: "land", weight: 2 },
-  { name: { uk: "Вулканічний Острів", en: "Volcano Isle" }, icon: "🌋", terrain: "land", weight: 1.5 },
-  { name: { uk: "Острів-Примара", en: "Phantom Island" }, icon: "👻", terrain: "land", weight: 1.5 },
-  { name: { uk: "Забута Затока", en: "Forgotten Bay" }, icon: "🏖️", terrain: "shallow", weight: 1.5 },
-  { name: { uk: "Рум'яний Острів", en: "Rum Island" }, icon: "🥃", terrain: "land", weight: 1 },
-  { name: { uk: "Мангровий Лабіринт", en: "Mangrove Maze" }, icon: "🌿", terrain: "shallow", weight: 1 },
-  { name: { uk: "Штормовий Пік", en: "Storm Peak" }, icon: "⛰️", terrain: "land", weight: 1 },
-  { name: { uk: "Чорний Пляж", en: "Black Beach" }, icon: "🏴", terrain: "land", weight: 1 },
-];
+export type { LocationTemplate };
 
 // ── Seeded random ──
 
@@ -105,8 +66,8 @@ class SeededRandom {
 
 // ── Map generation ──
 
-export const GEN_MAP_W = 30;
-export const GEN_MAP_H = 18;
+export const GEN_MAP_W = 44;
+export const GEN_MAP_H = 26;
 
 export interface PlacedLocation {
   x: number;
@@ -146,8 +107,8 @@ function generateTerrain(cells: MapCell[][], rng: SeededRandom): void {
     }
   }
 
-  // Place 8-14 island seeds
-  const numIslands = rng.int(8, 14);
+  // Place 14-22 island seeds (more for bigger map)
+  const numIslands = rng.int(14, 22);
   const seeds: [number, number, number][] = []; // x, y, size
 
   for (let i = 0; i < numIslands; i++) {
@@ -311,12 +272,12 @@ function buildRoutes(locations: PlacedLocation[]): Record<string, string[]> {
       .map(o => ({ loc: o, d: dist(loc.x, loc.y, o.x, o.y) }))
       .sort((a, b) => a.d - b.d);
 
-    // Connect to 2-3 nearest (max distance 15 cells)
-    const maxConnections = Math.min(3, others.length);
+    // Connect to 2-4 nearest (max distance 20 cells for bigger map)
+    const maxConnections = Math.min(4, others.length);
     let connected = 0;
     for (const other of others) {
       if (connected >= maxConnections) break;
-      if (other.d > 15) break;
+      if (other.d > 20) break;
       const otherKey = `${other.loc.x},${other.loc.y}`;
       if (!routes[key].includes(otherKey)) {
         routes[key].push(otherKey);
@@ -393,16 +354,25 @@ export function generateMap(seed?: number): GeneratedMap {
   // Generate terrain
   generateTerrain(cells, rng);
 
-  // Pick locations from pools
-  const numPorts = rng.int(5, 7);
-  const numExploration = rng.int(4, 6);
-  const numIslands = rng.int(3, 5);
+  // Pick locations from pools (diverse mix for larger map)
+  const pickedPorts = rng.weightedPick(PORT_POOL, rng.int(7, 10));
+  const pickedSettlements = rng.weightedPick(SETTLEMENT_POOL, rng.int(2, 4));
+  const pickedInhabited = rng.weightedPick(INHABITED_ISLAND_POOL, rng.int(2, 4));
+  const pickedWild = rng.weightedPick(WILD_ISLAND_POOL, rng.int(3, 6));
+  const pickedPhantom = rng.weightedPick(PHANTOM_ISLAND_POOL, rng.int(1, 3));
+  const pickedUnderwater = rng.weightedPick(UNDERWATER_POOL, rng.int(2, 4));
+  const pickedCaves = rng.weightedPick(CAVE_POOL, rng.int(2, 3));
+  const pickedWrecks = rng.weightedPick(WRECK_POOL, rng.int(2, 4));
+  const pickedMysterious = rng.weightedPick(MYSTERIOUS_POOL, rng.int(1, 3));
+  const pickedReefs = rng.weightedPick(REEF_POOL, rng.int(1, 2));
+  const pickedLandmarks = rng.weightedPick(LANDMARK_POOL, rng.int(1, 3));
 
-  const pickedPorts = rng.weightedPick(PORT_POOL, numPorts);
-  const pickedExploration = rng.weightedPick(EXPLORATION_POOL, numExploration);
-  const pickedIslands = rng.weightedPick(ISLAND_POOL, numIslands);
-
-  const allPicked = [...pickedPorts, ...pickedExploration, ...pickedIslands];
+  const allPicked = [
+    ...pickedPorts, ...pickedSettlements, ...pickedInhabited,
+    ...pickedWild, ...pickedPhantom, ...pickedUnderwater,
+    ...pickedCaves, ...pickedWrecks, ...pickedMysterious,
+    ...pickedReefs, ...pickedLandmarks,
+  ];
 
   // Place locations on map
   const placed: PlacedLocation[] = [];

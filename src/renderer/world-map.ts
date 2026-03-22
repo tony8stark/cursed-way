@@ -80,9 +80,9 @@ export function deserializeMap(data: SerializedMapState): MapState {
 
 // ── Renderer ──
 
-// Cell size (slightly smaller for larger maps)
-const CELL_W = 13;
-const CELL_H = 12;
+// Cell size (smaller for the expanded 44x26 map)
+const CELL_W = 10;
+const CELL_H = 9;
 
 // Fog colors
 const FOG_COLOR = "#08080e";

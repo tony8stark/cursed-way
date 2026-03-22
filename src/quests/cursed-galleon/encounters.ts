@@ -1082,4 +1082,30 @@ export const encounters: Encounter[] = [
       { text: "⚓ Попросити залишитись", eff: { crew: 0, karma: 0 }, msg: s => s.flags.has("kojo_disappointed") ? "'Дайте мені причину.' Ви не можете. Він іде на світанку." : "'Залишусь. Але не тому, що ви попросили. Тому що цей корабель — перше місце, яке я обрав сам.' Посміхається.", flag: "kojo_stays" },
     ],
   },
+
+  // ── АРТЕФАКТНІ КВЕСТИ (unlock encounters) ──
+
+  {
+    id: "treasure_map_complete", scene: "island", family: "quest", phase: "mid",
+    title: "Карта вказує шлях",
+    text: "Фрагмент карти в ваших руках раптом починає світитися. Лінії рухаються, вказуючи на скелю у формі черепа. Під нею — щось.",
+    requires: s => s.inventory.includes("map_fragment"),
+    choices: [
+      { text: "⛏️ Копати!", eff: { gold: [80, 150], crew: 0, karma: 0, curse: 1, loseItem: "map_fragment" }, msg: "Скриня капітана Флінта. Золото, коштовності, і записка: 'Хто знайде це — вже проклятий, як і я.'", flag: "flint_treasure" },
+      { text: "🗺️ Запам'ятати місце", eff: { gold: 0, crew: 0, karma: 0, curse: 0 }, msg: "Не час. Занадто небезпечно. Але місце тепер в пам'яті назавжди.", flag: "treasure_location_known" },
+      { text: "🔥 Спалити карту", eff: { gold: 0, crew: 0, karma: 1, curse: -2, loseItem: "map_fragment" }, msg: "Вогонь забирає карту. З нею — частину прокляття. Море ніби зітхає з полегшенням." },
+    ],
+  },
+  {
+    id: "pearl_whispers", scene: "ethereal", family: "quest", phase: ["mid", "late"],
+    title: "Шепіт Чорної Перлини",
+    text: "Вночі перлина починає шепотіти. Голос стародавній, нелюдський. Пропонує угоду: знання в обмін на жертву.",
+    requires: s => s.inventory.includes("black_pearl") && s.day >= 5,
+    choices: [
+      { text: "👂 Слухати", eff: { gold: 0, crew: 0, karma: 0, curse: 3 }, msg: "Перлина показує бачення: затонуле місто, де золото тече як вода. І щось в центрі, що не повинно існувати. Тепер ви знаєте, де воно.", flag: "pearl_vision" },
+      { text: "🩸 Запропонувати кров", eff: { gold: 0, crew: -1, karma: -2, curse: 2, item: "ancient_key" }, msg: "Кров торкається перлини і зникає. На палубі з'являється ключ з кістки. Один матрос падає і більше не встає.", flag: "pearl_sacrifice" },
+      { text: "🤫 Ігнорувати", eff: { gold: 0, crew: 0, karma: 0, curse: 0 }, msg: "Шепіт стихає. Але перлина тепліша, ніж раніше. Вона чекає." },
+      { text: "🌊 Викинути перлину", eff: { gold: 0, crew: 1, karma: 1, curse: -3, loseItem: "black_pearl" }, msg: "Перлина летить у хвилі. Крик, якого ніхто не чує. Команда видихає. Цієї ночі всі сплять спокійно." },
+    ],
+  },
 ];

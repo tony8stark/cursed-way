@@ -19,6 +19,8 @@ export interface GameState {
   delayedEffects: DelayedEffect[];
   visitedLocations: Set<string>;
   factionReps: import("./factions").FactionReps;
+  artifactLog: ArtifactLog[];
+  npcMeetings: NPCMeeting[];
 }
 
 export interface SerializedGameState {
@@ -34,6 +36,8 @@ export interface SerializedGameState {
   delayedEffects?: DelayedEffect[];
   visitedLocations?: string[];
   factionReps?: import("./factions").FactionReps;
+  artifactLog?: ArtifactLog[];
+  npcMeetings?: NPCMeeting[];
   objectiveId?: string;
   gameMode?: import("../engine/game-mode").GameMode;
   mapSeed?: number;
@@ -44,6 +48,22 @@ export interface LogEntry {
   day: number;
   title: string;
   summary: string;
+}
+
+/** Tracks where and when an artifact was found */
+export interface ArtifactLog {
+  itemId: string;
+  day: number;
+  encounterId: string;
+  encounterTitle: string;
+}
+
+/** Tracks NPCs the player has met */
+export interface NPCMeeting {
+  npcId: string;
+  day: number;
+  encounterId: string;
+  encounterTitle: string;
 }
 
 export type SceneId =
