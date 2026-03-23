@@ -143,8 +143,9 @@ function sceneIsland(ctx: CanvasRenderingContext2D, W: number, H: number, f: num
   ctx.fillStyle = "#50a040";
   ctx.beginPath(); ctx.ellipse(W * 0.65, H * 0.45, 60, 25, 0, Math.PI, Math.PI * 2); ctx.fill();
 
-  drawSprite(ctx, "palm", W * 0.55, H * 0.2, 3);
-  drawSprite(ctx, "palm", W * 0.72, H * 0.25, 2.5);
+  drawSprite(ctx, "palm", W * 0.52, H * 0.08, 3);
+  drawSprite(ctx, "palm", W * 0.70, H * 0.12, 2.5);
+  drawSprite(ctx, "bush", W * 0.62, H * 0.36, 2);
   ship(ctx, W * 0.15, H * 0.65 + Math.sin(f * 0.04) * 2, 3, 1, opts);
 
   // Shore foam
@@ -248,8 +249,9 @@ function scenePort(ctx: CanvasRenderingContext2D, W: number, H: number, f: numbe
     ctx.fillRect(W * 0.45 + i * 40, H * 0.5, 4, H * 0.2);
   }
 
-  drawSprite(ctx, "building", W * 0.5, H * 0.2, 3);
-  drawSprite(ctx, "building", W * 0.75, H * 0.25, 2.5);
+  drawSprite(ctx, "palm_big", W * 0.48, H * 0.02, 2);
+  drawSprite(ctx, "building", W * 0.68, H * 0.12, 2.5);
+  drawSprite(ctx, "bush", W * 0.85, H * 0.35, 2);
 
   for (let i = 0; i < 5; i++) {
     ctx.fillStyle = `rgba(255,200,80,${0.4 + Math.sin(f * 0.04 + i * 2) * 0.2})`;
