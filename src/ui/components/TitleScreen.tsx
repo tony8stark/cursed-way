@@ -5,6 +5,7 @@ import { useT, useLocaleStore } from "../../i18n";
 import { useGameModeStore, type GameMode } from "../../engine/game-mode";
 import { useOriginStore, ORIGINS, type OriginId } from "../../engine/origins";
 import { useObjectiveStore, OBJECTIVES } from "../../engine/objectives";
+import { ITEM_NAMES } from "../../engine/items-i18n";
 
 // ── Simple pixel art portraits for origins (16x20, palette indices) ──
 
@@ -414,7 +415,7 @@ function CharacterStep({
             {selectedOrigin.bonuses.crew ? ` 👥${selectedOrigin.bonuses.crew > 0 ? "+" : ""}${selectedOrigin.bonuses.crew}` : ""}
             {selectedOrigin.bonuses.karma ? ` ⚖️${selectedOrigin.bonuses.karma > 0 ? "+" : ""}${selectedOrigin.bonuses.karma}` : ""}
             {selectedOrigin.bonuses.curse ? ` ☠️+${selectedOrigin.bonuses.curse}` : ""}
-            {selectedOrigin.items?.length ? ` 🎒${selectedOrigin.items.join(", ")}` : ""}
+            {selectedOrigin.items?.length ? ` 🎒${selectedOrigin.items.map(id => ITEM_NAMES[id]?.[locale] ?? id).join(", ")}` : ""}
           </div>
         </motion.div>
       </AnimatePresence>
