@@ -115,6 +115,8 @@ export function originRepBonuses(originId: string): Partial<FactionReps> {
     case "smuggler": return { brethren: 2, guild: 1, crown: -1 };
     case "scholar": return { guild: 2 };
     case "mutineer": return { brethren: 3, crown: -3 };
+    case "voodoo_priestess": return { brethren: 1, crown: -2, guild: 1 };
+    case "merchant_captain": return { guild: 3, crown: 1, brethren: -2 };
     default: return {};
   }
 }

@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import type { Locale } from "../i18n";
 
-export type OriginId = "navy_defector" | "smuggler" | "scholar" | "mutineer";
+export type OriginId = "navy_defector" | "smuggler" | "scholar" | "mutineer" | "voodoo_priestess" | "merchant_captain";
 
 export interface Origin {
   id: OriginId;
@@ -66,6 +66,30 @@ export const ORIGINS: Origin[] = [
     },
     bonuses: { crew: 1, karma: -2 },
     flags: ["origin_mutineer"],
+  },
+  {
+    id: "voodoo_priestess",
+    icon: "🐍",
+    name: { uk: "Зара \"Сирена\" Осеї", en: "Zara \"Siren\" Osei" },
+    desc: {
+      uk: "Народилася в рабстві на плантації Ямайки. Втекла під час урагану, коли море саме відкрило їй шлях. Бабуся навчила її мові духів та силі трав. Команда боїться її, але ще більше боїться без неї. Кажуть, навіть кракени відвертають погляд, коли вона співає.",
+      en: "Born into slavery on a Jamaican plantation. Escaped during a hurricane when the sea itself opened a path. Her grandmother taught her the language of spirits and the power of herbs. The crew fears her, but fears being without her even more. They say even krakens look away when she sings.",
+    },
+    bonuses: { curse: -1, crew: 1, gold: -5 },
+    flags: ["origin_voodoo"],
+    items: ["voodoo_doll"],
+  },
+  {
+    id: "merchant_captain",
+    icon: "⚖️",
+    name: { uk: "Мей-Лін Чень", en: "Mei-Lin Chen" },
+    desc: {
+      uk: "Спадкоємиця торговельної династії з Макао. Після загибелі батька від рук піратів перетворила торговий флот на військовий. Її джонки возять шовк удень, а зброю вночі. Знає ціну кожній речі та кожній людині. П'ять мов, три кинджали, жодної довіри.",
+      en: "Heir to a trading dynasty from Macau. After her father was killed by pirates, she turned the merchant fleet into a warship fleet. Her junks carry silk by day and weapons by night. She knows the price of everything and everyone. Five languages, three daggers, zero trust.",
+    },
+    bonuses: { gold: 30, crew: -1 },
+    flags: ["origin_merchant"],
+    items: ["trade_license"],
   },
 ];
 

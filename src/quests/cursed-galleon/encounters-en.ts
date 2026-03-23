@@ -20,6 +20,7 @@ export const encountersEn: Encounter[] = [
       { text: "🤝 Trade information", eff: { gold: 0, crew: 0, karma: 0, curse: 0 }, msg: "He tells of a British convoy passing in two days.", flag: "knows_convoy" },
       { text: "🗝️ [Smuggler] Use your old contacts", eff: { gold: -10, crew: 0, karma: 0, curse: 0 }, msg: "You know the handshake. Half price, no questions. He throws in a keg of powder.", flag: "armed", requires_flag: "origin_smuggler" },
       { text: "⚓ [Navy] Flash your old commission", eff: { gold: 0, crew: 0, karma: 0, curse: 0 }, msg: "He goes pale. Dumps the weapons overboard and flees. You fish out a fine pistol.", flag: "armed", requires_flag: "origin_navy" },
+      { text: "⚖️ [Merchant] Wholesale deal", eff: { gold: -15, crew: 0, karma: 1, curse: 0, rep: { guild: 1 } }, msg: "You name the wholesale price from Macau. He shakes your hand. Arms, powder, and three barrels for half the cost. He even gives you his supplier's address.", flag: "armed", requires_flag: "origin_merchant" },
     ],
   },
   {
@@ -29,6 +30,7 @@ export const encountersEn: Encounter[] = [
       { text: "🤝 Trade fairly", eff: { gold: [5, 20], crew: 0, karma: 2, curse: 0, item: "cursed_compass", rep: { guild: 2 } }, msg: "The captain gifts a compass that 'points not north, but to what you seek'." },
       { text: "⚔️ Board them", eff: { gold: [40, 80], crew: [-3, -1], karma: -3, curse: 2, rep: { guild: -3, brethren: 1 } }, msg: "The junk burns. Among the silk — a scroll with unknown symbols. It pulses." },
       { text: "🍵 Tea with the captain", eff: { gold: 0, crew: 1, karma: 1, curse: 0 }, msg: "A former pirate. One of yours stays, but two of his crew ask to join you.", flag: "chinese_allies" },
+      { text: "⚖️ [Merchant] Speak Mandarin", eff: { gold: [15, 40], crew: 2, karma: 2, curse: 0, rep: { guild: 3 } }, msg: "The captain invites you aboard. Turns out he knew your father. He gives you silk, two experienced sailors, and his blessing.", flag: "chinese_allies", requires_flag: "origin_merchant" },
     ],
   },
   {
@@ -231,6 +233,7 @@ export const encountersEn: Encounter[] = [
       { text: "🎵 Listen", eff: { gold: 0, crew: [-2, -1], karma: 0, curse: 3 }, msg: "Two leap overboard with smiles on their faces." },
       { text: "🎶 Sing back", eff: { gold: 0, crew: 0, karma: 0, curse: 2 }, msg: "A woman's voice: 'Interesting. We'll meet again.' In the fog — eyes.", flag: "siren_contact" },
       { text: "📖 [Scholar] Recite the Binding Hymn", eff: { gold: 0, crew: 0, karma: 0, curse: -1 }, msg: "You know this melody. Page 47 of the Forbidden Codex. You speak the counter-verse. The song falters. A stunned silence. Then: 'You... know the old words.' Respect in the voice.", flag: "siren_contact", requires_flag: "origin_scholar" },
+      { text: "🐍 [Priestess] Call upon the Loa", eff: { gold: 0, crew: 0, karma: 0, curse: 0 }, msg: "You draw the veve on the deck. Mama Bridgewater taught you this. The singing stops. 'You speak the deep tongue. Sister.' A face emerges in the mist, full of respect.", flag: "siren_contact", requires_flag: "origin_voodoo" },
     ],
   },
   {
@@ -250,6 +253,7 @@ export const encountersEn: Encounter[] = [
       { text: "💀 Board it!", eff: { gold: [30, 80], crew: [-2, 0], karma: 0, curse: 4 }, msg: "The skeletons fight in silence. In the hold — a map to a place that shouldn't exist.", flag: "ghost_map" },
       { text: "🔥 Burn it", eff: { gold: 0, crew: 0, karma: 1, curse: -2 }, msg: "Fire devours the dead wood. The sound — a scream, or perhaps gratitude." },
       { text: "👻 Speak to them", eff: { gold: 0, crew: 0, karma: 0, curse: 3 }, msg: s => s.flags?.has("deep_watcher") ? "'It waits,' says the dead captain. 'It has always waited for you.'" : "'Don't go to the bottom. There's no treasure there. Only the price.'" },
+      { text: "🐍 [Priestess] Free the souls", eff: { gold: [20, 40], crew: 0, karma: 2, curse: -3 }, msg: "You pull out a pouch of bones and begin the ritual. The spirits freeze. The dead captain bows his head. 'At last.' The skeletons crumble to dust, but the treasure remains.", flag: "ghost_freed", requires_flag: "origin_voodoo" },
     ],
   },
   {
