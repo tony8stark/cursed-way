@@ -40,15 +40,15 @@ export function NPCPortraitDisplay({ npcId }: NPCPortraitProps) {
       initial={{ opacity: 0, x: -10 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ delay: 0.3 }}
-      className="flex items-center gap-2 rounded border border-white/10 bg-black/30 px-2 py-1.5"
+      className="flex items-start gap-3 rounded border border-white/10 bg-black/30 px-3 py-2"
     >
       {hasSprite ? (
         <img
           src={npc.spritePath}
           alt={npc.name.en}
           style={{
-            width: 48,
-            height: 48,
+            width: 64,
+            height: 64,
             imageRendering: "pixelated",
           }}
           className="flex-shrink-0"
@@ -58,14 +58,14 @@ export function NPCPortraitDisplay({ npcId }: NPCPortraitProps) {
           ref={canvasRef}
           width={40}
           height={48}
-          style={{ imageRendering: "pixelated", width: 40, height: 48 }}
+          style={{ imageRendering: "pixelated", width: 56, height: 67 }}
         />
       )}
-      <div className="min-w-0">
-        <div className="font-game text-[8px] text-[#f0c040] truncate">
+      <div className="min-w-0 pt-1">
+        <div className="font-game text-[9px] text-[#f0c040] truncate">
           {npc.icon} {npc.name[locale]}
         </div>
-        <div className="font-game text-[6px] text-white/40 truncate">
+        <div className="font-game text-[7px] text-white/40 truncate">
           {npc.title[locale]}
         </div>
       </div>

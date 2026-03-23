@@ -136,7 +136,7 @@ export function EncounterScreen() {
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
           >
-            <div className="bg-white/[0.04] border border-white/[0.12] rounded px-3.5 py-3 mb-3 leading-[2.4]">
+            <div className="bg-white/[0.04] border border-white/[0.12] rounded px-3.5 py-3 mb-3 leading-[1.8]">
               <TypewriterText
                 text={result}
                 speed={20}
@@ -210,7 +210,7 @@ export function EncounterScreen() {
             </span>
           </motion.div>
 
-          <div className="leading-[2.4]">
+          <div className="leading-[1.8]">
             <TypewriterText
               text={text}
               speed={25}
