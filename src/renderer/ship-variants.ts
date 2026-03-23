@@ -243,16 +243,13 @@ export function drawShipVariant(
   const sprite = getShipSprite(visualState);
 
   if (sprite) {
-    // Snoblin Galleon sprites are ~59x57, drawn at 1.5x scale to fit scene
+    // Snoblin Galleon sprites are ~59x57. Scale so ship is a nice size on canvas.
     const drawScale = scale * 0.55;
     const sprW = sprite.naturalWidth * drawScale;
     const sprH = sprite.naturalHeight * drawScale;
-    // Center horizontally on old grid position, align bottom to old grid bottom
-    // so the ship "sits" on the water and the sails grow upward
-    const oldW = 14 * scale;
-    const oldH = 8 * scale;
-    const sx = x + (oldW - sprW) / 2;
-    const sy = y + oldH - sprH;
+    // y = waterline (bottom of hull). Ship drawn upward from this line.
+    const sx = x;
+    const sy = y - sprH;
 
     const prevAlpha = ctx.globalAlpha;
     ctx.globalAlpha = baseAlpha;
@@ -300,8 +297,10 @@ export function drawShipVariant(
       ctx.fillRect(sx + sprW * 0.3, sy, sprW * 0.4, sprH * 0.35);
     }
   } else {
-    // Fallback: original ASCII grid rendering
-    drawGrid(ctx, BASE_SHIP, BASE_COLORS, x, y, scale, baseAlpha);
+    // Fallback: original ASCII grid rendering (y = waterline, draw upward)
+    const gridH = BASE_SHIP.length * scale;
+    const gy = y - gridH;
+    drawGrid(ctx, BASE_SHIP, BASE_COLORS, x, gy, scale, baseAlpha);
     for (const layer of LAYERS) {
       if (layer.condition(visualState)) {
         let layerAlpha: number;
@@ -312,7 +311,7 @@ export function drawShipVariant(
         } else {
           layerAlpha = baseAlpha;
         }
-        drawGrid(ctx, layer.grid, layer.colors, x, y, scale, layerAlpha);
+        drawGrid(ctx, layer.grid, layer.colors, x, gy, scale, layerAlpha);
       }
     }
   }
