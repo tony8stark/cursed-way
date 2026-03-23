@@ -70,7 +70,9 @@ const SPRITE_IMAGES: Record<string, SpriteImage> = {
   chest:    { path: "/icons/scene/chest.png",      w: 10, h: 10 },   // 32x32 pirate chest
   enemy:    { path: "/icons/ships/enemy_cog.png",   w: 17, h: 15 },  // Snoblin Cog with skull sail
   ghost:    { path: "/icons/ships/ghost_sailboat.png", w: 14, h: 15 }, // Snoblin Sailboat (ethereal)
-  tentacle: { path: "", w: 8, h: 8 },  // serpent body as tentacle
+  tentacle: { path: "", w: 8, h: 8 },  // serpent body segment (dynamic variant)
+  serpent_head: { path: "/icons/map/serpent_head.png", w: 10, h: 10 },
+  serpent_tail: { path: "/icons/map/serpent_tail.png", w: 10, h: 10 },
 };
 
 // Dynamic path resolution for variant sprites

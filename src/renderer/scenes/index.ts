@@ -300,6 +300,7 @@ function sceneKraken(ctx: CanvasRenderingContext2D, W: number, H: number, f: num
   ctx.fillStyle = "#080810";
   ctx.fillRect(0, 0, W, H);
 
+  // Choppy dark water
   for (let y = 0; y < H; y += 5) {
     for (let x = 0; x < W; x += 5) {
       if (Math.sin((x + f * 2) * 0.06) * Math.cos((y + f * 1.5) * 0.07) > 0.1) {
@@ -309,15 +310,30 @@ function sceneKraken(ctx: CanvasRenderingContext2D, W: number, H: number, f: num
     }
   }
 
-  for (let i = 0; i < 6; i++) {
-    drawSprite(ctx, "tentacle", W * (0.1 + i * 0.15), H * 0.5 + Math.sin(f * 0.04 + i * 1.2) * 20, 3, 0.7);
+  // Sea serpent: head → body segments → tail, undulating through waves
+  const serpentY = H * 0.42;
+  const segSpacing = W * 0.1;
+  const segScale = 3.5;
+  // Head at left, moving right
+  const headX = W * 0.06;
+  drawSprite(ctx, "serpent_head", headX, serpentY + Math.sin(f * 0.05) * 12 - 8, segScale, 0.85);
+  // 5 body segments with wave motion
+  for (let i = 0; i < 5; i++) {
+    const sx = headX + segSpacing * (i + 1);
+    const sy = serpentY + Math.sin(f * 0.04 + (i + 1) * 1.0) * 18;
+    drawSprite(ctx, "tentacle", sx, sy, segScale, 0.75);
   }
+  // Tail
+  const tailX = headX + segSpacing * 6;
+  drawSprite(ctx, "serpent_tail", tailX, serpentY + Math.sin(f * 0.04 + 6.0) * 14, segScale, 0.7);
 
+  // Splash/foam particles
   if (f % 12 === 0) {
-    ps.emit(2, { x: W * 0.2, y: H * 0.5, w: W * 0.6, h: 30, color: "rgba(60,20,80,0.4)", size: 4, life: 50, vxRange: [-1, 1], vyRange: [-0.5, 0.5] });
+    ps.emit(2, { x: W * 0.1, y: serpentY, w: W * 0.7, h: 30, color: "rgba(60,20,80,0.4)", size: 4, life: 50, vxRange: [-1, 1], vyRange: [-0.5, 0.5] });
   }
 
-  ship(ctx, W / 2 - 21, H * 0.2 + Math.sin(f * 0.06) * 5, 3, 1, opts);
+  // Ship in foreground (bottom of scene)
+  ship(ctx, W / 2 - 21, H * 0.62 + Math.sin(f * 0.06) * 4, 3, 1, opts);
 }
 
 export const SCENES: Record<SceneId, SceneRenderer> = {
