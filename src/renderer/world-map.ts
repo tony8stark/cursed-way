@@ -40,61 +40,33 @@ const LOCATION_SPRITES: Record<string, string> = {
   landmark: "/icons/map/diamond_cross.png",
 };
 
-// Terrain type → sprite mapping (simple base tiles)
-const TERRAIN_SPRITES: Partial<Record<TerrainType, string>> = {
-  land: "/icons/map/land_base.png",
-  shallow: "/icons/map/shallow_base.png",
-  reef: "/icons/map/reef_light.png",
-  cave: "/icons/map/deep_base.png",
-  wreck: "/icons/map/deep_mid.png",
+// Color variations per terrain type for visual variety
+const TERRAIN_VARIANT_COLORS: Partial<Record<TerrainType, string[]>> = {
+  deep: ["#060a1a", "#080c1e", "#050916", "#0a0e22"],
+  water: ["#0a1a3e", "#0c1e44", "#081636", "#0e2248"],
+  shallow: ["#1a3a5e", "#1e4268", "#163252", "#224a6e"],
+  land: ["#3a6030", "#2e5428", "#446c38", "#355a2c"],
+  port: ["#4a3a2a", "#52422e", "#423226", "#5a4a32"],
+  reef: ["#2a4a4a", "#244242", "#305252", "#1e3e3e"],
+  cave: ["#1a1018", "#1e1420", "#161014", "#22181c"],
+  wreck: ["#2a1a1a", "#2e1e1e", "#261616", "#322222"],
 };
-
-// Terrain variants for visual variety (picked by cell position hash)
-const LAND_VARIANTS = [
-  "/icons/map/land_base.png",
-  "/icons/map/land_bay_1.png",
-  "/icons/map/land_bay_2.png",
-  "/icons/map/land_peninsula.png",
-];
-const SHALLOW_VARIANTS = [
-  "/icons/map/shallow_base.png",
-  "/icons/map/shallow_2.png",
-  "/icons/map/shallow_3.png",
-];
-const REEF_VARIANTS = [
-  "/icons/map/reef_light.png",
-  "/icons/map/reef_dark.png",
-  "/icons/map/reef_mixed.png",
-];
-const DEEP_VARIANTS = [
-  "/icons/map/deep_base.png",
-  "/icons/map/deep_base_2.png",
-  "/icons/map/deep_base_3.png",
-  "/icons/map/deep_mid.png",
-];
 
 /** Simple position-based hash for consistent variant selection */
 function cellHash(x: number, y: number): number {
   return ((x * 7 + y * 13 + x * y) & 0x7FFFFFFF);
 }
 
-function getTerrainVariant(terrain: TerrainType, x: number, y: number): string | null {
+function getTerrainVariantColor(terrain: TerrainType, x: number, y: number): string {
+  const variants = TERRAIN_VARIANT_COLORS[terrain];
+  if (!variants) return TERRAIN_COLORS[terrain];
   const h = cellHash(x, y);
-  switch (terrain) {
-    case "land": return LAND_VARIANTS[h % LAND_VARIANTS.length];
-    case "shallow": return SHALLOW_VARIANTS[h % SHALLOW_VARIANTS.length];
-    case "reef": return REEF_VARIANTS[h % REEF_VARIANTS.length];
-    case "cave":
-    case "wreck": return DEEP_VARIANTS[h % DEEP_VARIANTS.length];
-    default: return null;
-  }
+  return variants[h % variants.length];
 }
 
 // Preload all on startup
 [SHIP_SPRITE, SHIP_WRECK_SPRITE, PALM_SPRITE,
   ...Object.values(LOCATION_SPRITES),
-  ...Object.values(TERRAIN_SPRITES),
-  ...LAND_VARIANTS, ...SHALLOW_VARIANTS, ...REEF_VARIANTS, ...DEEP_VARIANTS,
 ].forEach(getSprite);
 
 export interface MapState {
@@ -235,17 +207,9 @@ function drawCells(
           ctx.fillRect(cx, cy, cellW, cellH);
         }
       } else {
-        // Try sprite variant for land/shallow/reef/cave/wreck
-        const variantPath = getTerrainVariant(cell.terrain, x, y);
-        const spr = variantPath ? getSprite(variantPath) : null;
-        if (spr) {
-          ctx.imageSmoothingEnabled = false;
-          ctx.drawImage(spr, cx, cy, cellW, cellH);
-          ctx.imageSmoothingEnabled = true;
-        } else {
-          ctx.fillStyle = baseColor;
-          ctx.fillRect(cx, cy, cellW, cellH);
-        }
+        // Use color variants for visual variety
+        ctx.fillStyle = getTerrainVariantColor(cell.terrain, x, y);
+        ctx.fillRect(cx, cy, cellW, cellH);
       }
 
       if (showLabels) {
@@ -489,7 +453,7 @@ export function drawFullWorldMap(
 
       const cell = MAP_CELLS[y]?.[x];
       if (!cell) continue;
-      ctx.fillStyle = TERRAIN_COLORS[cell.terrain];
+      ctx.fillStyle = getTerrainVariantColor(cell.terrain, x, y);
       ctx.fillRect(cx, cy, cellSize, cellSize);
 
       // Shimmer on water
