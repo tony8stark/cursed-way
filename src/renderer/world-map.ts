@@ -49,10 +49,52 @@ const TERRAIN_SPRITES: Partial<Record<TerrainType, string>> = {
   wreck: "/icons/map/deep_mid.png",
 };
 
+// Terrain variants for visual variety (picked by cell position hash)
+const LAND_VARIANTS = [
+  "/icons/map/land_base.png",
+  "/icons/map/land_bay_1.png",
+  "/icons/map/land_bay_2.png",
+  "/icons/map/land_peninsula.png",
+];
+const SHALLOW_VARIANTS = [
+  "/icons/map/shallow_base.png",
+  "/icons/map/shallow_2.png",
+  "/icons/map/shallow_3.png",
+];
+const REEF_VARIANTS = [
+  "/icons/map/reef_light.png",
+  "/icons/map/reef_dark.png",
+  "/icons/map/reef_mixed.png",
+];
+const DEEP_VARIANTS = [
+  "/icons/map/deep_base.png",
+  "/icons/map/deep_base_2.png",
+  "/icons/map/deep_base_3.png",
+  "/icons/map/deep_mid.png",
+];
+
+/** Simple position-based hash for consistent variant selection */
+function cellHash(x: number, y: number): number {
+  return ((x * 7 + y * 13 + x * y) & 0x7FFFFFFF);
+}
+
+function getTerrainVariant(terrain: TerrainType, x: number, y: number): string | null {
+  const h = cellHash(x, y);
+  switch (terrain) {
+    case "land": return LAND_VARIANTS[h % LAND_VARIANTS.length];
+    case "shallow": return SHALLOW_VARIANTS[h % SHALLOW_VARIANTS.length];
+    case "reef": return REEF_VARIANTS[h % REEF_VARIANTS.length];
+    case "cave":
+    case "wreck": return DEEP_VARIANTS[h % DEEP_VARIANTS.length];
+    default: return null;
+  }
+}
+
 // Preload all on startup
 [SHIP_SPRITE, SHIP_WRECK_SPRITE, PALM_SPRITE,
   ...Object.values(LOCATION_SPRITES),
   ...Object.values(TERRAIN_SPRITES),
+  ...LAND_VARIANTS, ...SHALLOW_VARIANTS, ...REEF_VARIANTS, ...DEEP_VARIANTS,
 ].forEach(getSprite);
 
 export interface MapState {
@@ -184,7 +226,7 @@ function drawCells(
       if (!cell) continue;
       const baseColor = TERRAIN_COLORS[cell.terrain];
 
-      if (cell.terrain === "water" || cell.terrain === "deep" || cell.terrain === "shallow") {
+      if (cell.terrain === "water" || cell.terrain === "deep") {
         ctx.fillStyle = baseColor;
         ctx.fillRect(cx, cy, cellW, cellH);
         const shimmer = Math.sin(frame * 0.03 + x * 0.7 + y * 0.5) * 0.08;
@@ -193,8 +235,17 @@ function drawCells(
           ctx.fillRect(cx, cy, cellW, cellH);
         }
       } else {
-        ctx.fillStyle = baseColor;
-        ctx.fillRect(cx, cy, cellW, cellH);
+        // Try sprite variant for land/shallow/reef/cave/wreck
+        const variantPath = getTerrainVariant(cell.terrain, x, y);
+        const spr = variantPath ? getSprite(variantPath) : null;
+        if (spr) {
+          ctx.imageSmoothingEnabled = false;
+          ctx.drawImage(spr, cx, cy, cellW, cellH);
+          ctx.imageSmoothingEnabled = true;
+        } else {
+          ctx.fillStyle = baseColor;
+          ctx.fillRect(cx, cy, cellW, cellH);
+        }
       }
 
       if (showLabels) {
