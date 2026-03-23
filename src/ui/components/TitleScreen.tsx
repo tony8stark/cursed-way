@@ -17,6 +17,38 @@ const ORIGIN_SPRITES: Record<OriginId, string> = {
   merchant_captain: "/icons/origins/merchant_captain.png",
 };
 
+// ── Decorative pirate icons for title screen ──
+const DECO_ICONS = [
+  "/icons/title/sword.png",
+  "/icons/title/compass.png",
+  "/icons/title/chest.png",
+  "/icons/title/map.png",
+  "/icons/title/rum.png",
+  "/icons/title/anchor.png",
+  "/icons/title/key.png",
+  "/icons/title/bomb.png",
+  "/icons/title/crystal.png",
+  "/icons/title/scroll.png",
+  "/icons/title/hat.png",
+  "/icons/title/coin.png",
+];
+
+/** Pixel art img helper */
+function PixelImg({ src, size = 32, className = "", style }: {
+  src: string; size?: number; className?: string; style?: React.CSSProperties;
+}) {
+  return (
+    <img
+      src={src}
+      width={size}
+      height={size}
+      className={className}
+      style={{ imageRendering: "pixelated", ...style }}
+      alt=""
+    />
+  );
+}
+
 // ── Steps ──
 
 type Step = "intro" | "character" | "mode";
@@ -99,51 +131,55 @@ function IntroStep({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0, y: -20 }}
-      transition={{ duration: 0.5 }}
+      transition={{ duration: 0.3 }}
     >
-      <motion.div
-        initial={{ y: -20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.8 }}
-        className="text-[11px] text-[#f0c040] mb-3 tracking-[2px] font-game"
-      >
-        ☠ ☠ ☠
-      </motion.div>
+      {/* Decorative icon row */}
+      <div className="flex justify-center gap-3 mb-4 opacity-40">
+        <PixelImg src="/icons/title/sword.png" size={28} />
+        <PixelImg src="/icons/title/compass.png" size={28} />
+        <PixelImg src="/icons/title/anchor.png" size={28} />
+      </div>
 
-      <motion.h1
-        initial={{ scale: 0.9, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ delay: 0.3, duration: 0.6 }}
-        className="font-game text-[22px] text-[#f0c040] leading-[2.5] mb-2"
-      >
+      {/* Title */}
+      <h1 className="font-game text-[22px] text-[#f0c040] leading-[2.5] mb-2">
         {t("gameTitle").split("\n").map((line, i) => (
           <span key={i}>{line}<br /></span>
         ))}
-      </motion.h1>
+      </h1>
 
-      {/* Atmospheric lines with staggered fade-in */}
-      <div className="mb-8 space-y-1">
+      {/* Ship illustration */}
+      <div className="flex justify-center mb-4">
+        <img
+          src="/icons/ships/galleon_pirate.png"
+          alt="ship"
+          className="w-[120px] h-auto drop-shadow-[0_0_12px_rgba(240,192,64,0.3)]"
+          style={{ imageRendering: "pixelated" }}
+        />
+      </div>
+
+      {/* Atmospheric intro text - all visible immediately */}
+      <div className="mb-6 space-y-1">
         {(["introLine1", "introLine2", "introLine3", "introLine4"] as const).map((key, i) => (
-          <motion.div
+          <div
             key={key}
-            initial={{ opacity: 0, x: -10 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.8 + i * 0.6, duration: 0.5 }}
             className={`font-game text-[9px] leading-[2.2] ${
               i < 2 ? "text-[#7a8ba8]" : "text-[#c8c8d8]"
             }`}
           >
             {t(key)}
-          </motion.div>
+          </div>
         ))}
       </div>
 
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 3.2, duration: 0.5 }}
-        className="flex flex-col items-center gap-3"
-      >
+      {/* Decorative divider */}
+      <div className="flex justify-center items-center gap-2 mb-6 opacity-30">
+        <div className="h-px w-16 bg-[#f0c040]" />
+        <PixelImg src="/icons/title/chest.png" size={24} />
+        <div className="h-px w-16 bg-[#f0c040]" />
+      </div>
+
+      {/* Buttons - immediately visible */}
+      <div className="flex flex-col items-center gap-3">
         <button
           onClick={onBegin}
           className="game-btn font-game text-[13px] text-[#f0c040] border-2 border-[#f0c040] bg-transparent px-8 py-3.5 cursor-pointer transition-all duration-200 hover:bg-[#f0c040] hover:text-[#0a0a1a]"
@@ -159,7 +195,14 @@ function IntroStep({
             {t("continueGame")}
           </button>
         )}
-      </motion.div>
+      </div>
+
+      {/* Bottom decorative icons */}
+      <div className="flex justify-center gap-4 mt-6 opacity-20">
+        {DECO_ICONS.slice(0, 8).map((src, i) => (
+          <PixelImg key={i} src={src} size={20} />
+        ))}
+      </div>
     </motion.div>
   );
 }
@@ -196,24 +239,17 @@ function CharacterStep({
       initial={{ opacity: 0, x: 30 }}
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -30 }}
-      transition={{ duration: 0.4 }}
+      transition={{ duration: 0.3 }}
     >
-      <motion.div
-        initial={{ y: -10, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        className="font-game text-[11px] text-[#f0c040] mb-5"
-      >
+      <div className="font-game text-[11px] text-[#f0c040] mb-5">
         {t("chooseYourCaptain")}
-      </motion.div>
+      </div>
 
-      {/* Character cards */}
+      {/* Character cards - all visible immediately */}
       <div className="flex justify-center gap-3 mb-4 flex-wrap">
-        {ORIGINS.map((o, i) => (
-          <motion.button
+        {ORIGINS.map((o) => (
+          <button
             key={o.id}
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 + i * 0.1 }}
             onClick={() => onSelect(o.id)}
             className={`flex flex-col items-center gap-2 px-3 py-3 rounded border transition-all duration-200 min-w-[120px] ${
               origin === o.id
@@ -227,7 +263,7 @@ function CharacterStep({
             }`}>
               {o.name[locale]}
             </div>
-          </motion.button>
+          </button>
         ))}
       </div>
 
@@ -238,7 +274,7 @@ function CharacterStep({
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -8 }}
-          transition={{ duration: 0.25 }}
+          transition={{ duration: 0.2 }}
           className="mx-auto max-w-[420px] mb-5 rounded border border-white/10 bg-white/[0.03] px-4 py-3"
         >
           <div className="font-game text-[9px] text-[#f0c040] mb-1">
@@ -296,24 +332,17 @@ function ModeStep({
       initial={{ opacity: 0, x: 30 }}
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -30 }}
-      transition={{ duration: 0.4 }}
+      transition={{ duration: 0.3 }}
     >
-      <motion.div
-        initial={{ y: -10, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        className="font-game text-[11px] text-[#f0c040] mb-5"
-      >
+      <div className="font-game text-[11px] text-[#f0c040] mb-5">
         {t("chooseMode")}
-      </motion.div>
+      </div>
 
-      {/* Game mode selector */}
+      {/* Game mode selector - immediately visible */}
       <div className="flex justify-center gap-3 mb-5">
-        {modes.map((m, i) => (
-          <motion.button
+        {modes.map((m) => (
+          <button
             key={m.code}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 + i * 0.1 }}
             onClick={() => onSetMode(m.code)}
             className={`font-game text-[9px] px-4 py-3 rounded border transition-all duration-200 text-left min-w-[160px] ${
               mode === m.code
@@ -327,7 +356,7 @@ function ModeStep({
             <div className={`text-[7px] mt-1 ${mode === m.code ? "opacity-60" : "opacity-30"}`}>
               {m.desc}
             </div>
-          </motion.button>
+          </button>
         ))}
       </div>
 
