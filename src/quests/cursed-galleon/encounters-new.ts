@@ -13,7 +13,7 @@ export const newEncounters: Encounter[] = [
     ],
   },
   {
-    id: "port_shipwright", scene: "port", phase: "early", family: "ambient", title: "Корабельний майстер",
+    id: "port_shipwright", npc: "shipwright", scene: "port", phase: "early", family: "ambient", title: "Корабельний майстер",
     text: "Литвак, найкращий тесляр на Карибах. Оглядає ваш корпус і кривиться: 'Ще місяць, і дно відвалиться.'",
     choices: [
       { text: "🔧 Повний ремонт (−30)", eff: { gold: -30, crew: 0, karma: 0, curse: 0, rep: { guild: 1 } }, msg: "Три дні роботи. Корпус як новий. Литвак каже: 'Тепер витримає шторм.' Додає мідну обшивку.", flag: "hull_reinforced" },
@@ -33,7 +33,7 @@ export const newEncounters: Encounter[] = [
     ],
   },
   {
-    id: "port_fortune_teller", scene: "port", family: "quest", title: "Ворожка з Гаїті",
+    id: "port_fortune_teller", npc: "fortune_teller", scene: "port", family: "quest", title: "Ворожка з Гаїті",
     text: "Темношкіра жінка з білими очима перегороджує дорогу. 'Я бачу твоє майбутнє. Воно мокре.'",
     choices: [
       { text: "🔮 Послухати (−5)", eff: { gold: -5, crew: 0, karma: 0, curse: 1 }, msg: s => s.curse >= 5 ? "'Морський цар вже поклав на тебе очі. Тобі потрібна кров кракена.' Витягує висушений зуб." : "'Три вибори попереду змінять все. Перший здаватиметься легким.'", flag: s => s.curse >= 5 ? "kraken_cure_hint" : null },
@@ -154,7 +154,7 @@ export const newEncounters: Encounter[] = [
 
   // ── CREW RELATIONSHIP ──
   {
-    id: "crew_cook_secret", scene: "open_sea", family: "relationship", title: "Секрет кухаря",
+    id: "crew_cook_secret", npc: "cook", scene: "open_sea", family: "relationship", title: "Секрет кухаря",
     text: "Кухар Жан-П'єр готує найкращий суп на Карибах. Але вночі ви бачите, як він розмовляє з вогнем.",
     choices: [
       { text: "👀 Стежити далі", eff: { gold: 0, crew: 0, karma: 0, curse: 1 }, msg: "Вогонь відповідає. Маленькі полум'яні фігурки танцюють на його долоні. Він їх годує олією.", flag: "cook_fire_magic" },
@@ -190,7 +190,7 @@ export const newEncounters: Encounter[] = [
     ],
   },
   {
-    id: "crew_navigator_doubt", scene: "open_sea", family: "relationship", phase: "mid", title: "Навігатор сумнівається",
+    id: "crew_navigator_doubt", npc: "navigator", scene: "open_sea", family: "relationship", phase: "mid", title: "Навігатор сумнівається",
     text: "Ваш штурман стоїть біля карти. 'Капітане, ми пливемо не туди. Я це знаю, але не можу пояснити.'",
     requires: s => s.day >= 7,
     choices: [

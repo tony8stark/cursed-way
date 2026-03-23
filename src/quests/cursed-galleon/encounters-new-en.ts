@@ -13,7 +13,7 @@ export const newEncountersEn: Encounter[] = [
     ],
   },
   {
-    id: "port_shipwright", scene: "port", phase: "early", family: "ambient", title: "Master Shipwright",
+    id: "port_shipwright", npc: "shipwright", scene: "port", phase: "early", family: "ambient", title: "Master Shipwright",
     text: "Litvak, the best carpenter in the Caribbean. He inspects your hull and grimaces: 'Another month, and the bottom falls off.'",
     choices: [
       { text: "🔧 Full repair (−30)", eff: { gold: -30, crew: 0, karma: 0, curse: 0, rep: { guild: 1 } }, msg: "Three days of work. Hull like new. Litvak says: 'She'll hold through any storm.' Adds copper sheathing.", flag: "hull_reinforced" },
@@ -33,7 +33,7 @@ export const newEncountersEn: Encounter[] = [
     ],
   },
   {
-    id: "port_fortune_teller", scene: "port", family: "quest", title: "Fortune Teller from Haiti",
+    id: "port_fortune_teller", npc: "fortune_teller", scene: "port", family: "quest", title: "Fortune Teller from Haiti",
     text: "A dark-skinned woman with white eyes blocks your path. 'I see your future. It is wet.'",
     choices: [
       { text: "🔮 Listen (−5)", eff: { gold: -5, crew: 0, karma: 0, curse: 1 }, msg: s => s.curse >= 5 ? "'The Sea King has already set his eyes on you. You need kraken blood.' She produces a dried tooth." : "'Three choices ahead will change everything. The first will seem easy.'", flag: s => s.curse >= 5 ? "kraken_cure_hint" : null },
@@ -154,7 +154,7 @@ export const newEncountersEn: Encounter[] = [
 
   // ── CREW RELATIONSHIP ──
   {
-    id: "crew_cook_secret", scene: "open_sea", family: "relationship", title: "The Cook's Secret",
+    id: "crew_cook_secret", npc: "cook", scene: "open_sea", family: "relationship", title: "The Cook's Secret",
     text: "Cook Jean-Pierre makes the best soup in the Caribbean. But at night you see him talking to the fire.",
     choices: [
       { text: "👀 Keep watching", eff: { gold: 0, crew: 0, karma: 0, curse: 1 }, msg: "The fire answers. Tiny flame figures dance on his palm. He feeds them oil.", flag: "cook_fire_magic" },
@@ -190,7 +190,7 @@ export const newEncountersEn: Encounter[] = [
     ],
   },
   {
-    id: "crew_navigator_doubt", scene: "open_sea", family: "relationship", phase: "mid", title: "The Navigator's Doubt",
+    id: "crew_navigator_doubt", npc: "navigator", scene: "open_sea", family: "relationship", phase: "mid", title: "The Navigator's Doubt",
     text: "Your helmsman stands over the chart. 'Captain, we're sailing the wrong way. I know it, but I can't explain it.'",
     requires: s => s.day >= 7,
     choices: [

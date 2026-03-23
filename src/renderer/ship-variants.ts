@@ -242,15 +242,14 @@ export function drawShipVariant(
 
   if (sprite) {
     // Sprite is 32x16. Original ASCII grid was 14x8 at scale 3 = 42x24.
-    // Scale sprite to match: 32 * scale * 14/32 ≈ scale factor that fits same space
-    // We want the sprite to occupy roughly the same screen area
     const sprW = 32 * scale;   // 96px at scale=3
     const sprH = 16 * scale;   // 48px at scale=3
-    // Center on same position as old grid (old was 14*scale wide, 8*scale tall)
+    // Center horizontally on old grid position, align bottom to old grid bottom
+    // so the ship "sits" on the water and the mast/sails grow upward
     const oldW = 14 * scale;
     const oldH = 8 * scale;
     const sx = x + (oldW - sprW) / 2;
-    const sy = y + (oldH - sprH) / 2;
+    const sy = y + oldH - sprH;
 
     const prevAlpha = ctx.globalAlpha;
     ctx.globalAlpha = baseAlpha;

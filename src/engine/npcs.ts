@@ -313,7 +313,7 @@ const npcList: NPCDef[] = [
   },
   {
     id: "first_mate_bones",
-    name: { uk: "Кістка", en: "Bones" },
+    name: { uk: "Боунс", en: "Bones" },
     title: { uk: "Перший помічник", en: "First Mate" },
     icon: "💀",
     category: "pirate",

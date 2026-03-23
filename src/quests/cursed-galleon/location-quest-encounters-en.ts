@@ -107,6 +107,7 @@ export const locationQuestEncountersEn: Encounter[] = [
   // ── Havana: Voodoo Blessing ──
   {
     id: "lq_voodoo_blessing",
+    npc: "voodoo_priestess",
     scene: "ethereal",
     family: "quest",
     tags: ["voodoo", "magic", "havana"],
@@ -171,6 +172,7 @@ export const locationQuestEncountersEn: Encounter[] = [
   // ── Port Royal: Ghost Captain ──
   {
     id: "lq_ghost_captain_deal",
+    npc: "ghost_captain",
     scene: "ethereal",
     family: "setpiece",
     tags: ["ghost", "undead", "port_royal"],

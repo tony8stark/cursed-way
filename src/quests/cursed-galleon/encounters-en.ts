@@ -3,7 +3,7 @@ import type { Encounter } from "../../engine/types";
 export const encountersEn: Encounter[] = [
   // ── SEA / TRADE ──
   {
-    id: "merchant_spice", scene: "open_sea", phase: "early", title: "Spice Merchant",
+    id: "merchant_spice", npc: "spice_trader", scene: "open_sea", phase: "early", title: "Spice Merchant",
     text: "A trader from Madagascar. Smells of cinnamon and cardamom. Offers a deal.",
     choices: [
       { text: "⚔️ Board them", eff: { gold: [25, 60], crew: [-2, 0], karma: -2, curse: 1, rep: { guild: -2, brethren: 1 } }, msg: "The hold is ours. The merchant watches with hatred." },
@@ -12,7 +12,7 @@ export const encountersEn: Encounter[] = [
     ],
   },
   {
-    id: "merchant_weapons", scene: "open_sea", phase: "early", title: "Arms Smuggler",
+    id: "merchant_weapons", npc: "weapons_dealer", scene: "open_sea", phase: "early", title: "Arms Smuggler",
     text: "A Dutch sloop under a false flag. Its hull bristles with muskets.",
     choices: [
       { text: "💰 Buy weapons (−25)", eff: { gold: -25, crew: 0, karma: 0, curse: 0, rep: { brethren: 1 } }, msg: "The crew is armed. The next fight will be easier.", flag: "armed" },
@@ -196,7 +196,7 @@ export const encountersEn: Encounter[] = [
     ],
   },
   {
-    id: "pirate_rival", scene: "combat", phase: "mid", weight: 1.2, title: "Black Barrett",
+    id: "pirate_rival", npc: "rival_captain", scene: "combat", phase: "mid", weight: 1.2, title: "Black Barrett",
     text: "A pirate brig. The captain is a notorious cutthroat. He shouts an offer.",
     choices: [
       { text: "⚔️ Fight", eff: { gold: [20, 70], crew: [-3, -1], karma: 0, curse: 0, rep: { brethren: -1 } }, msg: "Barrett fights like a demon. But you're better." },
@@ -226,7 +226,7 @@ export const encountersEn: Encounter[] = [
   },
   // ── SUPERNATURAL ──
   {
-    id: "sirens_song", scene: "ethereal", family: "setpiece", phase: ["mid", "late"], weight: 0.7, exclusivityGroup: "supernatural_sirens", title: "Song in the Fog",
+    id: "sirens_song", npc: "siren", scene: "ethereal", family: "setpiece", phase: ["mid", "late"], weight: 0.7, exclusivityGroup: "supernatural_sirens", title: "Song in the Fog",
     text: "A melody with no source. The crew freezes. Someone steps toward the rail.",
     choices: [
       { text: "🔇 Wax in ears", eff: { gold: 0, crew: 0, karma: 0, curse: 0 }, msg: "It works. But the melody was beautiful." },
@@ -531,7 +531,7 @@ export const encountersEn: Encounter[] = [
 
   // Nassau (14,2)
   {
-    id: "nassau_tavern", scene: "port", title: "Nassau Tavern",
+    id: "nassau_tavern", npc: "tavern_keeper", scene: "port", title: "Nassau Tavern",
     locationName: "Nassau",
     text: "The pirate republic. One law here: might makes right.",
     choices: [

@@ -3,7 +3,7 @@ import type { Encounter } from "../../engine/types";
 export const encounters: Encounter[] = [
   // ── SEA / TRADE ──
   {
-    id: "merchant_spice", scene: "open_sea", phase: "early", title: "Торговець спеціями",
+    id: "merchant_spice", npc: "spice_trader", scene: "open_sea", phase: "early", title: "Торговець спеціями",
     text: "Купець з Мадагаскару. Пахне корицею, кардамоном і далекими берегами. Пропонує угоду.",
     choices: [
       { text: "⚔️ Абордаж", eff: { gold: [25, 60], crew: [-2, 0], karma: -2, curse: 1, rep: { guild: -2, brethren: 1 } }, msg: "Трюм наш. Торговець дивиться з ненавистю." },
@@ -12,7 +12,7 @@ export const encounters: Encounter[] = [
     ],
   },
   {
-    id: "merchant_weapons", scene: "open_sea", phase: "early", title: "Контрабандист зброї",
+    id: "merchant_weapons", npc: "weapons_dealer", scene: "open_sea", phase: "early", title: "Контрабандист зброї",
     text: "Голландський шлюп під чужим прапором. На бортах рядками висять мушкети.",
     choices: [
       { text: "💰 Купити зброю (−25)", eff: { gold: -25, crew: 0, karma: 0, curse: 0, rep: { brethren: 1 } }, msg: "Команда озброєна. Наступний бій буде легшим.", flag: "armed" },
@@ -196,7 +196,7 @@ export const encounters: Encounter[] = [
     ],
   },
   {
-    id: "pirate_rival", scene: "combat", phase: "mid", weight: 1.2, title: "Чорний Баррет",
+    id: "pirate_rival", npc: "rival_captain", scene: "combat", phase: "mid", weight: 1.2, title: "Чорний Баррет",
     text: "Піратський бриг. Капітан — відомий головоріз. Кричить пропозицію.",
     choices: [
       { text: "⚔️ Бій", eff: { gold: [20, 70], crew: [-3, -1], karma: 0, curse: 0, rep: { brethren: -1 } }, msg: "Баррет б'ється як демон. Але ви — кращі." },
@@ -226,7 +226,7 @@ export const encounters: Encounter[] = [
   },
   // ── SUPERNATURAL ──
   {
-    id: "sirens_song", scene: "ethereal", family: "setpiece", phase: ["mid", "late"], weight: 0.7, exclusivityGroup: "supernatural_sirens", title: "Спів у тумані",
+    id: "sirens_song", npc: "siren", scene: "ethereal", family: "setpiece", phase: ["mid", "late"], weight: 0.7, exclusivityGroup: "supernatural_sirens", title: "Спів у тумані",
     text: "Мелодія звідкілясь. Команда завмирає. Хтось крокує до борту, ніби уві сні.",
     choices: [
       { text: "🔇 Воск у вуха", eff: { gold: 0, crew: 0, karma: 0, curse: 0 }, msg: "Працює. Але мелодія була красивою." },
@@ -531,7 +531,7 @@ export const encounters: Encounter[] = [
 
   // Nassau (14,2) - pirate republic
   {
-    id: "nassau_tavern", scene: "port", title: "Таверна Нассау",
+    id: "nassau_tavern", npc: "tavern_keeper", scene: "port", title: "Таверна Нассау",
     locationName: "Nassau",
     text: "Піратська республіка. Тут закон один: хто сильніший, той правий.",
     choices: [
@@ -945,7 +945,7 @@ export const encounters: Encounter[] = [
 
   // СТАРІ КОСТІ - таємничий торговець
   {
-    id: "npc_bones_1", npc: "first_mate_bones", scene: "port", family: "relationship", phase: "early", title: "Старі Кості",
+    id: "npc_bones_1", npc: "first_mate_bones", scene: "port", family: "relationship", phase: "early", title: "Старий Боунс",
     text: "Скелетно худий чоловік за кутовим столом. Одне око каламутне, інше бачить забагато. 'Вперше в цих водах, Капітане? Сідайте. Маю щось для вас.'",
     choices: [
       { text: "💰 Купити його товар (-15)", eff: { gold: -15, rep: { guild: 1 } }, msg: "'Компас, що вказує на жаль.' Сміється. Марний? Чи ні? Його ціни завжди дивні.", flag: "met_bones" },
@@ -954,7 +954,7 @@ export const encounters: Encounter[] = [
     ],
   },
   {
-    id: "npc_bones_2", npc: "first_mate_bones", scene: "port", family: "relationship", phase: "mid", title: "Знову Старі Кості",
+    id: "npc_bones_2", npc: "first_mate_bones", scene: "port", family: "relationship", phase: "mid", title: "Знову Боунс",
     text: "Інший порт, той самий куток. Він махає, ніби чекав. 'Казав же. Сідайте. Маю пропозицію.'",
     requires: s => s.flags.has("met_bones") && s.day >= 6,
     choices: [
@@ -964,7 +964,7 @@ export const encounters: Encounter[] = [
     ],
   },
   {
-    id: "npc_bones_3", npc: "first_mate_bones", scene: "port", family: "relationship", phase: ["mid", "late"], title: "Таємниця Старих Кісток",
+    id: "npc_bones_3", npc: "first_mate_bones", scene: "port", family: "relationship", phase: ["mid", "late"], title: "Таємниця Боунса",
     text: s => s.flags.has("bones_package")
       ? "'Ви ще маєте мою скриньку? Добре. Зміна планів. Відкрийте.' Його здорове око блищить."
       : "'Чую, ви мною цікавитесь. Розумний капітан. Небезпечний капітан.'",
@@ -977,7 +977,7 @@ export const encounters: Encounter[] = [
     ],
   },
   {
-    id: "npc_bones_4", npc: "first_mate_bones", scene: "port", family: "relationship", phase: "late", title: "Прощання Старих Кісток",
+    id: "npc_bones_4", npc: "first_mate_bones", scene: "port", family: "relationship", phase: "late", title: "Прощання Боунса",
     text: "'Останній раз, Капітане. Мої борги майже сплачені. Маю одну останню річ. Щось, що ношу з 1643 року.'",
     requires: s => s.flags.has("bones_truth") && s.day >= 14,
     choices: [
