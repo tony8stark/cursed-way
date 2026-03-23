@@ -1,12 +1,12 @@
 import type { GameState } from "../engine/types";
 
 // ── Sprite-based ship with conditional overlay effects ──
-// Base ship uses a pixel art sprite (32x16 from sea map tileset)
+// Base ship uses a pixel art sprite (32x26 from sea map tileset)
 // Overlays (curse glow, ghost sails, etc.) drawn as canvas effects on top
 
 // Ship sprite variants based on game state
 const SHIP_PATHS = {
-  default:  "/icons/ships/ship_large_32x16.png",
+  default:  "/icons/ships/ship_large_32x26.png",
   battle:   "/icons/ships/ship_battle_16.png",
   damaged:  "/icons/ships/wreck_32x16.png",
   medium:   "/icons/ships/ship_medium_16.png",
@@ -241,9 +241,9 @@ export function drawShipVariant(
   const sprite = getShipSprite(visualState);
 
   if (sprite) {
-    // Sprite is 32x16. Original ASCII grid was 14x8 at scale 3 = 42x24.
+    // Sprite is 32x26 (full ship with sails from sea map tileset)
     const sprW = 32 * scale;   // 96px at scale=3
-    const sprH = 16 * scale;   // 48px at scale=3
+    const sprH = 26 * scale;   // 78px at scale=3
     // Center horizontally on old grid position, align bottom to old grid bottom
     // so the ship "sits" on the water and the mast/sails grow upward
     const oldW = 14 * scale;
