@@ -24,12 +24,19 @@ export function MapScreen() {
     audioManager.playAmbient("open_sea");
   }, []);
 
-  // ESC to close world map
+  // Keyboard shortcuts: ESC to close world map, Space to sail when en route
+  const isEnRoute = !!(mapState?.currentRoute && mapState.routeProgress < mapState.currentRoute.length);
+
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
     if (e.key === "Escape" && showWorldMap) {
       setShowWorldMap(false);
     }
-  }, [showWorldMap]);
+    if (e.key === " " && isEnRoute && !showWorldMap) {
+      e.preventDefault();
+      audioManager.playSFX("splash");
+      sail();
+    }
+  }, [showWorldMap, isEnRoute, sail]);
 
   useEffect(() => {
     window.addEventListener("keydown", handleKeyDown);
@@ -79,7 +86,6 @@ export function MapScreen() {
   };
 
   // Show destination choices when at a named location with no active route
-  const isEnRoute = !!(mapState?.currentRoute && mapState.routeProgress < mapState.currentRoute.length);
   const destinations = (!isEnRoute && mapState)
     ? getConnectedLocations(mapState.playerPos)
     : [];
