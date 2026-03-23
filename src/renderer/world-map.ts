@@ -1,6 +1,59 @@
 import { getMapCells, getMapWidth, getMapHeight, getRoutes, TERRAIN_COLORS } from "./map-data";
 import type { Locale } from "../i18n";
 import type { MapCell } from "./map-data";
+import type { TerrainType } from "./map-data";
+
+// ── Sprite preloading ──
+
+const spriteCache = new Map<string, HTMLImageElement>();
+const spriteLoading = new Set<string>();
+
+function getSprite(path: string): HTMLImageElement | null {
+  const cached = spriteCache.get(path);
+  if (cached?.complete && cached.naturalWidth > 0) return cached;
+  if (spriteLoading.has(path)) return null;
+  spriteLoading.add(path);
+  const img = new Image();
+  img.src = path;
+  img.onload = () => spriteCache.set(path, img);
+  spriteCache.set(path, img);
+  return null;
+}
+
+// Preload key sprites on import
+const SHIP_SPRITE = "/icons/map/sailboat.png";
+const SHIP_WRECK_SPRITE = "/icons/map/shipwreck_1.png";
+const PALM_SPRITE = "/icons/map/palm_tree.png";
+
+// Location type → sprite mapping
+const LOCATION_SPRITES: Record<string, string> = {
+  port: "/icons/map/diamond_house.png",
+  settlement: "/icons/map/diamond_coin.png",
+  island_inhabited: "/icons/map/diamond_cross.png",
+  island_wild: "/icons/map/diamond_small.png",
+  phantom: "/icons/map/diamond_cross_red.png",
+  underwater: "/icons/map/diamond_anchor.png",
+  cave: "/icons/map/diamond_sword.png",
+  wreck: "/icons/map/diamond_anchor.png",
+  mysterious: "/icons/map/diamond_compass.png",
+  reef: "/icons/map/diamond_small.png",
+  landmark: "/icons/map/diamond_cross.png",
+};
+
+// Terrain type → sprite mapping (simple base tiles)
+const TERRAIN_SPRITES: Partial<Record<TerrainType, string>> = {
+  land: "/icons/map/land_base.png",
+  shallow: "/icons/map/shallow_base.png",
+  reef: "/icons/map/reef_light.png",
+  cave: "/icons/map/deep_base.png",
+  wreck: "/icons/map/deep_mid.png",
+};
+
+// Preload all on startup
+[SHIP_SPRITE, SHIP_WRECK_SPRITE, PALM_SPRITE,
+  ...Object.values(LOCATION_SPRITES),
+  ...Object.values(TERRAIN_SPRITES),
+].forEach(getSprite);
 
 export interface MapState {
   playerPos: [number, number];
@@ -149,9 +202,19 @@ function drawCells(
         ctx.strokeRect(cx, cy, cellW, cellH);
       }
 
+      // Location icons (sprite diamonds or emoji fallback)
       if (cell.icon && cellW >= 10) {
-        ctx.font = `${Math.max(8, cellW - 4)}px sans-serif`;
-        ctx.fillText(cell.icon, cx + 2, cy + cellH - 2);
+        const locType = cell.locationType;
+        const spritePath = locType && LOCATION_SPRITES[locType];
+        const locSprite = spritePath ? getSprite(spritePath) : null;
+        if (locSprite) {
+          ctx.imageSmoothingEnabled = false;
+          ctx.drawImage(locSprite, cx, cy - 2, cellW, cellW);
+          ctx.imageSmoothingEnabled = true;
+        } else {
+          ctx.font = `${Math.max(8, cellW - 4)}px sans-serif`;
+          ctx.fillText(cell.icon, cx + 2, cy + cellH - 2);
+        }
       }
     }
   }
@@ -294,26 +357,36 @@ export function drawWorldMap(
     drawY = startDrawY + (targetY - startDrawY) * t;
   }
 
-  const pulse = 1 + Math.sin(frame * 0.08) * 0.1;
-  const shipSize = 5 * pulse;
+  // Player ship sprite (with glow)
+  const shipSprite = getSprite(SHIP_SPRITE);
+  const pulse = 1 + Math.sin(frame * 0.08) * 0.15;
 
-  ctx.fillStyle = "rgba(240,192,64,0.3)";
+  // Glow behind ship
+  ctx.fillStyle = "rgba(240,192,64,0.25)";
   ctx.beginPath();
-  ctx.arc(drawX, drawY, shipSize + 3, 0, Math.PI * 2);
+  ctx.arc(drawX, drawY, 8 * pulse, 0, Math.PI * 2);
   ctx.fill();
 
-  ctx.fillStyle = "#f0c040";
-  ctx.beginPath();
-  ctx.arc(drawX, drawY, shipSize, 0, Math.PI * 2);
-  ctx.fill();
-
-  ctx.fillStyle = "#0a0a1a";
-  ctx.beginPath();
-  ctx.moveTo(drawX, drawY - 3);
-  ctx.lineTo(drawX - 2, drawY + 2);
-  ctx.lineTo(drawX + 2, drawY + 2);
-  ctx.closePath();
-  ctx.fill();
+  if (shipSprite) {
+    const sprW = 14 * pulse;
+    const sprH = 14 * pulse;
+    ctx.imageSmoothingEnabled = false;
+    ctx.drawImage(shipSprite, drawX - sprW / 2, drawY - sprH / 2, sprW, sprH);
+    ctx.imageSmoothingEnabled = true;
+  } else {
+    // Fallback: old circle + triangle
+    ctx.fillStyle = "#f0c040";
+    ctx.beginPath();
+    ctx.arc(drawX, drawY, 5 * pulse, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = "#0a0a1a";
+    ctx.beginPath();
+    ctx.moveTo(drawX, drawY - 3);
+    ctx.lineTo(drawX - 2, drawY + 2);
+    ctx.lineTo(drawX + 2, drawY + 2);
+    ctx.closePath();
+    ctx.fill();
+  }
 
   // Compass rose
   drawCompass(ctx, W - 18, 18, frame);
@@ -443,22 +516,30 @@ export function drawFullWorldMap(
     ctx.setLineDash([]);
   }
 
-  // Player position (pulsing)
+  // Player ship (sprite or fallback circle)
   const [px, py] = map.playerPos;
   const playerX = ox + px * cellSize + cellSize / 2;
   const playerY = oy + py * cellSize + cellSize / 2;
   const pp = 1 + Math.sin(frame * 0.08) * 0.2;
-  const pr = Math.max(3, cellSize / 1.5) * pp;
 
-  ctx.fillStyle = "rgba(240,192,64,0.4)";
+  ctx.fillStyle = "rgba(240,192,64,0.3)";
   ctx.beginPath();
-  ctx.arc(playerX, playerY, pr + 3, 0, Math.PI * 2);
+  ctx.arc(playerX, playerY, Math.max(4, cellSize) * pp, 0, Math.PI * 2);
   ctx.fill();
 
-  ctx.fillStyle = "#f0c040";
-  ctx.beginPath();
-  ctx.arc(playerX, playerY, pr, 0, Math.PI * 2);
-  ctx.fill();
+  const worldShip = getSprite(SHIP_SPRITE);
+  if (worldShip && cellSize >= 4) {
+    const ss = Math.max(8, cellSize * 1.8) * pp;
+    ctx.imageSmoothingEnabled = false;
+    ctx.drawImage(worldShip, playerX - ss / 2, playerY - ss / 2, ss, ss);
+    ctx.imageSmoothingEnabled = true;
+  } else {
+    const pr = Math.max(3, cellSize / 1.5) * pp;
+    ctx.fillStyle = "#f0c040";
+    ctx.beginPath();
+    ctx.arc(playerX, playerY, pr, 0, Math.PI * 2);
+    ctx.fill();
+  }
 
   // Viewport rectangle (showing what the local map displays)
   const viewCols = Math.floor(520 / CELL_W); // match main canvas size

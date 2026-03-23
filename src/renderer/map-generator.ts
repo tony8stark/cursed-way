@@ -388,6 +388,7 @@ export function generateMap(seed?: number): GeneratedMap {
       terrain: template.terrain,
       name: template.name,
       icon: template.icon,
+      locationType: template.category,
     };
 
     placed.push({ x, y, template });

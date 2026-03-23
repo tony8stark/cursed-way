@@ -8,6 +8,7 @@ export interface MapCell {
   terrain: TerrainType;
   name?: Record<Locale, string>;
   icon?: string; // emoji for named locations
+  locationType?: string; // location category for sprite mapping (port, settlement, etc.)
 }
 
 // Terrain colors for map rendering
