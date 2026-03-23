@@ -19,24 +19,34 @@ export function InventoryBar({ inventory, artifactLog }: InventoryBarProps) {
       {inventory.map((id, i) => {
         const def = ARTIFACTS[id];
         const name = ITEM_NAMES[id]?.[locale] ?? id;
-        // Find acquisition info
         const logEntry = artifactLog?.find(l => l.itemId === id);
         const tooltip = logEntry
           ? `${name} (${t("day")} ${logEntry.day}: ${logEntry.encounterTitle})`
           : name;
+        const borderColor = def?.rarity === "cursed" ? "#8020c0"
+          : def?.rarity === "rare" ? "#f0c040"
+          : "#40c0f0";
         return (
           <div
             key={`${id}-${i}`}
-            className="w-7 h-7 flex items-center justify-center rounded border text-sm"
+            className="w-8 h-8 flex items-center justify-center rounded border"
             style={{
-              borderColor: def?.rarity === "cursed" ? "#8020c0"
-                : def?.rarity === "rare" ? "#f0c040"
-                : "#40c0f0",
-              background: "rgba(0,0,0,0.3)",
+              borderColor,
+              background: "rgba(0,0,0,0.4)",
+              boxShadow: `0 0 4px ${borderColor}40`,
             }}
             title={tooltip}
           >
-            {def?.icon || "?"}
+            {def?.iconPath ? (
+              <img
+                src={def.iconPath}
+                alt={name}
+                className="w-6 h-6"
+                style={{ imageRendering: "pixelated" }}
+              />
+            ) : (
+              <span className="text-sm">{def?.icon || "?"}</span>
+            )}
           </div>
         );
       })}
