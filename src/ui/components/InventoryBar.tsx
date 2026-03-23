@@ -11,7 +11,8 @@ interface InventoryBarProps {
 /** Format passive effect as human-readable string */
 function formatEffect(
   def: (typeof ARTIFACTS)[string],
-  t: (key: string) => string,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  t: (key: any) => string,
 ): string | null {
   const parts: string[] = [];
 
