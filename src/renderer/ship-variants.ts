@@ -4,21 +4,44 @@ import type { GameState } from "../engine/types";
 // Base ship uses a pixel art sprite (32x16 from sea map tileset)
 // Overlays (curse glow, ghost sails, etc.) drawn as canvas effects on top
 
-const SHIP_SPRITE_PATH = "/icons/ships/ship_large_32x16.png";
-let shipSpriteImg: HTMLImageElement | null = null;
-let shipSpriteLoading = false;
+// Ship sprite variants based on game state
+const SHIP_PATHS = {
+  default:  "/icons/ships/ship_large_32x16.png",
+  battle:   "/icons/ships/ship_battle_16.png",
+  damaged:  "/icons/ships/wreck_32x16.png",
+  medium:   "/icons/ships/ship_medium_16.png",
+};
 
-function getShipSprite(): HTMLImageElement | null {
-  if (shipSpriteImg?.complete && shipSpriteImg.naturalWidth > 0) return shipSpriteImg;
-  if (shipSpriteLoading) return null;
-  shipSpriteLoading = true;
-  shipSpriteImg = new Image();
-  shipSpriteImg.src = SHIP_SPRITE_PATH;
+const spriteCache = new Map<string, HTMLImageElement>();
+
+function loadShipSprite(path: string): HTMLImageElement | null {
+  const cached = spriteCache.get(path);
+  if (cached?.complete && cached.naturalWidth > 0) return cached;
+  if (!spriteCache.has(path)) {
+    const img = new Image();
+    img.src = path;
+    spriteCache.set(path, img);
+  }
   return null;
 }
 
-// Preload immediately
-getShipSprite();
+// Preload all variants
+Object.values(SHIP_PATHS).forEach(loadShipSprite);
+
+/** Pick ship sprite based on game state */
+function pickShipSprite(state: ShipVisualState): string {
+  // Heavily damaged (crew <= 3)
+  if (state.crew <= 3) return SHIP_PATHS.damaged;
+  // Battle ready (has armed flag + decent crew)
+  if (state.flags.has("armed") && state.crew >= 8) return SHIP_PATHS.battle;
+  // Default
+  return SHIP_PATHS.default;
+}
+
+function getShipSprite(state?: ShipVisualState): HTMLImageElement | null {
+  const path = state ? pickShipSprite(state) : SHIP_PATHS.default;
+  return loadShipSprite(path);
+}
 
 // Ship overlay layers - same ASCII grid format as sprites.ts
 // Each layer is drawn on top of the base ship at an offset
@@ -215,7 +238,7 @@ export function drawShipVariant(
   baseAlpha: number,
   visualState: ShipVisualState,
 ) {
-  const sprite = getShipSprite();
+  const sprite = getShipSprite(visualState);
 
   if (sprite) {
     // Sprite is 32x16. Original ASCII grid was 14x8 at scale 3 = 42x24.
