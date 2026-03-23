@@ -9,6 +9,7 @@ import { MapScreen } from "./ui/components/MapScreen";
 import { EncounterScreen } from "./ui/components/EncounterScreen";
 import { EndingScreen } from "./ui/components/EndingScreen";
 import { AchievementToast } from "./ui/components/AchievementToast";
+import { ItemToast } from "./ui/components/ItemToast";
 import { AchievementsPanel } from "./ui/components/AchievementsPanel";
 import { HistoryPanel } from "./ui/components/HistoryPanel";
 import { NPCJournal } from "./ui/components/NPCJournal";
@@ -34,6 +35,8 @@ export default function App() {
   const [showSettings, setShowSettings] = useState(false);
   const [showNPCJournal, setShowNPCJournal] = useState(false);
   const endingSavedRef = useRef(false);
+  const [itemToast, setItemToast] = useState<string | null>(null);
+  const prevInventoryLenRef = useRef(0);
 
   // Load quest based on locale
   useEffect(() => {
@@ -64,6 +67,18 @@ export default function App() {
       setToastQueue(q => q.slice(1));
     }
   }, [currentToast, toastQueue]);
+
+  // Item acquisition toast
+  useEffect(() => {
+    if (!state) return;
+    const len = state.inventory.length;
+    if (len > prevInventoryLenRef.current && prevInventoryLenRef.current > 0) {
+      // New item acquired
+      const newItem = state.inventory[len - 1];
+      setItemToast(newItem);
+    }
+    prevInventoryLenRef.current = len;
+  }, [state?.inventory.length]);
 
   // Glitch effect
   useEffect(() => {
@@ -154,10 +169,14 @@ export default function App() {
         </button>
       </div>
 
-      {/* Achievement toast */}
+      {/* Toasts */}
       <AchievementToast
         achievement={currentToast}
         onDone={() => setCurrentToast(null)}
+      />
+      <ItemToast
+        itemId={itemToast}
+        onDone={() => setItemToast(null)}
       />
 
       {/* Modals */}
