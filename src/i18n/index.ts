@@ -34,13 +34,13 @@ const translations = {
   uk: {
     // Title screen
     gameTitle: "ЧОРНИЙ\nПРИЛИВ",
-    tagline1: "Один корабель. Кожен вибір має наслідки.",
+    tagline1: "Один корабель. Кожен вибір залишає слід.",
     tagline2: "Море пам'ятає все.",
     startGame: "ВИЙТИ В МОРЕ",
     continueGame: "ПРОДОВЖИТИ",
     introLine1: "1692 рік. Карибське море.",
     introLine2: "Прокляття поглинає ці води.",
-    introLine3: "Кожен капітан обирає свій шлях.",
+    introLine3: "Кожен капітан обирає власний шлях.",
     introLine4: "Ваш починається зараз.",
     introBegin: "ПОЧАТИ",
     chooseYourCaptain: "ОБЕРІТЬ СВОГО КАПІТАНА",
@@ -74,7 +74,7 @@ const translations = {
     achievementLabel: "ДОСЯГНЕННЯ",
     // History
     pastVoyages: "МИНУЛІ ПЛАВАННЯ",
-    noVoyages: "Ще жодного плавання. Вийдіть в море!",
+    noVoyages: "Ще жодного плавання. Час вийти в море!",
     // Settings
     settings: "НАЛАШТУВАННЯ",
     music: "МУЗИКА",
@@ -84,9 +84,9 @@ const translations = {
     close: "ЗАКРИТИ",
     // Game mode
     modeExpedition: "ЕКСПЕДИЦІЯ",
-    modeExpeditionDesc: "20 днів. Виживи.",
+    modeExpeditionDesc: "20 днів. Вижити б.",
     modeFreeRoam: "ВІЛЬНЕ ПЛАВАННЯ",
-    modeFreeRoamDesc: "Без ліміту. Досліджуй.",
+    modeFreeRoamDesc: "Без обмежень. Досліджуй.",
     // Origin
     chooseOrigin: "ХТО ВИ?",
     // Map
@@ -96,7 +96,7 @@ const translations = {
     // Objectives
     chooseObjective: "ЗАВДАННЯ",
     objectiveNone: "Без цілі",
-    objectiveNoneDesc: "Просто плавай.",
+    objectiveNoneDesc: "Просто плисти.",
     objectiveProgress: "ЦІЛЬ",
     objectiveComplete: "ЦІЛЬ ДОСЯГНУТА!",
     objectiveCompleteHint: "Ви можете завершити плавання або пливти далі.",
