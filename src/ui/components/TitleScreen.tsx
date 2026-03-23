@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useGameStore } from "../../engine/state";
 import { useT, useLocaleStore } from "../../i18n";
@@ -7,170 +7,15 @@ import { useOriginStore, ORIGINS, type OriginId } from "../../engine/origins";
 import { useObjectiveStore, OBJECTIVES } from "../../engine/objectives";
 import { ITEM_NAMES } from "../../engine/items-i18n";
 
-// ── Simple pixel art portraits for origins (16x20, palette indices) ──
-
-const PALETTES: Record<OriginId, string[]> = {
-  navy_defector: ["#1a1a2e", "#0f3460", "#16213e", "#e8b796", "#533a1f", "#c8c8d8", "#f0c040", "#2471a3"],
-  smuggler: ["#1a1a2e", "#3d1c02", "#6e4b3a", "#c68642", "#1c1c1c", "#8e44ad", "#f0c040", "#e8e8e8"],
-  scholar: ["#1a1a2e", "#2c2c54", "#474787", "#f5d6ba", "#95a5a6", "#c040f0", "#f0c040", "#e8e8e8"],
-  mutineer: ["#1a1a2e", "#922b21", "#c0392b", "#e8b796", "#5d3a1a", "#1c1c1c", "#f0c040", "#e67e22"],
-  voodoo_priestess: ["#1a1a2e", "#27ae60", "#1e8449", "#8d5524", "#1c1c1c", "#e8e8e8", "#f0c040", "#8e44ad"],
-  merchant_captain: ["#1a1a2e", "#c0392b", "#922b21", "#e8b796", "#1c1c1c", "#f0c040", "#00bcd4", "#e8e8e8"],
+// ── Origin portrait sprites (8x8 pixel art from pirates2-grid) ──
+const ORIGIN_SPRITES: Record<OriginId, string> = {
+  navy_defector: "/icons/origins/navy_defector.png",
+  smuggler: "/icons/origins/smuggler.png",
+  scholar: "/icons/origins/scholar.png",
+  mutineer: "/icons/origins/mutineer.png",
+  voodoo_priestess: "/icons/origins/voodoo_priestess.png",
+  merchant_captain: "/icons/origins/merchant_captain.png",
 };
-
-// 16 wide x 20 tall, '.' = transparent, hex digit = palette index
-const PORTRAITS: Record<OriginId, string[]> = {
-  navy_defector: [
-    "......4444......",
-    ".....444444.....",
-    "....44444444....",
-    "...2222222222...",
-    "...2266666622...",
-    "..22633333622...",
-    "..22633333622...",
-    "..22633333622...",
-    "...2233333322...",
-    "....33333333....",
-    ".....333333.....",
-    "...1111111111...",
-    "..111177711111..",
-    "..111111111111..",
-    ".11111111111111.",
-    ".11155111155111.",
-    ".11111111111111.",
-    "..111111111111..",
-    "...1111..1111...",
-    "...22......22...",
-  ],
-  smuggler: [
-    "......4444......",
-    ".....444444.....",
-    "....44444444....",
-    "...4444444444...",
-    "...4433333344...",
-    "..44333333334...",
-    "..44333333334...",
-    "..55333333335...",
-    "...3333333333...",
-    "....33333333....",
-    ".....333333.....",
-    "...5555555555...",
-    "..555566555555..",
-    "..555555555555..",
-    ".55555555555555.",
-    ".55522555522555.",
-    ".55555555555555.",
-    "..555555555555..",
-    "...5555..5555...",
-    "...22......22...",
-  ],
-  scholar: [
-    "....44444444....",
-    "...4444444444...",
-    "..444444444444..",
-    "..444444444444..",
-    "..44433333444...",
-    "..44333333344...",
-    "..44333333344...",
-    "..44333333344...",
-    "...3333333333...",
-    "....33333333....",
-    ".....333333.....",
-    "...2222222222...",
-    "..222255222222..",
-    "..222222222222..",
-    ".22222222222222.",
-    ".22211222211222.",
-    ".22222222222222.",
-    "..222222222222..",
-    "...2222..2222...",
-    "...11......11...",
-  ],
-  mutineer: [
-    "......4444......",
-    ".....444444.....",
-    "....4444444.....",
-    "...55444444.....",
-    "...5533333355...",
-    "..55333333355...",
-    "..55333333355...",
-    "..55333333355...",
-    "...3333333333...",
-    "....33333333....",
-    ".....333333.....",
-    "...2222222222...",
-    "..222277222222..",
-    "..222222222222..",
-    ".22222222222222.",
-    ".22255222255222.",
-    ".22222222222222.",
-    "..222222222222..",
-    "...2222..2222...",
-    "...55......55...",
-  ],
-  voodoo_priestess: [
-    "....66..66......",
-    "...6666666......",
-    "...4444444444...",
-    "..444444444444..",
-    "..444433333444..",
-    "..44433333344...",
-    "..44433333344...",
-    "..44433333344...",
-    "...3333333333...",
-    "....33333333....",
-    ".....333333.....",
-    "...1166611111...",
-    "..111155111111..",
-    "..111111111111..",
-    ".11111111111111.",
-    ".11177111177111.",
-    ".11111111111111.",
-    "..111111111111..",
-    "...1111..1111...",
-    "...44......44...",
-  ],
-  merchant_captain: [
-    "......4444......",
-    ".....444444.....",
-    "....44444444....",
-    "...4444444444...",
-    "...4433333344...",
-    "..44333333344...",
-    "..44333333344...",
-    "..44333333344...",
-    "...3333333333...",
-    "....33333333....",
-    ".....333333.....",
-    "...1166111111...",
-    "..111155111111..",
-    "..111111111111..",
-    ".11111111111111.",
-    ".11122111122111.",
-    ".11111111111111.",
-    "..111111111111..",
-    "...1111..1111...",
-    "...44......44...",
-  ],
-};
-
-function drawPortrait(
-  ctx: CanvasRenderingContext2D,
-  originId: OriginId,
-  scale: number,
-) {
-  const palette = PALETTES[originId];
-  const rows = PORTRAITS[originId];
-  for (let y = 0; y < rows.length; y++) {
-    for (let x = 0; x < rows[y].length; x++) {
-      const ch = rows[y][x];
-      if (ch === ".") continue;
-      const idx = parseInt(ch, 16);
-      ctx.fillStyle = palette[idx];
-      ctx.fillRect(x * scale, y * scale, scale, scale);
-    }
-  }
-}
 
 // ── Steps ──
 
@@ -321,23 +166,15 @@ function IntroStep({
 
 // ── Step 2: Character Select ──
 
-function CharacterPortrait({ originId, selected, scale = 3 }: { originId: OriginId; selected: boolean; scale?: number }) {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-
-  useEffect(() => {
-    const c = canvasRef.current;
-    if (!c) return;
-    const ctx = c.getContext("2d")!;
-    ctx.clearRect(0, 0, c.width, c.height);
-    drawPortrait(ctx, originId, scale);
-  }, [originId, scale]);
-
+function CharacterPortrait({ originId, selected, scale = 7 }: { originId: OriginId; selected: boolean; scale?: number }) {
+  const size = 8 * scale;
   return (
-    <canvas
-      ref={canvasRef}
-      width={16 * scale}
-      height={20 * scale}
-      className={`transition-all duration-200 ${selected ? "brightness-110" : "brightness-75 hover:brightness-100"}`}
+    <img
+      src={ORIGIN_SPRITES[originId]}
+      alt={originId}
+      width={size}
+      height={size}
+      className={`transition-all duration-200 ${selected ? "brightness-110 drop-shadow-[0_0_6px_rgba(240,192,64,0.4)]" : "brightness-75 hover:brightness-100"}`}
       style={{ imageRendering: "pixelated" }}
     />
   );

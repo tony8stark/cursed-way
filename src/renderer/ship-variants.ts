@@ -1,15 +1,15 @@
 import type { GameState } from "../engine/types";
 
 // ── Sprite-based ship with conditional overlay effects ──
-// Base ship uses a pixel art sprite (64x30 assembled from sea map tileset)
+// Base ship uses Snoblin Galleon sprites (composited hull + sail + flag layers)
 // Overlays (curse glow, ghost sails, etc.) drawn as canvas effects on top
 
 // Ship sprite variants based on game state
 const SHIP_PATHS = {
-  default:  "/icons/ships/ship_large_64x30.png",
-  battle:   "/icons/ships/ship_battle_16.png",
-  damaged:  "/icons/ships/wreck_32x16.png",
-  medium:   "/icons/ships/ship_medium_16.png",
+  default:  "/icons/ships/galleon_default.png",   // white sails, hull_1
+  battle:   "/icons/ships/galleon_battle.png",     // brown sails, hull_2, red flag
+  damaged:  "/icons/ships/galleon_damaged.png",    // patched sails, hull_3
+  pirate:   "/icons/ships/galleon_pirate.png",     // skull sails, hull_1
 };
 
 const spriteCache = new Map<string, HTMLImageElement>();
@@ -32,8 +32,10 @@ Object.values(SHIP_PATHS).forEach(loadShipSprite);
 function pickShipSprite(state: ShipVisualState): string {
   // Heavily damaged (crew <= 3)
   if (state.crew <= 3) return SHIP_PATHS.damaged;
-  // Battle ready (has armed flag + decent crew)
+  // Battle ready (decent crew + combat context)
   if (state.flags.has("armed") && state.crew >= 8) return SHIP_PATHS.battle;
+  // High curse = pirate skull sails
+  if (state.curse >= 8) return SHIP_PATHS.pirate;
   // Default
   return SHIP_PATHS.default;
 }
@@ -241,11 +243,10 @@ export function drawShipVariant(
   const sprite = getShipSprite(visualState);
 
   if (sprite) {
-    // Sprite is 64x30 (full ship with sails assembled from sea map tileset)
-    // Scale down: at scale=3, draw sprite at 2x native = 128x60 to fit scene
-    const drawScale = scale * 0.65;
-    const sprW = 64 * drawScale;
-    const sprH = 30 * drawScale;
+    // Snoblin Galleon sprites are ~59x57, drawn at 1.5x scale to fit scene
+    const drawScale = scale * 0.55;
+    const sprW = sprite.naturalWidth * drawScale;
+    const sprH = sprite.naturalHeight * drawScale;
     // Center horizontally on old grid position, align bottom to old grid bottom
     // so the ship "sits" on the water and the sails grow upward
     const oldW = 14 * scale;
