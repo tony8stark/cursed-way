@@ -121,7 +121,7 @@ export interface Encounter {
   text: string | ((state: GameState) => string);
   requires?: (state: GameState) => boolean;
   choices: Choice[];
-  enemyType?: "ghost" | "enemy";
+  enemyType?: "ghost" | "enemy" | "merchant" | "raider";
   location?: string; // deprecated: "x,y" key (ignored on procedural maps)
   locationName?: string; // location name (en) - only triggers at named destination
   npc?: string;      // NPC id - shows portrait in encounter screen

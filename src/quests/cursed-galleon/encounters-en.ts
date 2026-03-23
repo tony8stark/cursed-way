@@ -3,7 +3,7 @@ import type { Encounter } from "../../engine/types";
 export const encountersEn: Encounter[] = [
   // ── SEA / TRADE ──
   {
-    id: "merchant_spice", npc: "spice_trader", scene: "open_sea", phase: "early", title: "Spice Merchant",
+    id: "merchant_spice", npc: "spice_trader", scene: "open_sea", phase: "early", enemyType: "merchant", title: "Spice Merchant",
     text: "A trader from Madagascar. Smells of cinnamon and cardamom. Offers a deal.",
     choices: [
       { text: "⚔️ Board them", eff: { gold: [25, 60], crew: [-2, 0], karma: -2, curse: 1, rep: { guild: -2, brethren: 1 } }, msg: "The hold is ours. The merchant watches with hatred." },
@@ -12,7 +12,7 @@ export const encountersEn: Encounter[] = [
     ],
   },
   {
-    id: "merchant_weapons", npc: "weapons_dealer", scene: "open_sea", phase: "early", title: "Arms Smuggler",
+    id: "merchant_weapons", npc: "weapons_dealer", scene: "open_sea", phase: "early", enemyType: "merchant", title: "Arms Smuggler",
     text: "A Dutch sloop under a false flag. Its hull bristles with muskets.",
     choices: [
       { text: "💰 Buy weapons (−25)", eff: { gold: -25, crew: 0, karma: 0, curse: 0, rep: { brethren: 1 } }, msg: "The crew is armed. The next fight will be easier.", flag: "armed" },
@@ -24,7 +24,7 @@ export const encountersEn: Encounter[] = [
     ],
   },
   {
-    id: "merchant_silk", scene: "open_sea", phase: "early", title: "Chinese Junk",
+    id: "merchant_silk", scene: "open_sea", phase: "early", enemyType: "merchant", title: "Chinese Junk",
     text: "A majestic ship with crimson sails. Silk, porcelain, tea.",
     choices: [
       { text: "🤝 Trade fairly", eff: { gold: [5, 20], crew: 0, karma: 2, curse: 0, item: "cursed_compass", rep: { guild: 2 } }, msg: "The captain gifts a compass that 'points not north, but to what you seek'." },
@@ -833,7 +833,7 @@ export const encountersEn: Encounter[] = [
     ],
   },
   {
-    id: "floating_market", scene: "open_sea", title: "Floating Market",
+    id: "floating_market", scene: "open_sea", enemyType: "merchant", title: "Floating Market",
     text: "A dozen boats lashed together. They sell everything: from fruit to prophecies.",
     choices: [
       { text: "🔮 Buy a prophecy (-10)", eff: { gold: -10, crew: 0, karma: 0, curse: 0 }, msg: "'On the 15th day, beware the water.' Useful? Who knows.", flag: "prophecy_water" },

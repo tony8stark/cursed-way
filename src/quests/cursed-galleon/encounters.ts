@@ -3,7 +3,7 @@ import type { Encounter } from "../../engine/types";
 export const encounters: Encounter[] = [
   // ── SEA / TRADE ──
   {
-    id: "merchant_spice", npc: "spice_trader", scene: "open_sea", phase: "early", title: "Торговець спеціями",
+    id: "merchant_spice", npc: "spice_trader", scene: "open_sea", phase: "early", enemyType: "merchant", title: "Торговець спеціями",
     text: "Купець з Мадагаскару. Пахне корицею, кардамоном і далекими берегами. Пропонує угоду.",
     choices: [
       { text: "⚔️ Абордаж", eff: { gold: [25, 60], crew: [-2, 0], karma: -2, curse: 1, rep: { guild: -2, brethren: 1 } }, msg: "Трюм наш. Торговець дивиться з ненавистю." },
@@ -12,7 +12,7 @@ export const encounters: Encounter[] = [
     ],
   },
   {
-    id: "merchant_weapons", npc: "weapons_dealer", scene: "open_sea", phase: "early", title: "Контрабандист зброї",
+    id: "merchant_weapons", npc: "weapons_dealer", scene: "open_sea", phase: "early", enemyType: "merchant", title: "Контрабандист зброї",
     text: "Голландський шлюп під чужим прапором. На бортах рядками висять мушкети.",
     choices: [
       { text: "💰 Купити зброю (−25)", eff: { gold: -25, crew: 0, karma: 0, curse: 0, rep: { brethren: 1 } }, msg: "Команда озброєна. Наступний бій буде легшим.", flag: "armed" },
@@ -24,7 +24,7 @@ export const encounters: Encounter[] = [
     ],
   },
   {
-    id: "merchant_silk", scene: "open_sea", phase: "early", title: "Китайська джонка",
+    id: "merchant_silk", scene: "open_sea", phase: "early", enemyType: "merchant", title: "Китайська джонка",
     text: "Величний корабель під багряними вітрилами. На борту: шовк, порцеляна, чай.",
     choices: [
       { text: "🤝 Торгувати чесно", eff: { gold: [5, 20], crew: 0, karma: 2, curse: 0, item: "cursed_compass", rep: { guild: 2 } }, msg: "Капітан дарує компас, що 'вказує не на північ, а на те, чого найдужче прагнеш'." },
@@ -833,7 +833,7 @@ export const encounters: Encounter[] = [
     ],
   },
   {
-    id: "floating_market", scene: "open_sea", title: "Плавучий ринок",
+    id: "floating_market", scene: "open_sea", enemyType: "merchant", title: "Плавучий ринок",
     text: "Десяток човнів, зв'язаних борт до борту. Торгують усім на світі: від фруктів до пророцтв.",
     choices: [
       { text: "🔮 Купити пророцтво (−10)", eff: { gold: -10, crew: 0, karma: 0, curse: 0 }, msg: "'На 15-й день стережись води.' Корисно? Хто знає.", flag: "prophecy_water" },

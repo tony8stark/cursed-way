@@ -90,6 +90,17 @@ function sceneOpenSea(ctx: CanvasRenderingContext2D, W: number, H: number, f: nu
     ps.emit(2, { x: 0, y: waterY, w: W, h: H * 0.1, color: "rgba(200,220,255,0.4)", size: 1.5, life: 50, vxRange: [0.15, 0.4], vyRange: [-0.05, 0.05] });
   }
 
+  // NPC ship (merchant, raider, enemy, ghost) in the distance
+  if (opts?.enemyType) {
+    const npcWaterY = waterY - 35; // higher = further away
+    const npcBob = Math.sin(f * 0.035 + 2) * 2;
+    const isGhost = opts.enemyType === "ghost";
+    const spriteName = opts.enemyType === "merchant" ? "merchant"
+      : opts.enemyType === "raider" ? "raider"
+      : isGhost ? "ghost" : "enemy";
+    drawSprite(ctx, spriteName, W * 0.6, npcWaterY + npcBob, 2.2, isGhost ? 0.6 : 0.9);
+  }
+
   // Ship centered, hull bottom on waterline
   const bob = Math.sin(f * 0.04) * 3 + Math.sin(f * 0.07) * 1.5;
   ship(ctx, W * 0.35, waterY + bob, 3, 1, opts);
