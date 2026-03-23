@@ -51,32 +51,46 @@ function sceneOpenSea(ctx: CanvasRenderingContext2D, W: number, H: number, f: nu
   }
   ctx.fillRect(0, 0, W, H);
 
-  // Water waves
-  for (let y = 0; y < H; y += 6) {
-    for (let x = 0; x < W; x += 6) {
-      const w = Math.sin((x + f * 0.8) * 0.03) * Math.cos((y + f * 0.5) * 0.04);
-      if (w > 0.2 - (y / H) * 0.2) {
-        if (pal) {
-          ctx.fillStyle = pal.waterHighlight;
-        } else {
-          ctx.fillStyle = `rgba(${30 + cr * 40 | 0},${Math.max(0, 30 - cr * 20) | 0},${60 + cr * 30 | 0},0.35)`;
-        }
-        ctx.fillRect(x, y, 6, 6);
-      }
+  // Water: layered horizontal wave lines for depth
+  const waterStart = H * 0.35;
+  for (let y = waterStart; y < H; y += 3) {
+    const depth = (y - waterStart) / (H - waterStart); // 0..1
+    const waveOff = Math.sin((y * 0.08) + f * 0.04) * 8 + Math.sin((y * 0.15) + f * 0.06) * 4;
+    const alpha = 0.08 + depth * 0.12;
+    if (pal) {
+      ctx.fillStyle = pal.waterHighlight;
+      ctx.globalAlpha = alpha;
+    } else {
+      ctx.fillStyle = `rgba(${30 + cr * 40 | 0},${Math.max(0, 40 - cr * 20) | 0},${80 + cr * 30 | 0},${alpha})`;
     }
+    ctx.fillRect(waveOff, y, W, 2);
   }
+  ctx.globalAlpha = 1;
 
-  // Stars
+  // Gentle surface shimmer (small highlights moving across water)
+  for (let i = 0; i < 6; i++) {
+    const sx = ((f * 0.3 + i * 97) % (W + 40)) - 20;
+    const sy = waterStart + 10 + Math.sin(f * 0.03 + i * 2.1) * 15 + i * 25;
+    const sw = 12 + Math.sin(f * 0.05 + i) * 4;
+    ctx.fillStyle = pal ? pal.waterHighlight : `rgba(100,160,220,0.15)`;
+    ctx.globalAlpha = 0.12 + Math.sin(f * 0.04 + i * 1.7) * 0.06;
+    ctx.fillRect(sx, sy, sw, 1);
+  }
+  ctx.globalAlpha = 1;
+
+  // Stars (above water line)
   if (f % 120 === 0) {
-    ps.emit(1, { x: 0, y: 0, w: W, h: H * 0.3, color: "#fff", alpha: 0.3, size: 1, life: 120, vxRange: [0, 0], vyRange: [0, 0] });
+    ps.emit(1, { x: 0, y: 0, w: W, h: waterStart * 0.8, color: "#fff", alpha: 0.3, size: 1, life: 120, vxRange: [0, 0], vyRange: [0, 0] });
   }
 
   // Foam particles on waves
-  if (f % 20 === 0) {
-    ps.emit(2, { x: 0, y: H * 0.4, w: W, h: H * 0.2, color: "rgba(200,220,255,0.5)", size: 2, life: 40, vxRange: [0.2, 0.5], vyRange: [-0.1, 0.1] });
+  if (f % 18 === 0) {
+    ps.emit(2, { x: 0, y: waterStart + 10, w: W, h: H * 0.15, color: "rgba(200,220,255,0.4)", size: 1.5, life: 50, vxRange: [0.15, 0.4], vyRange: [-0.05, 0.05] });
   }
 
-  ship(ctx, W / 2 - 21, H / 2 + Math.sin(f * 0.05) * 3, 3, 1, opts);
+  // Ship with gentle bob
+  const bob = Math.sin(f * 0.04) * 3 + Math.sin(f * 0.07) * 1.5;
+  ship(ctx, W / 2 - 21, H / 2 + bob - 8, 3, 1, opts);
 }
 
 function sceneStorm(ctx: CanvasRenderingContext2D, W: number, H: number, f: number, ps: ParticleSystem, opts?: SceneOpts) {
