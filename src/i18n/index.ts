@@ -93,6 +93,7 @@ const translations = {
     mapTitle: "КАРТА",
     chooseDestination: "КУДИ ПЛИВЕМО?",
     enRoute: "В ДОРОЗІ",
+    routeSteps: "{0} кроків",
     // Objectives
     chooseObjective: "ЗАВДАННЯ",
     objectiveNone: "Без цілі",
@@ -168,6 +169,7 @@ const translations = {
     mapTitle: "MAP",
     chooseDestination: "WHERE TO?",
     enRoute: "EN ROUTE",
+    routeSteps: "{0} steps",
     chooseObjective: "OBJECTIVE",
     objectiveNone: "No objective",
     objectiveNoneDesc: "Just sail.",

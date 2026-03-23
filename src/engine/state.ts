@@ -263,13 +263,105 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const playerPos = mapState?.playerPos;
     const pickerCtx: PickerContext = { recentFamilies, recentTags, usedGroups, recentIds };
     // Determine current location name for location-bound encounters
+    // IMPORTANT: use playerPos (actual position), NOT destination, to avoid
+    // triggering location-bound encounters while still en route
     let currentLocationName: string | null = null;
+    const isEnRoute = !!(mapState?.currentRoute && mapState.routeProgress < mapState.currentRoute.length);
     if (mapState) {
       const cells = getMapCells();
-      const pos = mapState.destination ?? mapState.playerPos;
+      const pos = mapState.playerPos;
       const cell = cells[pos[1]]?.[pos[0]];
       if (cell?.name) currentLocationName = cell.name.en;
     }
+
+    // Empty sailing: when en route (not at a named location), there's a chance
+    // nothing happens and the ship just moves forward without an encounter.
+    // This makes voyages feel more realistic with stretches of open sea.
+    const EMPTY_SAIL_CHANCE = 0.35; // 35% chance of calm seas while sailing
+    if (isEnRoute && !currentLocationName && Math.random() < EMPTY_SAIL_CHANCE) {
+      // Move ship forward without triggering an encounter
+      let newMapState = mapState ? { ...mapState } : null;
+      if (newMapState?.currentRoute && newMapState.routeProgress < newMapState.currentRoute.length) {
+        let revealRadius = 3;
+        for (const itemId of state.inventory) {
+          const def = ARTIFACTS[itemId];
+          if (def?.revealRadius) revealRadius += def.revealRadius;
+        }
+        const nextCell = newMapState.currentRoute[newMapState.routeProgress];
+        newMapState.playerPos = nextCell;
+        newMapState.routeProgress++;
+        revealAround(newMapState, nextCell[0], nextCell[1], revealRadius);
+
+        // Check if we arrived at destination during empty sail
+        if (newMapState.routeProgress >= newMapState.currentRoute.length) {
+          const destKey = `${nextCell[0]},${nextCell[1]}`;
+          newVisitedLocations.add(destKey);
+
+          const cells = getMapCells();
+          const cell = cells[nextCell[1]]?.[nextCell[0]];
+          if (cell?.name) {
+            const locName = cell.name.en;
+            const visits = (state.locationVisits[locName] ?? 0) + 1;
+            state.locationVisits[locName] = visits;
+
+            const lq = checkLocationQuest(locName, visits, usedIds);
+            if (lq) {
+              const questEnc = quest.encounters.find(e => e.id === lq.encounterId);
+              if (questEnc) {
+                const newUsedForLQ = new Set(usedIds);
+                newUsedForLQ.add(lq.id);
+                newUsedForLQ.add(questEnc.id);
+                newMapState.currentRoute = null;
+                newMapState.destination = null;
+                newMapState.routeProgress = 0;
+                set({
+                  usedIds: newUsedForLQ,
+                  encounter: questEnc,
+                  result: null,
+                  screen: "encounter",
+                  state: {
+                    ...state, day: newDay, watch: newWatch,
+                    gold, crew, karma, curse,
+                    flags: newFlags,
+                    visitedLocations: newVisitedLocations,
+                    locationVisits: { ...state.locationVisits },
+                  },
+                  mapState: newMapState,
+                });
+                setTimeout(() => get().save(), 0);
+                return;
+              }
+            }
+          }
+
+          newMapState.currentRoute = null;
+          newMapState.destination = null;
+          newMapState.routeProgress = 0;
+        }
+      }
+
+      // Stay on sailing screen (no encounter)
+      set({
+        state: {
+          ...state,
+          day: newDay,
+          watch: newWatch,
+          gold, crew, karma, curse,
+          flags: newFlags,
+          visitedLocations: newVisitedLocations,
+          inventory: [...state.inventory],
+          delayedEffects: [...state.delayedEffects],
+          log: [...state.log],
+          factionReps: { ...state.factionReps },
+          locationVisits: { ...state.locationVisits },
+        },
+        mapState: newMapState,
+        screen: "sailing",
+      });
+      setTimeout(() => get().save(), 0);
+      return;
+    }
+
     const enc = pickEncounter(quest.encounters, state, usedIds, playerPos ?? undefined, pickerCtx, currentLocationName);
     const newUsed = new Set(usedIds);
     newUsed.add(enc.id);

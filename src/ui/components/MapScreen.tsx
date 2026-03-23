@@ -5,7 +5,7 @@ import { useGameStore } from "../../engine/state";
 import { audioManager } from "../../audio/audio-manager";
 import { useT, useLocaleStore } from "../../i18n";
 import { drawWorldMap } from "../../renderer/world-map";
-import { getConnectedLocations } from "../../renderer/map-data";
+import { getConnectedLocations, computeRoute } from "../../renderer/map-data";
 import { InventoryBar } from "./InventoryBar";
 import { useObjectiveStore, getObjective } from "../../engine/objectives";
 import { FactionBar } from "./FactionBar";
@@ -18,6 +18,7 @@ export function MapScreen() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const frameRef = useRef(0);
   const [showWorldMap, setShowWorldMap] = useState(false);
+  const [previewRoute, setPreviewRoute] = useState<[number, number][] | null>(null);
 
   useEffect(() => {
     audioManager.playAmbient("open_sea");
@@ -44,7 +45,7 @@ export function MapScreen() {
 
     const draw = () => {
       frameRef.current++;
-      drawWorldMap(ctx, c.width, c.height, frameRef.current, mapState, locale);
+      drawWorldMap(ctx, c.width, c.height, frameRef.current, mapState, locale, previewRoute);
 
       // Map title overlay
       ctx.fillStyle = "#f0c040";
@@ -61,7 +62,7 @@ export function MapScreen() {
 
     draw();
     return () => cancelAnimationFrame(id);
-  }, [mapState, locale, t]);
+  }, [mapState, locale, t, previewRoute]);
 
   if (!state) return null;
 
@@ -217,13 +218,22 @@ export function MapScreen() {
                   onMouseOver={e => {
                     e.currentTarget.style.background = "#40c0f0";
                     e.currentTarget.style.color = "#0a0a1a";
+                    if (mapState) {
+                      setPreviewRoute(computeRoute(mapState.playerPos, d.pos));
+                    }
                   }}
                   onMouseOut={e => {
                     e.currentTarget.style.background = "transparent";
                     e.currentTarget.style.color = "#40c0f0";
+                    setPreviewRoute(null);
                   }}
                 >
-                  {d.icon} {d.name[locale]}
+                  <span>{d.icon} {d.name[locale]}</span>
+                  {mapState && (
+                    <span className="text-[7px] opacity-50 ml-1">
+                      {t("routeSteps").replace("{0}", String(computeRoute(mapState.playerPos, d.pos).length))}
+                    </span>
+                  )}
                 </motion.button>
               ))}
             </div>

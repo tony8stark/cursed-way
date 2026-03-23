@@ -185,6 +185,7 @@ export function drawWorldMap(
   frame: number,
   map: MapState,
   locale: Locale,
+  previewRoute?: [number, number][] | null,
 ) {
   const MAP_W = getMapWidth();
   const MAP_H = getMapHeight();
@@ -215,6 +216,37 @@ export function drawWorldMap(
   const oy = Math.floor((H - viewRows * CELL_H) / 2);
 
   drawCells(ctx, map, MAP_CELLS, MAP_W, MAP_H, ox, oy, CELL_W, CELL_H, frame, locale, camX, camY, endX, endY, true);
+
+  // Draw preview route (hover over destination button)
+  if (previewRoute && previewRoute.length > 0) {
+    ctx.strokeStyle = "rgba(64,192,240,0.35)";
+    ctx.lineWidth = 2;
+    ctx.setLineDash([3, 5]);
+    ctx.beginPath();
+    const sX = ox + (px - camX) * CELL_W + CELL_W / 2;
+    const sY = oy + (py - camY) * CELL_H + CELL_H / 2;
+    ctx.moveTo(sX, sY);
+
+    for (const [rx, ry] of previewRoute) {
+      ctx.lineTo(ox + (rx - camX) * CELL_W + CELL_W / 2, oy + (ry - camY) * CELL_H + CELL_H / 2);
+    }
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Preview destination marker (pulsing cyan diamond)
+    const lastPt = previewRoute[previewRoute.length - 1];
+    const pdx = ox + (lastPt[0] - camX) * CELL_W + CELL_W / 2;
+    const pdy = oy + (lastPt[1] - camY) * CELL_H + CELL_H / 2;
+    const pdp = 1 + Math.sin(frame * 0.08) * 0.3;
+    ctx.fillStyle = "rgba(64,192,240,0.4)";
+    ctx.beginPath();
+    ctx.moveTo(pdx, pdy - 5 * pdp);
+    ctx.lineTo(pdx + 4 * pdp, pdy);
+    ctx.lineTo(pdx, pdy + 5 * pdp);
+    ctx.lineTo(pdx - 4 * pdp, pdy);
+    ctx.closePath();
+    ctx.fill();
+  }
 
   // Draw planned route
   if (map.currentRoute && map.destination) {

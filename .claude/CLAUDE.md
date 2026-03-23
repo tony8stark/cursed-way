@@ -99,7 +99,7 @@ Mode stored in `useGameModeStore` (Zustand), persisted to localStorage. Saved wi
 - **Flags**: Set<string> tracking player choices for consequence encounters
 - **Inventory**: string[] of artifact IDs with passive per-day effects
 - **Storylet scheduler**: Weighted encounter selection using: phase fit (early/mid/late), family diversity (ambient/consequence/quest/relationship/setpiece), tag novelty (anti-repeat with sliding window), base weight, exclusivity groups, cooldown enforcement. Falls back to top-40% weighted random for variety. Auto-tagger infers metadata from encounter id/scene/requires for backward compat.
-- **Encounter types**: Standard, chain (multi-step), location-bound, item-gated choices, delayed triggers
+- **Encounter types**: Standard, chain (multi-step), location-bound (only trigger at actual playerPos, not destination), item-gated choices, delayed triggers
 - **Effects**: gold, crew, karma, curse, item gain/loss, map reveal, chain to next encounter, delayed encounter
 - **Delayed effects**: Scheduled encounters trigger N days later, with hint text shown on map
 - **Objectives**: 6 run objectives for Free Roam mode (treasure_hunter, curse_breaker, explorer, trade_baron, redeemer, cartographer). Player picks one on title screen. Progress tracked via progress bar in sidebar. Completing objective unlocks special ending + option to end voyage or keep sailing.
@@ -120,7 +120,9 @@ Always-on enhanced visuals (no classic/simple mode):
 - **Location pool**: 130+ bilingual location templates organized in 11 categories: port (22), settlement (12), inhabited island (12), wild island (16), phantom island (10), underwater (10), cave (10), wreck (12), mysterious (11), reef (8), landmark (8). Each run gets a unique combination.
 - **Route system**: Auto-built graph connecting nearby locations (2-4 nearest within 25 cells). Validated for full connectivity. Player picks destination from connected locations.
 - **Fog of war**: Reveals 3x3 area around player (bonus from artifacts like cursed_compass), persisted in save
+- **Route preview**: Hovering over destination buttons shows a cyan dashed route preview on the map with step count, helping players plan their route
 - **Map movement**: Route-based (ship advances along planned route each encounter), falls back to terrain-matching if no route set
+- **Empty sailing**: 35% chance of calm seas (no encounter) when en route through open water, making voyages feel more realistic
 
 ## Inventory System
 10 artifacts with rarity (common/rare/cursed), passive per-day stat effects (randomized ranges), reveal radius bonuses, and encounter unlocks.
