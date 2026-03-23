@@ -233,6 +233,7 @@ class AudioManager {
       // Fade out existing
       if (this.ambientNodes) {
         const old = this.ambientNodes;
+        this.ambientNodes = null;
         const oldGain = old.masterGain;
         oldGain.gain.linearRampToValueAtTime(0, ctx.currentTime + 1.5);
         if (this.fadeTimeout) clearTimeout(this.fadeTimeout);
@@ -242,6 +243,12 @@ class AudioManager {
             old.osc2?.stop();
             old.lfo.stop();
             old.noiseSource.stop();
+            old.osc1.disconnect();
+            old.osc2?.disconnect();
+            old.lfo.disconnect();
+            old.noiseSource.disconnect();
+            old.masterGain.disconnect();
+            old.filter.disconnect();
           } catch { /* already stopped */ }
         }, 1600);
       }

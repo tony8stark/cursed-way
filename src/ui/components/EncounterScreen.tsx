@@ -1,4 +1,4 @@
-import { useEffect, useCallback, useMemo } from "react";
+import { useEffect, useCallback, useMemo, useRef } from "react";
 import { motion } from "framer-motion";
 import { GameCanvas } from "./GameCanvas";
 import { StatsBar } from "./StatsBar";
@@ -24,9 +24,17 @@ export function EncounterScreen() {
     if (encounter?.scene) {
       audioManager.playAmbient(encounter.scene);
     }
-  }, [encounter?.scene]);
+    // Reset choice guard when a new encounter loads
+    choosingRef.current = false;
+  }, [encounter]);
+
+  const choosingRef = useRef(false);
 
   const handleChoice = useCallback((choice: Choice) => {
+    // Guard against double-click / keyboard race condition
+    if (choosingRef.current) return;
+    choosingRef.current = true;
+
     audioManager.playSFX("click");
 
     const goldEff = choice.eff.gold;

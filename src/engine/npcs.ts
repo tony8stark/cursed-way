@@ -317,7 +317,7 @@ const npcList: NPCDef[] = [
     title: { uk: "Перший помічник", en: "First Mate" },
     icon: "💀",
     category: "pirate",
-    metFlag: "met_first_mate_bones",
+    metFlag: "met_bones",
     spritePath: "/icons/npcs/pirate_crew.png",
     // Bandana, thin face, pale skin, striped shirt
     portrait: px(

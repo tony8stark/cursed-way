@@ -40,9 +40,9 @@ export const ACHIEVEMENTS: Achievement[] = [
   {
     id: "empty",
     title: "Порожній трюм",
-    description: "Закінчити гру з 0 золота",
+    description: "Закінчити гру з менше ніж 5 золота",
     icon: "🫗",
-    check: s => s.gold === 0,
+    check: s => s.gold < 5,
   },
   {
     id: "full_crew",

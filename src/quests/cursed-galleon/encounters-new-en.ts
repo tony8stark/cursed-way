@@ -163,17 +163,17 @@ export const newEncountersEn: Encounter[] = [
     ],
   },
   {
-    id: "crew_old_bones", scene: "open_sea", family: "relationship", phase: "mid", title: "Old Bones",
-    text: "The oldest sailor, whom everyone calls Bones, coughs blood. 'Last voyage, Captain. I promise.'",
+    id: "crew_old_grim", scene: "open_sea", family: "relationship", phase: "mid", title: "Old Grim",
+    text: "The oldest sailor, whom everyone calls Grim, coughs blood. 'Last voyage, Captain. I promise.'",
     requires: s => s.day >= 5,
     choices: [
-      { text: "🏥 Treat him (−10)", eff: { gold: -10, crew: 0, karma: 1, curse: 0 }, msg: "'You're a good one, Captain.' Bones knows every port, every reef. While he lives, you're safe.", flag: "bones_alive" },
-      { text: "🗣️ Listen to his story", eff: { gold: 0, crew: 1, karma: 0, curse: 0 }, msg: "Sailed with Henry Morgan. The Panama raid. 'I've seen gold destroy men. Three hundred times.' The crew listens with reverence.", flag: "bones_story" },
-      { text: "😔 Put him ashore", eff: { gold: 0, crew: -1, karma: 0, curse: 0, delay: { daysLater: 5, encounterId: "bones_ghost", hint: "Old Bones' spirit seeks the ship" } }, msg: "Bones salutes. 'Fair winds, Captain.' Not offended. Just sad." },
+      { text: "🏥 Treat him (−10)", eff: { gold: -10, crew: 0, karma: 1, curse: 0 }, msg: "'You're a good one, Captain.' Grim knows every port, every reef. While he lives, you're safe.", flag: "grim_alive" },
+      { text: "🗣️ Listen to his story", eff: { gold: 0, crew: 1, karma: 0, curse: 0 }, msg: "Sailed with Henry Morgan. The Panama raid. 'I've seen gold destroy men. Three hundred times.' The crew listens with reverence.", flag: "grim_story" },
+      { text: "😔 Put him ashore", eff: { gold: 0, crew: -1, karma: 0, curse: 0, delay: { daysLater: 5, encounterId: "grim_ghost", hint: "Old Grim's spirit seeks the ship" } }, msg: "Grim salutes. 'Fair winds, Captain.' Not offended. Just sad." },
     ],
   },
   {
-    id: "bones_ghost", scene: "ethereal", family: "consequence", title: "The Ghost of Bones",
+    id: "grim_ghost", scene: "ethereal", family: "consequence", title: "The Ghost of Grim",
     text: "At dawn, you see the old man on deck. Translucent. 'Told you. Last voyage.'",
     choices: [
       { text: "🙏 Say goodbye", eff: { gold: 0, crew: 0, karma: 1, curse: -1 }, msg: "'Thank you, Captain. Now I am part of the sea.' He dissolves into the spray." },

@@ -135,7 +135,8 @@ export function pickEncounter(
       if (e.locationName || e.location) return false; // skip location-bound
       return true;
     });
-    return fallback[Math.floor(Math.random() * fallback.length)] || encounters[0];
+    if (fallback.length === 0) return encounters[0];
+    return fallback[Math.floor(Math.random() * fallback.length)];
   }
 
   // Score all general encounters

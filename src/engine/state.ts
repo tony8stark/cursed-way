@@ -8,7 +8,7 @@ import { generateMap } from "../renderer/map-generator";
 import { ARTIFACTS } from "./items";
 import { useGameModeStore } from "./game-mode";
 import { useOriginStore, getOrigin } from "./origins";
-import { useObjectiveStore } from "./objectives";
+import { useObjectiveStore, getObjective } from "./objectives";
 import { defaultReps, originRepBonuses, applyRepChanges } from "./factions";
 import { checkLocationQuest } from "./location-quests";
 import { NPCS } from "./npcs";
@@ -192,7 +192,24 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // In free roam: only crew/curse death (no day limit)
     const dayLimitReached = gameMode === "expedition" && state.day >= 20;
     if (dayLimitReached || state.crew <= 0 || state.curse >= 15) {
-      const idx = quest.endings.findIndex(e => e.req(state));
+      // Auto-check objective completion before resolving ending
+      const objectiveId = useObjectiveStore.getState().objectiveId;
+      let finalState = state;
+      if (objectiveId && !state.flags.has("objective_complete")) {
+        const obj = getObjective(objectiveId);
+        if (obj) {
+          const { mapState } = get();
+          const prog = obj.check(state, mapState);
+          if (prog.complete) {
+            const newFlags = new Set(state.flags);
+            newFlags.add("objective_complete");
+            newFlags.add(`objective_${objectiveId}`);
+            finalState = { ...state, flags: newFlags };
+            set({ state: finalState });
+          }
+        }
+      }
+      const idx = quest.endings.findIndex(e => e.req(finalState));
       set({ endingIndex: idx >= 0 ? idx : quest.endings.length - 1, screen: "ending" });
       get().clearSave();
       return;
@@ -302,7 +319,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           if (cell?.name) {
             const locName = cell.name.en;
             const visits = (state.locationVisits[locName] ?? 0) + 1;
-            state.locationVisits[locName] = visits;
+            const newLocationVisits = { ...state.locationVisits, [locName]: visits };
 
             const lq = checkLocationQuest(locName, visits, usedIds);
             if (lq) {
@@ -324,7 +341,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
                     gold, crew, karma, curse,
                     flags: newFlags,
                     visitedLocations: newVisitedLocations,
-                    locationVisits: { ...state.locationVisits },
+                    locationVisits: newLocationVisits,
                   },
                   mapState: newMapState,
                 });
@@ -407,7 +424,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           if (cell?.name) {
             const locName = cell.name.en; // quest system uses English names
             const visits = (state.locationVisits[locName] ?? 0) + 1;
-            state.locationVisits[locName] = visits;
+            const newLocationVisits = { ...state.locationVisits, [locName]: visits };
 
             const lq = checkLocationQuest(locName, visits, usedIds);
             if (lq) {
@@ -431,7 +448,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
                     gold, crew, karma, curse,
                     flags: newFlags,
                     visitedLocations: newVisitedLocations,
-                    locationVisits: { ...state.locationVisits },
+                    locationVisits: newLocationVisits,
                   },
                   mapState: newMapState,
                 });

@@ -945,7 +945,7 @@ export const encountersEn: Encounter[] = [
 
   // OLD BONES - mysterious merchant who appears at different ports
   {
-    id: "npc_bones_1", scene: "port", family: "relationship", phase: "early", title: "Old Bones",
+    id: "npc_bones_1", npc: "first_mate_bones", scene: "port", family: "relationship", phase: "early", title: "Old Bones",
     text: "A skeleton-thin man at a corner table. One eye clouded, the other sees too much. 'First time in these waters, Captain? Sit. I have something for you.'",
     choices: [
       { text: "💰 Buy his wares (-15)", eff: { gold: -15, rep: { guild: 1 } }, msg: "'A compass that points to regret.' He laughs. Useless? Or is it? His prices are always strange.", flag: "met_bones" },
@@ -954,7 +954,7 @@ export const encountersEn: Encounter[] = [
     ],
   },
   {
-    id: "npc_bones_2", scene: "port", family: "relationship", phase: "mid", title: "Old Bones Again",
+    id: "npc_bones_2", npc: "first_mate_bones", scene: "port", family: "relationship", phase: "mid", title: "Old Bones Again",
     text: "Different port, same corner. He waves as if expecting you. 'Told you. Sit down. I have a proposition.'",
     requires: s => s.flags.has("met_bones") && s.day >= 6,
     choices: [
@@ -964,7 +964,7 @@ export const encountersEn: Encounter[] = [
     ],
   },
   {
-    id: "npc_bones_3", scene: "port", family: "relationship", phase: ["mid", "late"], title: "Old Bones' Secret",
+    id: "npc_bones_3", npc: "first_mate_bones", scene: "port", family: "relationship", phase: ["mid", "late"], title: "Old Bones' Secret",
     text: s => s.flags.has("bones_package")
       ? "'You still have my package? Good. Change of plans. Open it.' His one good eye glitters."
       : "'I hear you've been asking about me. Smart captain. Dangerous captain.'",
@@ -977,7 +977,7 @@ export const encountersEn: Encounter[] = [
     ],
   },
   {
-    id: "npc_bones_4", scene: "port", family: "relationship", phase: "late", title: "Old Bones' Farewell",
+    id: "npc_bones_4", npc: "first_mate_bones", scene: "port", family: "relationship", phase: "late", title: "Old Bones' Farewell",
     text: "'Last time, Captain. My debts are nearly paid. I have one thing left to offer. Something I've been carrying since 1643.'",
     requires: s => s.flags.has("bones_truth") && s.day >= 14,
     choices: [
@@ -989,7 +989,7 @@ export const encountersEn: Encounter[] = [
 
   // CAPITANA VEGA - rival pirate captain
   {
-    id: "npc_vega_1", scene: "combat", family: "relationship", phase: "early", title: "La Venganza",
+    id: "npc_vega_1", npc: "pirate_queen", scene: "combat", family: "relationship", phase: "early", title: "La Venganza",
     text: "A sleek brigantine cuts your path. On the bow: a woman with a saber and a smile. 'I'm taking your cargo, Captain. Nothing personal. I'm Vega.'",
     choices: [
       { text: "⚔️ Fight!", eff: { gold: 0, crew: [-2, -1], karma: 0, curse: 0, rep: { brethren: -1 } }, msg: "She fights like lightning. You win, barely. She jumps overboard laughing. 'Better luck next time, Captain!'", flag: "vega_fought" },
@@ -998,7 +998,7 @@ export const encountersEn: Encounter[] = [
     ],
   },
   {
-    id: "npc_vega_2", scene: "open_sea", family: "relationship", phase: "mid", title: "Vega's Signal",
+    id: "npc_vega_2", npc: "pirate_queen", scene: "open_sea", family: "relationship", phase: "mid", title: "Vega's Signal",
     text: s => {
       if (s.flags.has("vega_fought")) return "A red flare from the east. It's her ship. La Venganza lists badly. She's in trouble.";
       if (s.flags.has("vega_talked")) return "A red flare: Vega's signal. 'Remember that treasure? It's time. Meet me at the reef.'";
@@ -1012,7 +1012,7 @@ export const encountersEn: Encounter[] = [
     ],
   },
   {
-    id: "npc_vega_3", scene: "open_sea", family: "relationship", phase: ["mid", "late"], title: "Vega's Proposition",
+    id: "npc_vega_3", npc: "pirate_queen", scene: "open_sea", family: "relationship", phase: ["mid", "late"], title: "Vega's Proposition",
     text: "'Two captains, two ships. We can own these waters.' She lays a chart on your table. Her eyes are serious for the first time.",
     requires: s => s.flags.has("vega_saved") && s.day >= 11,
     choices: [
@@ -1022,7 +1022,7 @@ export const encountersEn: Encounter[] = [
     ],
   },
   {
-    id: "npc_vega_final", scene: "combat", family: "relationship", phase: "late", title: "Vega's Last Stand",
+    id: "npc_vega_final", npc: "pirate_queen", scene: "combat", family: "relationship", phase: "late", title: "Vega's Last Stand",
     text: s => {
       if (s.flags.has("vega_love")) return "Crown warships. Six of them. Vega grabs your hand. 'Together. Like we promised.'";
       if (s.flags.has("vega_alliance")) return "Crown ambush! Six warships. Vega signals from La Venganza: 'FIGHT OR FLEE?'";
@@ -1038,7 +1038,7 @@ export const encountersEn: Encounter[] = [
 
   // KOJO THE BOSUN - loyal crew member who develops personality
   {
-    id: "npc_kojo_1", scene: "open_sea", family: "relationship", phase: "early", title: "The New Bosun",
+    id: "npc_kojo_1", npc: "bosun", scene: "open_sea", family: "relationship", phase: "early", title: "The New Bosun",
     text: "The biggest man you've ever seen steps forward. 'Name's Kojo. I'll keep order. If you're worth following.'",
     choices: [
       { text: "🤝 Welcome aboard", eff: { crew: 1 }, msg: "He shakes your hand. Yours disappears inside his. The crew straightens up. Order has arrived.", flag: "kojo_joined" },
@@ -1047,7 +1047,7 @@ export const encountersEn: Encounter[] = [
     ],
   },
   {
-    id: "npc_kojo_2", scene: "open_sea", family: "relationship", phase: "mid", title: "Kojo's Story",
+    id: "npc_kojo_2", npc: "bosun", scene: "open_sea", family: "relationship", phase: "mid", title: "Kojo's Story",
     text: s => s.karma >= 2
       ? "Night watch. Kojo sits beside you. 'Captain, you're a decent person. That's dangerous here. Let me tell you why I know.'"
       : "Night watch. Kojo is quiet. Then: 'Captain, I was a slave. A plantation in Barbados. I killed the overseer with my chains. I need you to know that.'",
@@ -1059,7 +1059,7 @@ export const encountersEn: Encounter[] = [
     ],
   },
   {
-    id: "npc_kojo_3", scene: "combat", family: "relationship", phase: ["mid", "late"], title: "Kojo's Judgment",
+    id: "npc_kojo_3", npc: "bosun", scene: "combat", family: "relationship", phase: ["mid", "late"], title: "Kojo's Judgment",
     text: s => {
       if (s.karma <= -3) return "Kojo blocks your path. The crew behind him. 'Captain. We need to talk about what you've become.'";
       if (s.flags.has("kojo_story")) return "A slaver ship on the horizon. Kojo goes still. His hands shake. 'Captain. That ship carries my people.'";
@@ -1073,7 +1073,7 @@ export const encountersEn: Encounter[] = [
     ],
   },
   {
-    id: "npc_kojo_4", scene: "open_sea", family: "relationship", phase: "late", title: "Kojo's Choice",
+    id: "npc_kojo_4", npc: "bosun", scene: "open_sea", family: "relationship", phase: "late", title: "Kojo's Choice",
     text: s => {
       if (s.flags.has("kojo_freed_slaves")) return "Kojo comes with a carved wooden figure. 'In Ashanti, we give this to family. You are my family now, Captain.'";
       if (s.flags.has("kojo_disappointed")) return "Kojo approaches. 'I'm leaving at the next port. I can't follow someone who sails past chains.'";

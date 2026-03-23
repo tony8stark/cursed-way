@@ -23,8 +23,8 @@ const achievementTexts: Record<string, Record<Locale, AchievementText>> = {
     en: { title: "Diplomat", description: "No boarding in a single game" },
   },
   empty: {
-    uk: { title: "Порожній трюм", description: "Закінчити гру з 0 золота" },
-    en: { title: "Empty Hold", description: "Finish with 0 gold" },
+    uk: { title: "Порожній трюм", description: "Закінчити гру з менше ніж 5 золота" },
+    en: { title: "Empty Hold", description: "Finish with less than 5 gold" },
   },
   full_crew: {
     uk: { title: "Капітан року", description: "Закінчити з 12+ членів команди" },

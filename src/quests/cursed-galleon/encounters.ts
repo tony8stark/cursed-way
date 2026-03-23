@@ -945,7 +945,7 @@ export const encounters: Encounter[] = [
 
   // СТАРІ КОСТІ - таємничий торговець
   {
-    id: "npc_bones_1", scene: "port", family: "relationship", phase: "early", title: "Старі Кості",
+    id: "npc_bones_1", npc: "first_mate_bones", scene: "port", family: "relationship", phase: "early", title: "Старі Кості",
     text: "Скелетно худий чоловік за кутовим столом. Одне око каламутне, інше бачить забагато. 'Вперше в цих водах, Капітане? Сідайте. Маю щось для вас.'",
     choices: [
       { text: "💰 Купити його товар (-15)", eff: { gold: -15, rep: { guild: 1 } }, msg: "'Компас, що вказує на жаль.' Сміється. Марний? Чи ні? Його ціни завжди дивні.", flag: "met_bones" },
@@ -954,7 +954,7 @@ export const encounters: Encounter[] = [
     ],
   },
   {
-    id: "npc_bones_2", scene: "port", family: "relationship", phase: "mid", title: "Знову Старі Кості",
+    id: "npc_bones_2", npc: "first_mate_bones", scene: "port", family: "relationship", phase: "mid", title: "Знову Старі Кості",
     text: "Інший порт, той самий куток. Він махає, ніби чекав. 'Казав же. Сідайте. Маю пропозицію.'",
     requires: s => s.flags.has("met_bones") && s.day >= 6,
     choices: [
@@ -964,7 +964,7 @@ export const encounters: Encounter[] = [
     ],
   },
   {
-    id: "npc_bones_3", scene: "port", family: "relationship", phase: ["mid", "late"], title: "Таємниця Старих Кісток",
+    id: "npc_bones_3", npc: "first_mate_bones", scene: "port", family: "relationship", phase: ["mid", "late"], title: "Таємниця Старих Кісток",
     text: s => s.flags.has("bones_package")
       ? "'Ви ще маєте мою скриньку? Добре. Зміна планів. Відкрийте.' Його здорове око блищить."
       : "'Чую, ви мною цікавитесь. Розумний капітан. Небезпечний капітан.'",
@@ -977,7 +977,7 @@ export const encounters: Encounter[] = [
     ],
   },
   {
-    id: "npc_bones_4", scene: "port", family: "relationship", phase: "late", title: "Прощання Старих Кісток",
+    id: "npc_bones_4", npc: "first_mate_bones", scene: "port", family: "relationship", phase: "late", title: "Прощання Старих Кісток",
     text: "'Останній раз, Капітане. Мої борги майже сплачені. Маю одну останню річ. Щось, що ношу з 1643 року.'",
     requires: s => s.flags.has("bones_truth") && s.day >= 14,
     choices: [
@@ -989,7 +989,7 @@ export const encounters: Encounter[] = [
 
   // КАПІТАНА ВЕГА - пірат-суперниця
   {
-    id: "npc_vega_1", scene: "combat", family: "relationship", phase: "early", title: "Ла Венганза",
+    id: "npc_vega_1", npc: "pirate_queen", scene: "combat", family: "relationship", phase: "early", title: "Ла Венганза",
     text: "Стрункий бригантин перерізає ваш шлях. На носі: жінка з шаблею і посмішкою. 'Забираю ваш вантаж, Капітане. Нічого особистого. Я Вега.'",
     choices: [
       { text: "⚔️ Бій!", eff: { gold: 0, crew: [-2, -1], karma: 0, curse: 0, rep: { brethren: -1 } }, msg: "Вона б'ється як блискавка. Ви перемагаєте, ледь. Стрибає за борт, сміючись. 'Наступного разу, Капітане!'", flag: "vega_fought" },
@@ -998,7 +998,7 @@ export const encounters: Encounter[] = [
     ],
   },
   {
-    id: "npc_vega_2", scene: "open_sea", family: "relationship", phase: "mid", title: "Сигнал Веги",
+    id: "npc_vega_2", npc: "pirate_queen", scene: "open_sea", family: "relationship", phase: "mid", title: "Сигнал Веги",
     text: s => {
       if (s.flags.has("vega_fought")) return "Червоний спалах зі сходу. Це її корабель. Ла Венганза сильно кренить. У неї біда.";
       if (s.flags.has("vega_talked")) return "Червоний спалах: сигнал Веги. 'Пам'ятаєте той скарб? Час. Зустрічаємось біля рифу.'";
@@ -1012,7 +1012,7 @@ export const encounters: Encounter[] = [
     ],
   },
   {
-    id: "npc_vega_3", scene: "open_sea", family: "relationship", phase: ["mid", "late"], title: "Пропозиція Веги",
+    id: "npc_vega_3", npc: "pirate_queen", scene: "open_sea", family: "relationship", phase: ["mid", "late"], title: "Пропозиція Веги",
     text: "'Два капітани, два кораблі. Ми можемо володіти цими водами.' Розкладає карту на вашому столі. Її очі серйозні вперше.",
     requires: s => s.flags.has("vega_saved") && s.day >= 11,
     choices: [
@@ -1022,7 +1022,7 @@ export const encounters: Encounter[] = [
     ],
   },
   {
-    id: "npc_vega_final", scene: "combat", family: "relationship", phase: "late", title: "Останній бій Веги",
+    id: "npc_vega_final", npc: "pirate_queen", scene: "combat", family: "relationship", phase: "late", title: "Останній бій Веги",
     text: s => {
       if (s.flags.has("vega_love")) return "Військові кораблі Корони. Шість. Вега хапає вашу руку. 'Разом. Як обіцяли.'";
       if (s.flags.has("vega_alliance")) return "Засідка Корони! Шість кораблів. Вега сигналить з Ла Венганзи: 'БІЙСЯ ЧИ ТІКАЙ?'";
@@ -1038,7 +1038,7 @@ export const encounters: Encounter[] = [
 
   // КОДЖО БОЦМАН - вірний член екіпажу
   {
-    id: "npc_kojo_1", scene: "open_sea", family: "relationship", phase: "early", title: "Новий боцман",
+    id: "npc_kojo_1", npc: "bosun", scene: "open_sea", family: "relationship", phase: "early", title: "Новий боцман",
     text: "Найбільша людина, яку ви бачили, виходить вперед. 'Мене звати Коджо. Я наведу порядок. Якщо ви варті того, щоб за вами йти.'",
     choices: [
       { text: "🤝 Ласкаво просимо", eff: { crew: 1 }, msg: "Потискує руку. Ваша зникає в його. Команда вирівнюється. Порядок прибув.", flag: "kojo_joined" },
@@ -1047,7 +1047,7 @@ export const encounters: Encounter[] = [
     ],
   },
   {
-    id: "npc_kojo_2", scene: "open_sea", family: "relationship", phase: "mid", title: "Історія Коджо",
+    id: "npc_kojo_2", npc: "bosun", scene: "open_sea", family: "relationship", phase: "mid", title: "Історія Коджо",
     text: s => s.karma >= 2
       ? "Нічна вахта. Коджо сідає поруч. 'Капітане, ви порядна людина. Це небезпечно тут. Дозвольте розповісти, чому я знаю.'"
       : "Нічна вахта. Коджо мовчить. Потім: 'Капітане, я був рабом. Плантація на Барбадосі. Я вбив наглядача його ж ланцюгами. Ви маєте це знати.'",
@@ -1059,7 +1059,7 @@ export const encounters: Encounter[] = [
     ],
   },
   {
-    id: "npc_kojo_3", scene: "combat", family: "relationship", phase: ["mid", "late"], title: "Суд Коджо",
+    id: "npc_kojo_3", npc: "bosun", scene: "combat", family: "relationship", phase: ["mid", "late"], title: "Суд Коджо",
     text: s => {
       if (s.karma <= -3) return "Коджо перекриває вам шлях. Команда за ним. 'Капітане. Треба поговорити про те, ким ви стали.'";
       if (s.flags.has("kojo_story")) return "Корабель работорговців на горизонті. Коджо завмирає. Його руки тремтять. 'Капітане. Той корабель везе моїх людей.'";
@@ -1073,7 +1073,7 @@ export const encounters: Encounter[] = [
     ],
   },
   {
-    id: "npc_kojo_4", scene: "open_sea", family: "relationship", phase: "late", title: "Вибір Коджо",
+    id: "npc_kojo_4", npc: "bosun", scene: "open_sea", family: "relationship", phase: "late", title: "Вибір Коджо",
     text: s => {
       if (s.flags.has("kojo_freed_slaves")) return "Коджо приходить з різьбленою дерев'яною фігуркою. 'В Ашанті ми даємо це родині. Ви моя родина тепер, Капітане.'";
       if (s.flags.has("kojo_disappointed")) return "Коджо підходить. 'Я сходжу в наступному порту. Не можу йти за тим, хто пливе повз ланцюги.'";

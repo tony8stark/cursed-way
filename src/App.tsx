@@ -68,17 +68,22 @@ export default function App() {
     }
   }, [currentToast, toastQueue]);
 
-  // Item acquisition toast
+  // Item acquisition toast (delayed if achievement toast is active to avoid overlap)
   useEffect(() => {
     if (!state) return;
     const len = state.inventory.length;
     if (len > prevInventoryLenRef.current && prevInventoryLenRef.current > 0) {
-      // New item acquired
       const newItem = state.inventory[len - 1];
+      if (currentToast) {
+        // Delay item toast until achievement toast is done
+        const timer = setTimeout(() => setItemToast(newItem), 3500);
+        prevInventoryLenRef.current = len;
+        return () => clearTimeout(timer);
+      }
       setItemToast(newItem);
     }
     prevInventoryLenRef.current = len;
-  }, [state?.inventory.length]);
+  }, [state?.inventory.length, currentToast]);
 
   // Glitch effect
   useEffect(() => {

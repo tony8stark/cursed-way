@@ -163,17 +163,17 @@ export const newEncounters: Encounter[] = [
     ],
   },
   {
-    id: "crew_old_bones", scene: "open_sea", family: "relationship", phase: "mid", title: "Старий Кістка",
-    text: "Найстаріший матрос, якого всі звуть Кістка, кашляє кров'ю. 'Капітане, останнє плавання. Обіцяю.'",
+    id: "crew_old_grim", scene: "open_sea", family: "relationship", phase: "mid", title: "Старий Грім",
+    text: "Найстаріший матрос, якого всі звуть Грім, кашляє кров'ю. 'Капітане, останнє плавання. Обіцяю.'",
     requires: s => s.day >= 5,
     choices: [
-      { text: "🏥 Лікувати (−10)", eff: { gold: -10, crew: 0, karma: 1, curse: 0 }, msg: "'Ти добрий, капітане.' Кістка знає кожен порт, кожен риф. Поки живий, ви у безпеці.", flag: "bones_alive" },
-      { text: "🗣️ Вислухати його історію", eff: { gold: 0, crew: 1, karma: 0, curse: 0 }, msg: "Плавав з Генрі Морганом. Панамський рейд. 'Я бачив, як золото знищує людей. Триста разів.' Команда слухає з повагою.", flag: "bones_story" },
-      { text: "😔 Висадити в порту", eff: { gold: 0, crew: -1, karma: 0, curse: 0, delay: { daysLater: 5, encounterId: "bones_ghost", hint: "Дух Кістки шукає корабель" } }, msg: "Кістка салютує. 'Добре плавання, капітане.' Не ображений. Просто сумний." },
+      { text: "🏥 Лікувати (−10)", eff: { gold: -10, crew: 0, karma: 1, curse: 0 }, msg: "'Ти добрий, капітане.' Грім знає кожен порт, кожен риф. Поки живий, ви у безпеці.", flag: "grim_alive" },
+      { text: "🗣️ Вислухати його історію", eff: { gold: 0, crew: 1, karma: 0, curse: 0 }, msg: "Плавав з Генрі Морганом. Панамський рейд. 'Я бачив, як золото знищує людей. Триста разів.' Команда слухає з повагою.", flag: "grim_story" },
+      { text: "😔 Висадити в порту", eff: { gold: 0, crew: -1, karma: 0, curse: 0, delay: { daysLater: 5, encounterId: "grim_ghost", hint: "Дух Гріма шукає корабель" } }, msg: "Грім салютує. 'Добре плавання, капітане.' Не ображений. Просто сумний." },
     ],
   },
   {
-    id: "bones_ghost", scene: "ethereal", family: "consequence", title: "Привид Кістки",
+    id: "grim_ghost", scene: "ethereal", family: "consequence", title: "Привид Гріма",
     text: "На рані бачите старого на палубі. Прозорого. 'Казав же, останнє плавання.'",
     choices: [
       { text: "🙏 Попрощатися", eff: { gold: 0, crew: 0, karma: 1, curse: -1 }, msg: "'Дякую, капітане. Тепер я частина моря.' Розчиняється у бризках." },
