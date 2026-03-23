@@ -131,11 +131,11 @@ InventoryBar component shown on map and encounter screens with acquisition histo
 **Artifact Log**: GameState tracks `artifactLog[]` with itemId, day, encounterId, encounterTitle for each acquisition.
 
 ## NPC System
-32 NPCs across 7 categories: merchant, pirate, official, mystic, crew, civilian, supernatural.
-Each NPC has bilingual name/title, emoji icon, pixel art portrait (10x12 grid), and a `metFlag`.
+36 NPCs across 7 categories: merchant, pirate, official, mystic, crew, civilian, supernatural.
+Each NPC has bilingual name/title, emoji icon, `spritePath` (Minifolks 32x32 idle frame), legacy canvas portrait (10x12 grid), and a `metFlag`.
 NPCs are tracked in GameState via `npcMeetings[]` with npcId, day, encounterId, encounterTitle.
-Portraits rendered via `drawNPCPortrait()` on Canvas 2D.
-**NPC Journal**: Modal panel (👤 button in top bar) showing all met NPCs grouped by category, with pixel art portraits rendered on canvas, bilingual names/titles, and meeting details. Shows X/32 progress counter.
+**Sprites**: 24 unique idle frames extracted from Minifolks sprite sheets (Pirates, Villagers, Villagers2) to `public/icons/npcs/`. Rendered as `<img>` with `image-rendering: pixelated`. Unmet NPCs shown as dark silhouettes via CSS filter. Canvas `drawNPCPortrait()` kept as fallback.
+**NPC Journal**: Modal panel (📔 button in top bar on title screen) showing all met NPCs grouped by category, with sprite portraits, bilingual names/titles, and meeting details. Shows X/36 progress counter.
 
 ## Location Quest System
 Difficulty-tiered quests bound to specific map locations with probability mechanics:
