@@ -1,5 +1,6 @@
 import { useRef, useEffect } from "react";
 import { SCENES } from "../../renderer/scenes";
+import { setSpriteVariantSeed } from "../../renderer/sprites";
 import { ParticleSystem } from "../../renderer/particles";
 import { getShipVisualState } from "../../renderer/ship-variants";
 import { getAtmosphere, drawFogOverlay } from "../../renderer/atmosphere";
@@ -44,6 +45,8 @@ export function GameCanvas({ scene, curse = 0, day = 0, enemyType }: Props) {
       const f = frameRef.current;
       const renderer = SCENES[scene] || SCENES.open_sea;
 
+      // Seed sprite variants from game day for visual variety
+      setSpriteVariantSeed(day ?? 1);
       renderer(ctx, W, H, f, ps, opts);
 
       ps.update();

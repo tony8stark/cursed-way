@@ -65,6 +65,7 @@ const translations = {
     continueButton: "ПЛИВТИ ДАЛІ →",
     continueChain: "ДАЛІ →",
     cantAfford: "(замало 💰)",
+    alreadyOwned: "(вже є)",
     // Ending
     journal: "ЖУРНАЛ",
     dayPrefix: "Д",
@@ -149,6 +150,7 @@ const translations = {
     continueButton: "SAIL ON →",
     continueChain: "CONTINUE →",
     cantAfford: "(not enough 💰)",
+    alreadyOwned: "(already owned)",
     journal: "LOG",
     dayPrefix: "D",
     replayButton: "SET SAIL AGAIN",

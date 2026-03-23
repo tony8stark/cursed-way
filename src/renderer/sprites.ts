@@ -23,18 +23,63 @@ interface SpriteImage {
   h: number;
 }
 
+// Sprite variants for randomization (picked per-scene using day seed)
+const PALM_VARIANTS = [
+  "/icons/scene/palm_0.png",
+  "/icons/scene/palm_1.png",
+  "/icons/scene/palm_2.png",
+  "/icons/scene/palm_3.png",
+];
+const PALM_BIG_VARIANTS = [
+  "/icons/scene/palm_big_0.png",
+  "/icons/scene/palm_big_1.png",
+  "/icons/scene/palm_big_2.png",
+];
+const BUSH_VARIANTS = [
+  "/icons/scene/bush_0.png",
+  "/icons/scene/bush_1.png",
+];
+const TENTACLE_VARIANTS = [
+  "/icons/map/serpent_body_1.png",
+  "/icons/map/serpent_body_2.png",
+  "/icons/map/serpent_body_3.png",
+];
+
+// Current variant seed (set by scene renderer based on game day)
+let variantSeed = 0;
+export function setSpriteVariantSeed(seed: number) { variantSeed = seed; }
+
+function pickVariant(variants: string[], offset = 0): string {
+  return variants[(variantSeed + offset) % variants.length];
+}
+
 const SPRITE_IMAGES: Record<string, SpriteImage> = {
-  palm:     { path: "/icons/scene/palm_1.png",     w: 16, h: 21 },   // 48x64 → compact
-  palm_big: { path: "/icons/scene/palm_big_0.png", w: 20, h: 28 },   // 80x112 → compact
-  bush:     { path: "/icons/scene/bush_0.png",     w: 10, h: 10 },   // 32x32
-  building: { path: "/icons/scene/palm_big_1.png", w: 20, h: 28 },   // use palm as port scenery
+  palm:     { path: "", w: 16, h: 21 },   // 48x64 → compact (path set dynamically)
+  palm_big: { path: "", w: 20, h: 28 },   // 80x112 → compact
+  bush:     { path: "", w: 10, h: 10 },   // 32x32
+  building: { path: "", w: 20, h: 28 },   // use palm as port scenery
   chest:    { path: "/icons/scene/chest.png",      w: 10, h: 10 },   // 32x32 pirate chest
   enemy:    { path: "/icons/ships/ship_dark_16.png", w: 14, h: 14 }, // dark ship
   ghost:    { path: "/icons/ships/ship_dark_16.png", w: 14, h: 14 }, // same ship, tinted by scene
+  tentacle: { path: "", w: 8, h: 8 },  // serpent body as tentacle
 };
 
-// Preload all scene sprites
-Object.values(SPRITE_IMAGES).forEach(s => loadImg(s.path));
+// Dynamic path resolution for variant sprites
+function getSpritePath(name: string, imgDef: SpriteImage): string {
+  if (imgDef.path) return imgDef.path; // static path
+  switch (name) {
+    case "palm": return pickVariant(PALM_VARIANTS, 0);
+    case "palm_big": return pickVariant(PALM_BIG_VARIANTS, 1);
+    case "bush": return pickVariant(BUSH_VARIANTS, 2);
+    case "building": return pickVariant(PALM_BIG_VARIANTS, 3);
+    case "tentacle": return pickVariant(TENTACLE_VARIANTS, 4);
+    default: return "";
+  }
+}
+
+// Preload all scene sprites (static + variants)
+Object.values(SPRITE_IMAGES).forEach(s => { if (s.path) loadImg(s.path); });
+[...PALM_VARIANTS, ...PALM_BIG_VARIANTS, ...BUSH_VARIANTS, ...TENTACLE_VARIANTS].forEach(p => loadImg(p));
 
 // ── Legacy ASCII sprite data (fallback) ──
 
@@ -131,7 +176,8 @@ export function drawSprite(
   // Try image sprite first
   const imgDef = SPRITE_IMAGES[name];
   if (imgDef) {
-    const img = loadImg(imgDef.path);
+    const path = getSpritePath(name, imgDef);
+    const img = path ? loadImg(path) : null;
     if (img) {
       const prevAlpha = ctx.globalAlpha;
       ctx.globalAlpha = alpha;
