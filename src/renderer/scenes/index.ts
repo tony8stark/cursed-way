@@ -88,9 +88,9 @@ function sceneOpenSea(ctx: CanvasRenderingContext2D, W: number, H: number, f: nu
     ps.emit(2, { x: 0, y: waterStart + 10, w: W, h: H * 0.15, color: "rgba(200,220,255,0.4)", size: 1.5, life: 50, vxRange: [0.15, 0.4], vyRange: [-0.05, 0.05] });
   }
 
-  // Ship with gentle bob
+  // Ship with gentle bob (centered on waterline)
   const bob = Math.sin(f * 0.04) * 3 + Math.sin(f * 0.07) * 1.5;
-  ship(ctx, W / 2 - 21, H / 2 + bob - 8, 3, 1, opts);
+  ship(ctx, W / 2 - 21, H * 0.55 + bob, 3, 1, opts);
 }
 
 function sceneStorm(ctx: CanvasRenderingContext2D, W: number, H: number, f: number, ps: ParticleSystem, opts?: SceneOpts) {
@@ -121,7 +121,7 @@ function sceneStorm(ctx: CanvasRenderingContext2D, W: number, H: number, f: numb
     ps.emit(5, { x: 0, y: -5, w: W, h: 1, color: "rgba(150,180,220,0.5)", size: 1, life: 30, vxRange: [0.5, 1.5], vyRange: [4, 6] });
   }
 
-  ship(ctx, W / 2 - 21, H / 2 + Math.sin(f * 0.08) * 8, 3, 1, opts);
+  ship(ctx, W / 2 - 21, H * 0.55 + Math.sin(f * 0.08) * 8, 3, 1, opts);
 }
 
 function sceneIsland(ctx: CanvasRenderingContext2D, W: number, H: number, f: number, ps: ParticleSystem, opts?: SceneOpts) {
@@ -194,18 +194,21 @@ function sceneCombat(ctx: CanvasRenderingContext2D, W: number, H: number, f: num
     }
   }
 
+  // Enemy ship: far away (upper-right, smaller scale = perspective)
   const isGhost = opts?.enemyType === "ghost";
-  drawSprite(ctx, isGhost ? "ghost" : "enemy", W / 2 - 21, H * 0.15 + Math.sin(f * 0.06 + 1) * 3, 3, isGhost ? 0.7 : 1);
-  ship(ctx, W / 2 - 21, H * 0.6 + Math.sin(f * 0.05) * 2, 3, 1, opts);
+  drawSprite(ctx, isGhost ? "ghost" : "enemy", W * 0.55, H * 0.08 + Math.sin(f * 0.06 + 1) * 3, 2.2, isGhost ? 0.7 : 1);
 
+  // Cannon fire particles between ships
   if (f % 15 === 0) {
-    ps.emit(3, { x: W / 2 - 30, y: H * 0.35, w: 60, h: 20, color: "#f0c040", alpha: 0.8, size: 2, life: 15, vxRange: [-2, 2], vyRange: [-2, 1] });
+    ps.emit(3, { x: W * 0.35, y: H * 0.3, w: W * 0.2, h: 20, color: "#f0c040", alpha: 0.8, size: 2, life: 15, vxRange: [-2, 2], vyRange: [-2, 1] });
   }
-
   if (f % 30 < 5) {
     ctx.fillStyle = "rgba(255,200,50,0.6)";
-    ctx.beginPath(); ctx.arc(W / 2 + (Math.random() - 0.5) * 60, H * 0.4, 4, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(W * 0.4 + (Math.random() - 0.5) * 80, H * 0.35, 4, 0, Math.PI * 2); ctx.fill();
   }
+
+  // Our ship: close (lower-left, full scale = foreground)
+  ship(ctx, W * 0.08, H * 0.5 + Math.sin(f * 0.05) * 2, 3, 1, opts);
 }
 
 function sceneEthereal(ctx: CanvasRenderingContext2D, W: number, H: number, f: number, ps: ParticleSystem, opts?: SceneOpts) {
@@ -232,7 +235,7 @@ function sceneEthereal(ctx: CanvasRenderingContext2D, W: number, H: number, f: n
     ctx.fillRect((i * 127 + f * 0.5) % W, (i * 83 + f * 0.3) % H, 2, 2);
   }
 
-  ship(ctx, W / 2 - 21, H / 2 + Math.sin(f * 0.04) * 4, 3, 0.8, opts);
+  ship(ctx, W / 2 - 21, H * 0.55 + Math.sin(f * 0.04) * 4, 3, 0.8, opts);
 }
 
 function scenePort(ctx: CanvasRenderingContext2D, W: number, H: number, f: number, ps: ParticleSystem, opts?: SceneOpts) {
