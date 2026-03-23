@@ -42,23 +42,23 @@ const CATEGORY_LABELS: Record<NPCDef["category"], Record<"uk" | "en", string>> =
 const ALL_NPCS = Object.values(NPCS);
 const TOTAL_NPCS = ALL_NPCS.length;
 
-/** Small canvas that renders an NPC pixel portrait */
-function NPCPortraitCanvas({ npc, met }: { npc: NPCDef; met: boolean }) {
+/** NPC portrait: sprite image with fallback to canvas pixel art */
+function NPCPortrait({ npc, met, size = 48 }: { npc: NPCDef; met: boolean; size?: number }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const scale = 3;
-  const w = 10 * scale;
-  const h = 12 * scale;
+  const hasSprite = !!npc.spritePath;
 
+  // Canvas fallback for NPCs without sprites
   useEffect(() => {
+    if (hasSprite) return;
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
-    ctx.clearRect(0, 0, w, h);
+    const scale = 3;
+    ctx.clearRect(0, 0, 30, 36);
     if (met) {
       drawNPCPortrait(ctx, npc.portrait, 0, 0, scale);
     } else {
-      // Draw silhouette for unmet NPCs
       const { pixels } = npc.portrait;
       for (let row = 0; row < pixels.length; row++) {
         const cols = pixels[row];
@@ -69,14 +69,35 @@ function NPCPortraitCanvas({ npc, met }: { npc: NPCDef; met: boolean }) {
         }
       }
     }
-  }, [npc, met, w, h]);
+  }, [npc, met, hasSprite]);
+
+  if (hasSprite) {
+    return (
+      <div
+        className="flex items-center justify-center flex-shrink-0"
+        style={{ width: size, height: size }}
+      >
+        <img
+          src={npc.spritePath}
+          alt={npc.name.en}
+          style={{
+            width: size,
+            height: size,
+            imageRendering: "pixelated",
+            filter: met ? "none" : "brightness(0.15) saturate(0)",
+            opacity: met ? 1 : 0.5,
+          }}
+        />
+      </div>
+    );
+  }
 
   return (
     <canvas
       ref={canvasRef}
-      width={w}
-      height={h}
-      className={`pixelated ${!met ? "opacity-40" : ""}`}
+      width={30}
+      height={36}
+      className={`pixelated flex-shrink-0 ${!met ? "opacity-40" : ""}`}
       style={{ imageRendering: "pixelated" }}
     />
   );
@@ -159,7 +180,7 @@ export function NPCJournal({ onClose }: Props) {
                           : "bg-white/[0.01] border-white/5"
                       }`}
                     >
-                      <NPCPortraitCanvas npc={npc} met={met} />
+                      <NPCPortrait npc={npc} met={met} />
                       <div className="flex-1 min-w-0">
                         <div className={`font-game text-[9px] ${met ? "text-[#e8dcc8]" : "text-white/20"}`}>
                           {met ? `${npc.icon} ${npc.name[locale]}` : t("npcUnknown")}

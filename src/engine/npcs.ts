@@ -28,8 +28,10 @@ export interface NPCDef {
     | "crew"
     | "civilian"
     | "supernatural";
-  /** Pixel art drawing instructions */
+  /** Pixel art drawing instructions (legacy, kept as fallback) */
   portrait: NPCPortrait;
+  /** Path to sprite image (32x32 idle frame from Minifolks) */
+  spritePath?: string;
   /** Flag that gets set when player meets this NPC */
   metFlag: string;
 }
@@ -104,6 +106,7 @@ const npcList: NPCDef[] = [
     icon: "🧂",
     category: "merchant",
     metFlag: "met_spice_trader",
+    spritePath: "/icons/npcs/merchant.png",
     // Turban, medium-dark skin, mustache, orange/gold sash
     portrait: px(
       [WHITE, SKIN_MED, ORANGE, HAIR_BLACK, GOLD, BROWN],
@@ -129,6 +132,7 @@ const npcList: NPCDef[] = [
     icon: "⚔️",
     category: "merchant",
     metFlag: "met_weapons_dealer",
+    spritePath: "/icons/npcs/blacksmith.png",
     // Bald, scarred, pale skin, leather vest
     portrait: px(
       [SKIN_PALE, HAIR_BLACK, RED, BROWN, GRAY, DARK_BROWN],
@@ -154,6 +158,7 @@ const npcList: NPCDef[] = [
     icon: "🗺️",
     category: "merchant",
     metFlag: "met_map_seller",
+    spritePath: "/icons/npcs/suspicious_merchant.png",
     // Feathered hat, spectacles, light skin, green coat
     portrait: px(
       [GREEN, SKIN_LIGHT, HAIR_BROWN, GOLD, DARK_GREEN, BLACK],
@@ -179,6 +184,7 @@ const npcList: NPCDef[] = [
     icon: "💰",
     category: "merchant",
     metFlag: "met_fence",
+    spritePath: "/icons/npcs/thief.png",
     // Hood up, dark skin, sly grin, dark cloak
     portrait: px(
       [DARK_BROWN, SKIN_DARK, BROWN, GOLD, BLACK, GRAY],
@@ -204,6 +210,7 @@ const npcList: NPCDef[] = [
     icon: "🐚",
     category: "merchant",
     metFlag: "met_exotic_trader",
+    spritePath: "/icons/npcs/gatherer.png",
     // Conical hat, olive skin, silk robe
     portrait: px(
       [GOLD, SKIN_OLIVE, HAIR_BLACK, RED, DARK_RED, BROWN],
@@ -229,6 +236,7 @@ const npcList: NPCDef[] = [
     icon: "🔨",
     category: "merchant",
     metFlag: "met_shipwright",
+    spritePath: "/icons/npcs/worker.png",
     // Flat cap, big beard, light skin, apron
     portrait: px(
       [BROWN, SKIN_LIGHT, HAIR_RED, WHITE, GRAY, DARK_BROWN],
@@ -254,6 +262,7 @@ const npcList: NPCDef[] = [
     icon: "🍹",
     category: "merchant",
     metFlag: "met_rum_merchant",
+    spritePath: "/icons/npcs/villager_man.png",
     // Wide-brim hat, curly mustache, ruddy skin
     portrait: px(
       [DARK_BROWN, SKIN_LIGHT, HAIR_BLACK, RED, BROWN, GOLD],
@@ -283,6 +292,7 @@ const npcList: NPCDef[] = [
     icon: "🏴‍☠️",
     category: "pirate",
     metFlag: "met_rival_captain",
+    spritePath: "/icons/npcs/pirate_captain.png",
     // Tricorn hat, eyepatch, scar, dark skin
     portrait: px(
       [BLACK, SKIN_DARK, RED, GOLD, HAIR_BLACK, GRAY],
@@ -308,6 +318,7 @@ const npcList: NPCDef[] = [
     icon: "💀",
     category: "pirate",
     metFlag: "met_first_mate_bones",
+    spritePath: "/icons/npcs/pirate_crew.png",
     // Bandana, thin face, pale skin, striped shirt
     portrait: px(
       [RED, SKIN_PALE, HAIR_BLACK, BLUE, WHITE, DARK_BLUE],
@@ -333,6 +344,7 @@ const npcList: NPCDef[] = [
     icon: "👑",
     category: "pirate",
     metFlag: "met_pirate_queen",
+    spritePath: "/icons/npcs/queen.png",
     // Red hair flowing, bandana, fierce expression, red coat
     portrait: px(
       [HAIR_RED, SKIN_LIGHT, RED, GOLD, BLACK, DARK_RED],
@@ -358,6 +370,7 @@ const npcList: NPCDef[] = [
     icon: "🦜",
     category: "pirate",
     metFlag: "met_legendary_pirate",
+    spritePath: "/icons/npcs/pirate_harpooner.png",
     // Huge hat with feather, massive black beard, menacing
     portrait: px(
       [BLACK, SKIN_MED, RED, GOLD, DARK_BROWN, HAIR_BLACK],
@@ -383,6 +396,7 @@ const npcList: NPCDef[] = [
     icon: "🦿",
     category: "pirate",
     metFlag: "met_retired_pirate",
+    spritePath: "/icons/npcs/old_man.png",
     // White hair, weathered, eye-patch, tattered clothes
     portrait: px(
       [HAIR_WHITE, SKIN_MED, GRAY, BROWN, BLACK, DARK_BROWN],
@@ -408,6 +422,7 @@ const npcList: NPCDef[] = [
     icon: "🌑",
     category: "pirate",
     metFlag: "met_smuggler",
+    spritePath: "/icons/npcs/hunter.png",
     // Dark hood, only eyes visible, olive skin
     portrait: px(
       [BLACK, SKIN_OLIVE, DARK_BROWN, GRAY, NAVY, BROWN],
@@ -433,6 +448,7 @@ const npcList: NPCDef[] = [
     icon: "🗡️",
     category: "pirate",
     metFlag: "met_mutineer",
+    spritePath: "/icons/npcs/pirate_gunner.png",
     // Scarred, bandana, angry brows, pale skin
     portrait: px(
       [RED, SKIN_PALE, BLACK, BROWN, DARK_RED, GRAY],
@@ -462,6 +478,7 @@ const npcList: NPCDef[] = [
     icon: "🎩",
     category: "official",
     metFlag: "met_governor",
+    spritePath: "/icons/npcs/noble_man.png",
     // Powdered wig, pale skin, fancy blue coat with gold trim
     portrait: px(
       [HAIR_WHITE, SKIN_PALE, BLUE, GOLD, DARK_BLUE, RED],
@@ -487,6 +504,7 @@ const npcList: NPCDef[] = [
     icon: "⚓",
     category: "official",
     metFlag: "met_navy_captain",
+    spritePath: "/icons/npcs/pirate_captain.png",
     // Bicorn hat with gold badge, stern face, navy uniform
     portrait: px(
       [NAVY, SKIN_LIGHT, GOLD, BLUE, WHITE, DARK_BLUE],
@@ -512,6 +530,7 @@ const npcList: NPCDef[] = [
     icon: "📋",
     category: "official",
     metFlag: "met_customs_officer",
+    spritePath: "/icons/npcs/miner.png",
     // Small hat, spectacles, thin mustache, gray uniform
     portrait: px(
       [GRAY, SKIN_LIGHT, BLACK, HAIR_BROWN, WHITE, DARK_BROWN],
@@ -537,6 +556,7 @@ const npcList: NPCDef[] = [
     icon: "⚖️",
     category: "official",
     metFlag: "met_judge",
+    spritePath: "/icons/npcs/noble_man.png",
     // Long white wig, stern expression, black robes
     portrait: px(
       [HAIR_WHITE, SKIN_PALE, BLACK, RED, DARK_BROWN, GRAY],
@@ -566,6 +586,7 @@ const npcList: NPCDef[] = [
     icon: "🔮",
     category: "mystic",
     metFlag: "met_voodoo_priestess",
+    spritePath: "/icons/npcs/nun.png",
     // Head wrap with beads, dark skin, face paint, purple cloth
     portrait: px(
       [PURPLE, SKIN_DARK, GOLD, WHITE, RED, DARK_BROWN],
@@ -591,6 +612,7 @@ const npcList: NPCDef[] = [
     icon: "⭐",
     category: "mystic",
     metFlag: "met_fortune_teller",
+    spritePath: "/icons/npcs/princess.png",
     // Headscarf with stars, olive skin, hoop earrings
     portrait: px(
       [PURPLE, SKIN_OLIVE, GOLD, DARK_RED, BLACK, TEAL],
@@ -616,6 +638,7 @@ const npcList: NPCDef[] = [
     icon: "☠️",
     category: "mystic",
     metFlag: "met_cursed_sailor",
+    spritePath: "/icons/npcs/grave_digger.png",
     // Gaunt, green-tinged skin, hollow eyes, tattered clothes
     portrait: px(
       [DARK_GREEN, "#7d9a6b", BLACK, GRAY, BROWN, DARK_BROWN],
@@ -641,6 +664,7 @@ const npcList: NPCDef[] = [
     icon: "🐙",
     category: "mystic",
     metFlag: "met_sea_witch",
+    spritePath: "/icons/npcs/noble_woman.png",
     // Wild dark hair, pale green skin, seaweed accessories
     portrait: px(
       [DARK_GREEN, "#a8d5ba", BLACK, TEAL, PURPLE, HAIR_BLACK],
@@ -666,6 +690,7 @@ const npcList: NPCDef[] = [
     icon: "📿",
     category: "mystic",
     metFlag: "met_hermit_monk",
+    spritePath: "/icons/npcs/old_man.png",
     // Brown hood, bald, light skin, wooden cross
     portrait: px(
       [BROWN, SKIN_LIGHT, DARK_BROWN, GOLD, BLACK, HAIR_GRAY],
@@ -695,6 +720,7 @@ const npcList: NPCDef[] = [
     icon: "💉",
     category: "crew",
     metFlag: "met_surgeon",
+    spritePath: "/icons/npcs/merchant.png",
     // Spectacles, receding hair, white apron with red cross
     portrait: px(
       [HAIR_GRAY, SKIN_LIGHT, BLACK, WHITE, RED, BROWN],
@@ -720,6 +746,7 @@ const npcList: NPCDef[] = [
     icon: "🧭",
     category: "crew",
     metFlag: "met_navigator",
+    spritePath: "/icons/npcs/pirate_crew.png",
     // Bandana, tanned skin, compass rose tattoo
     portrait: px(
       [BLUE, SKIN_MED, HAIR_BLACK, GOLD, DARK_BLUE, WHITE],
@@ -745,6 +772,7 @@ const npcList: NPCDef[] = [
     icon: "🍖",
     category: "crew",
     metFlag: "met_cook",
+    spritePath: "/icons/npcs/peasant.png",
     // Chef hat, round face, dark skin, apron
     portrait: px(
       [WHITE, SKIN_DARK, HAIR_BLACK, BROWN, GRAY, RED],
@@ -770,6 +798,7 @@ const npcList: NPCDef[] = [
     icon: "💣",
     category: "crew",
     metFlag: "met_gunner",
+    spritePath: "/icons/npcs/pirate_gunner.png",
     // Bandana, soot-stained face, muscular, dark vest
     portrait: px(
       [RED, SKIN_MED, BLACK, DARK_BROWN, GRAY, BROWN],
@@ -795,6 +824,7 @@ const npcList: NPCDef[] = [
     icon: "⛵",
     category: "crew",
     metFlag: "met_bosun",
+    spritePath: "/icons/npcs/lumberjack.png",
     // Flat cap, weathered face, rope coiled, striped shirt
     portrait: px(
       [BROWN, SKIN_MED, HAIR_BLACK, BLUE, WHITE, DARK_BROWN],
@@ -824,6 +854,7 @@ const npcList: NPCDef[] = [
     icon: "🎣",
     category: "civilian",
     metFlag: "met_fisherman",
+    spritePath: "/icons/npcs/old_man.png",
     // Straw hat, tanned, simple clothes, fishing line
     portrait: px(
       [GOLD, SKIN_MED, HAIR_WHITE, BROWN, GRAY, DARK_BROWN],
@@ -849,6 +880,7 @@ const npcList: NPCDef[] = [
     icon: "🌿",
     category: "civilian",
     metFlag: "met_plantation_owner",
+    spritePath: "/icons/npcs/noble_man.png",
     // Wide hat, thin mustache, white suit
     portrait: px(
       [WHITE, SKIN_LIGHT, HAIR_BLACK, GOLD, BROWN, DARK_BROWN],
@@ -874,6 +906,7 @@ const npcList: NPCDef[] = [
     icon: "✝️",
     category: "civilian",
     metFlag: "met_priest",
+    spritePath: "/icons/npcs/nun.png",
     // Black hat, collar, pale skin, black robes
     portrait: px(
       [BLACK, SKIN_PALE, WHITE, GOLD, DARK_BROWN, GRAY],
@@ -899,6 +932,7 @@ const npcList: NPCDef[] = [
     icon: "🍺",
     category: "civilian",
     metFlag: "met_tavern_keeper",
+    spritePath: "/icons/npcs/villager_woman.png",
     // Tied-up hair, earrings, warm expression, apron
     portrait: px(
       [HAIR_BROWN, SKIN_LIGHT, RED, GOLD, WHITE, BROWN],
@@ -928,6 +962,7 @@ const npcList: NPCDef[] = [
     icon: "👻",
     category: "supernatural",
     metFlag: "met_ghost_captain",
+    spritePath: "/icons/npcs/pirate_captain.png",
     // Translucent blue-white, tricorn hat outline, hollow eyes
     portrait: px(
       [GHOST_BLUE, GHOST_WHITE, GHOST_GLOW, BLACK, NAVY, WHITE],
@@ -953,6 +988,7 @@ const npcList: NPCDef[] = [
     icon: "🧜‍♀️",
     category: "supernatural",
     metFlag: "met_siren",
+    spritePath: "/icons/npcs/princess.png",
     // Long flowing hair (teal/green), pale luminous skin, fish scales
     portrait: px(
       [TEAL, "#d4efdf", CYAN, DARK_GREEN, PURPLE, GOLD],
@@ -978,6 +1014,7 @@ const npcList: NPCDef[] = [
     icon: "🌊",
     category: "supernatural",
     metFlag: "met_sea_god",
+    spritePath: "/icons/npcs/grave_digger.png",
     // Crown of coral, green skin, tentacle beard, glowing eyes
     portrait: px(
       [DARK_GREEN, "#5d8a6b", GOLD, TEAL, CYAN, PURPLE],
@@ -1003,6 +1040,7 @@ const npcList: NPCDef[] = [
     icon: "💀",
     category: "supernatural",
     metFlag: "met_skeleton_crew",
+    spritePath: "/icons/npcs/pirate_crew.png",
     // Bone-white skull, dark eye sockets, tattered naval hat
     portrait: px(
       [DARK_BROWN, WHITE, BLACK, GRAY, NAVY, HAIR_WHITE],

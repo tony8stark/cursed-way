@@ -12,7 +12,11 @@ export function NPCPortraitDisplay({ npcId }: NPCPortraitProps) {
   const locale = useLocaleStore(s => s.locale);
   const npc = getNPC(npcId);
 
+  const hasSprite = !!npc?.spritePath;
+
+  // Canvas fallback for NPCs without sprites
   useEffect(() => {
+    if (hasSprite) return;
     const c = canvasRef.current;
     if (!c || !npc) return;
     const ctx = c.getContext("2d")!;
@@ -21,19 +25,13 @@ export function NPCPortraitDisplay({ npcId }: NPCPortraitProps) {
     const h = 12 * scale;
 
     ctx.clearRect(0, 0, c.width, c.height);
-
-    // Dark background
     ctx.fillStyle = "rgba(10,10,20,0.6)";
     ctx.fillRect(0, 0, w, h);
-
-    // Draw portrait
     drawNPCPortrait(ctx, npc.portrait, 0, 0, scale);
-
-    // Border
     ctx.strokeStyle = "rgba(240,192,64,0.4)";
     ctx.lineWidth = 1;
     ctx.strokeRect(0, 0, w, h);
-  }, [npc]);
+  }, [npc, hasSprite]);
 
   if (!npc) return null;
 
@@ -44,12 +42,25 @@ export function NPCPortraitDisplay({ npcId }: NPCPortraitProps) {
       transition={{ delay: 0.3 }}
       className="flex items-center gap-2 rounded border border-white/10 bg-black/30 px-2 py-1.5"
     >
-      <canvas
-        ref={canvasRef}
-        width={40}
-        height={48}
-        style={{ imageRendering: "pixelated", width: 40, height: 48 }}
-      />
+      {hasSprite ? (
+        <img
+          src={npc.spritePath}
+          alt={npc.name.en}
+          style={{
+            width: 48,
+            height: 48,
+            imageRendering: "pixelated",
+          }}
+          className="flex-shrink-0"
+        />
+      ) : (
+        <canvas
+          ref={canvasRef}
+          width={40}
+          height={48}
+          style={{ imageRendering: "pixelated", width: 40, height: 48 }}
+        />
+      )}
       <div className="min-w-0">
         <div className="font-game text-[8px] text-[#f0c040] truncate">
           {npc.icon} {npc.name[locale]}
