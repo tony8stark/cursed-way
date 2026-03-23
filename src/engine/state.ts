@@ -519,8 +519,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
         : { ...state.factionReps },
     };
 
-    // Handle item gain
-    if (choice.eff.item) {
+    // Handle item gain (skip if already owned — no duplicate artifacts)
+    if (choice.eff.item && !ns.inventory.includes(choice.eff.item)) {
       ns.inventory.push(choice.eff.item);
       ns.flags.add(`has_${choice.eff.item}`);
       const encTitle = typeof encounter.title === "function" ? encounter.title(state) : encounter.title;
