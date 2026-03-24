@@ -13,14 +13,14 @@ function getInitial(): GameMode {
   try {
     const saved = localStorage.getItem(MODE_KEY);
     if (saved === "expedition" || saved === "free_roam") return saved;
-  } catch {}
+  } catch (error) { void error; }
   return "expedition";
 }
 
 export const useGameModeStore = create<GameModeStore>((set) => ({
   mode: getInitial(),
   setMode: (mode) => {
-    try { localStorage.setItem(MODE_KEY, mode); } catch {}
+    try { localStorage.setItem(MODE_KEY, mode); } catch (error) { void error; }
     set({ mode });
   },
 }));

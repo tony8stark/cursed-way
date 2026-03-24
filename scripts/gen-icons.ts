@@ -2,7 +2,7 @@
 // Generates PWA icons as simple canvas-drawn PNGs
 
 import { createCanvas } from "canvas";
-import { writeFileSync, mkdirSync } from "fs";
+import { writeFileSync } from "fs";
 
 function drawIcon(size: number): Buffer {
   const canvas = createCanvas(size, size);

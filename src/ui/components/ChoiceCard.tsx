@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import type { Choice, GameState } from "../../engine/types";
 import { useT } from "../../i18n";
+import { getChoiceAvailability } from "../../engine/choice-availability";
 
 interface Props {
   choice: Choice;
@@ -11,12 +12,8 @@ interface Props {
 
 export function ChoiceCard({ choice, index, state, onChoose }: Props) {
   const t = useT();
-  const cost = choice.eff.gold && typeof choice.eff.gold === "number" && choice.eff.gold < 0
-    ? Math.abs(choice.eff.gold)
-    : 0;
-  const canAfford = cost <= state.gold;
-  const alreadyOwned = !!(choice.eff.item && state.inventory.includes(choice.eff.item));
-  const canChoose = canAfford && !alreadyOwned;
+  const availability = getChoiceAvailability(choice, state);
+  const canChoose = availability.selectable;
 
   return (
     <motion.button
@@ -36,7 +33,9 @@ export function ChoiceCard({ choice, index, state, onChoose }: Props) {
         }
       `}
     >
-      {choice.text}{!canAfford ? ` ${t("cantAfford")}` : ""}{alreadyOwned ? ` ${t("alreadyOwned")}` : ""}
+      {choice.text}
+      {availability.cantAfford ? ` ${t("cantAfford")}` : ""}
+      {availability.alreadyOwned ? ` ${t("alreadyOwned")}` : ""}
       <span className="text-white/20 ml-2 text-[8px]">[{index + 1}]</span>
     </motion.button>
   );

@@ -108,14 +108,14 @@ export function NPCJournal({ onClose }: Props) {
   const locale = useLocaleStore(s => s.locale);
   const t = useT();
 
-  const meetings = state?.npcMeetings ?? [];
   const meetingMap = useMemo(() => {
+    const meetings = state?.npcMeetings ?? [];
     const map = new Map<string, NPCMeeting>();
     for (const m of meetings) {
       if (!map.has(m.npcId)) map.set(m.npcId, m);
     }
     return map;
-  }, [meetings]);
+  }, [state?.npcMeetings]);
 
   const metCount = meetingMap.size;
 

@@ -404,7 +404,7 @@ export function drawWorldMap(
   }
 
   // Compass rose
-  drawCompass(ctx, W - 18, 18, frame);
+  drawCompass(ctx, W - 18, 18);
 }
 
 /** Draw the full world map (for the overlay modal) */
@@ -576,7 +576,7 @@ export function drawFullWorldMap(
   );
 }
 
-function drawCompass(ctx: CanvasRenderingContext2D, x: number, y: number, _frame: number) {
+function drawCompass(ctx: CanvasRenderingContext2D, x: number, y: number) {
   const s = 8;
   ctx.strokeStyle = "rgba(240,192,64,0.3)";
   ctx.lineWidth = 1;

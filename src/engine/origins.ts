@@ -106,14 +106,14 @@ function getInitialOrigin(): OriginId {
   try {
     const saved = localStorage.getItem(ORIGIN_KEY);
     if (saved && ORIGINS.some(o => o.id === saved)) return saved as OriginId;
-  } catch {}
+  } catch (error) { void error; }
   return "navy_defector";
 }
 
 export const useOriginStore = create<OriginStore>((set) => ({
   origin: getInitialOrigin(),
   setOrigin: (origin) => {
-    try { localStorage.setItem(ORIGIN_KEY, origin); } catch {}
+    try { localStorage.setItem(ORIGIN_KEY, origin); } catch (error) { void error; }
     set({ origin });
   },
 }));

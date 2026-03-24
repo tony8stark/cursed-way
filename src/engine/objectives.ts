@@ -32,9 +32,9 @@ export const OBJECTIVES: ObjectiveDef[] = [
     desc: { uk: "Зберіть 5 різних артефактів за одне плавання", en: "Collect 5 different artifacts in a single voyage" },
     completedDesc: { uk: "Ваш трюм повний реліквій забутих епох.", en: "Your hold brims with relics of forgotten ages." },
     check: (state) => ({
-      current: state.inventory.length,
+      current: new Set(state.artifactLog.map(entry => entry.itemId)).size,
       target: 5,
-      complete: state.inventory.length >= 5,
+      complete: new Set(state.artifactLog.map(entry => entry.itemId)).size >= 5,
     }),
   },
   {
@@ -135,7 +135,9 @@ export const useObjectiveStore = create<ObjectiveStore>((set) => ({
     try {
       if (id) localStorage.setItem(OBJ_KEY, id);
       else localStorage.removeItem(OBJ_KEY);
-    } catch {}
+    } catch {
+      /* ignore storage errors */
+    }
     set({ objectiveId: id });
   },
 }));

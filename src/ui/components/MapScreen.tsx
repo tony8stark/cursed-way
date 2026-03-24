@@ -10,11 +10,15 @@ import { InventoryBar } from "./InventoryBar";
 import { useObjectiveStore, getObjective } from "../../engine/objectives";
 import { FactionBar } from "./FactionBar";
 import { WorldMapModal } from "./WorldMapModal";
+import { useGameModeStore } from "../../engine/game-mode";
+import { markObjectiveComplete, resolveQuestEndingIndex, shouldUseObjectiveSystem } from "../../engine/ending-resolution";
 
 export function MapScreen() {
   const { state, sail, setDestination, mapState } = useGameStore();
   const t = useT();
   const locale = useLocaleStore(s => s.locale);
+  const mode = useGameModeStore(s => s.mode);
+  const storedObjectiveId = useObjectiveStore(s => s.objectiveId);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const frameRef = useRef(0);
   const [showWorldMap, setShowWorldMap] = useState(false);
@@ -91,7 +95,7 @@ export function MapScreen() {
     : [];
 
   // Objective progress
-  const objectiveId = useObjectiveStore(s => s.objectiveId);
+  const objectiveId = shouldUseObjectiveSystem(mode, storedObjectiveId) ? storedObjectiveId : null;
   const objectiveDef = objectiveId ? getObjective(objectiveId) : null;
   const objectiveProgress = objectiveDef && state
     ? objectiveDef.check(state, mapState ?? null)
@@ -176,14 +180,13 @@ export function MapScreen() {
                   onClick={() => {
                     audioManager.playSFX("coin");
                     const { state: currentState, quest } = useGameStore.getState();
-                    if (currentState && quest) {
-                      currentState.flags.add("objective_complete");
-                      currentState.flags.add(`objective_${objectiveId}`);
-                      const idx = quest.endings.findIndex(e => e.req(currentState));
+                    if (currentState && quest && objectiveId) {
+                      const finalState = markObjectiveComplete(currentState, objectiveId);
+                      const idx = resolveQuestEndingIndex(quest.endings, finalState);
                       useGameStore.setState({
                         endingIndex: idx >= 0 ? idx : quest.endings.length - 1,
                         screen: "ending",
-                        state: currentState,
+                        state: finalState,
                       });
                       useGameStore.getState().clearSave();
                     }

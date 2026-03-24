@@ -6,9 +6,15 @@ import tseslint from 'typescript-eslint'
 import { defineConfig, globalIgnores } from 'eslint/config'
 
 export default defineConfig([
-  globalIgnores(['dist']),
+  globalIgnores([
+    'dist',
+    '.worktrees/**',
+    'docs/**',
+    'pixel_assets/**',
+    'public/**',
+  ]),
   {
-    files: ['**/*.{ts,tsx}'],
+    files: ['src/**/*.{ts,tsx}', 'scripts/**/*.ts', 'vite.config.ts', 'vitest.config.ts'],
     extends: [
       js.configs.recommended,
       tseslint.configs.recommended,

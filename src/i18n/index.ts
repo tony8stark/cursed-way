@@ -24,7 +24,7 @@ function getInitialLocale(): Locale {
 export const useLocaleStore = create<LocaleStore>((set) => ({
   locale: getInitialLocale(),
   setLocale: (locale) => {
-    try { localStorage.setItem(LOCALE_KEY, locale); } catch {}
+    try { localStorage.setItem(LOCALE_KEY, locale); } catch (error) { void error; }
     set({ locale });
   },
 }));

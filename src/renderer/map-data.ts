@@ -85,22 +85,102 @@ export function getConnectedLocations(pos: [number, number]): Array<{
     .filter((v): v is NonNullable<typeof v> => v !== null);
 }
 
-// Compute intermediate cells along a straight line between two points
-export function computeRoute(from: [number, number], to: [number, number]): [number, number][] {
-  const steps: [number, number][] = [];
-  const dx = to[0] - from[0];
-  const dy = to[1] - from[1];
-  const dist = Math.max(Math.abs(dx), Math.abs(dy));
-  if (dist === 0) return [to];
+const ROUTE_DIRECTIONS: Array<[number, number]> = [
+  [-1, -1], [0, -1], [1, -1],
+  [-1, 0],            [1, 0],
+  [-1, 1],  [0, 1],  [1, 1],
+];
 
-  for (let i = 1; i <= dist; i++) {
-    const t = i / dist;
-    steps.push([
-      Math.round(from[0] + dx * t),
-      Math.round(from[1] + dy * t),
-    ]);
+const ROUTE_TERRAIN_COST: Record<TerrainType, number> = {
+  deep: 1,
+  water: 1,
+  shallow: 1.25,
+  port: 1,
+  reef: 3,
+  cave: 5,
+  wreck: 2.5,
+  land: 50,
+};
+
+function posKey(x: number, y: number): string {
+  return `${x},${y}`;
+}
+
+function parsePos(key: string): [number, number] {
+  const [x, y] = key.split(",").map(Number);
+  return [x, y];
+}
+
+function heuristic(from: [number, number], to: [number, number]): number {
+  return Math.max(Math.abs(to[0] - from[0]), Math.abs(to[1] - from[1]));
+}
+
+// Compute a terrain-aware route between two connected locations.
+export function computeRoute(from: [number, number], to: [number, number]): [number, number][] {
+  const fromKey = posKey(from[0], from[1]);
+  const toKey = posKey(to[0], to[1]);
+  if (fromKey === toKey) return [];
+
+  const routes = getRoutes();
+  const neighbors = routes[fromKey];
+  if (neighbors && !neighbors.includes(toKey)) {
+    return [];
   }
-  return steps;
+
+  const cells = getMapCells();
+  const open = new Set<string>([fromKey]);
+  const cameFrom = new Map<string, string>();
+  const gScore = new Map<string, number>([[fromKey, 0]]);
+  const fScore = new Map<string, number>([[fromKey, heuristic(from, to)]]);
+
+  while (open.size > 0) {
+    let currentKey: string | null = null;
+    let currentScore = Infinity;
+
+    for (const key of open) {
+      const score = fScore.get(key) ?? Infinity;
+      if (score < currentScore) {
+        currentScore = score;
+        currentKey = key;
+      }
+    }
+
+    if (!currentKey) break;
+    if (currentKey === toKey) {
+      const route: [number, number][] = [];
+      let stepKey: string | undefined = currentKey;
+      while (stepKey && stepKey !== fromKey) {
+        route.push(parsePos(stepKey));
+        stepKey = cameFrom.get(stepKey);
+      }
+      route.reverse();
+      return route;
+    }
+
+    open.delete(currentKey);
+    const [cx, cy] = parsePos(currentKey);
+
+    for (const [dx, dy] of ROUTE_DIRECTIONS) {
+      const nx = cx + dx;
+      const ny = cy + dy;
+      const cell = cells[ny]?.[nx];
+      if (!cell) continue;
+
+      const neighborKey = posKey(nx, ny);
+      const terrainCost = ROUTE_TERRAIN_COST[cell.terrain];
+      const moveCost = dx !== 0 && dy !== 0 ? 1.4 : 1;
+      const tentativeG = (gScore.get(currentKey) ?? Infinity) + terrainCost * moveCost;
+
+      if (tentativeG >= (gScore.get(neighborKey) ?? Infinity)) continue;
+
+      cameFrom.set(neighborKey, currentKey);
+      gScore.set(neighborKey, tentativeG);
+      fScore.set(neighborKey, tentativeG + heuristic([nx, ny], to));
+      open.add(neighborKey);
+    }
+  }
+
+  return [];
 }
 
 // Find cells matching a terrain type near a position

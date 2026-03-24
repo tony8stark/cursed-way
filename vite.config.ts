@@ -12,7 +12,10 @@ export default defineConfig({
             return "vendor";
           }
           if (id.includes("/quests/cursed-galleon/")) {
-            return "quest-data";
+            if (id.includes("/__tests__/") || id.endsWith("/index.ts")) {
+              return;
+            }
+            return id.includes("-en.") ? "quest-data-en" : "quest-data-uk";
           }
           if (id.includes("/renderer/location-pools") || id.includes("/renderer/map-generator") || id.includes("/renderer/world-map") || id.includes("/engine/npcs")) {
             return "map-data";

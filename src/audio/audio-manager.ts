@@ -80,6 +80,7 @@ interface AmbientNodes {
   osc1: OscillatorNode;
   osc2: OscillatorNode | null;
   lfo: OscillatorNode;
+  lfo2: OscillatorNode | null;
   noiseSource: AudioBufferSourceNode;
   masterGain: GainNode;
   filter: BiquadFilterNode;
@@ -93,6 +94,26 @@ class AudioManager {
   private ambientNodes: AmbientNodes | null = null;
   private currentScene: string | null = null;
   private fadeTimeout: ReturnType<typeof setTimeout> | null = null;
+
+  private stopAmbientNodes(nodes: AmbientNodes) {
+    try {
+      nodes.osc1.stop();
+      nodes.osc2?.stop();
+      nodes.lfo.stop();
+      nodes.lfo2?.stop();
+      nodes.noiseSource.stop();
+    } catch {
+      // Nodes may already be stopped.
+    }
+
+    try { nodes.osc1.disconnect(); } catch { /* noop */ }
+    try { nodes.osc2?.disconnect(); } catch { /* noop */ }
+    try { nodes.lfo.disconnect(); } catch { /* noop */ }
+    try { nodes.lfo2?.disconnect(); } catch { /* noop */ }
+    try { nodes.noiseSource.disconnect(); } catch { /* noop */ }
+    try { nodes.masterGain.disconnect(); } catch { /* noop */ }
+    try { nodes.filter.disconnect(); } catch { /* noop */ }
+  }
 
   private getContext(): AudioContext {
     if (!this.ctx) {
@@ -238,18 +259,7 @@ class AudioManager {
         oldGain.gain.linearRampToValueAtTime(0, ctx.currentTime + 1.5);
         if (this.fadeTimeout) clearTimeout(this.fadeTimeout);
         this.fadeTimeout = setTimeout(() => {
-          try {
-            old.osc1.stop();
-            old.osc2?.stop();
-            old.lfo.stop();
-            old.noiseSource.stop();
-            old.osc1.disconnect();
-            old.osc2?.disconnect();
-            old.lfo.disconnect();
-            old.noiseSource.disconnect();
-            old.masterGain.disconnect();
-            old.filter.disconnect();
-          } catch { /* already stopped */ }
+          this.stopAmbientNodes(old);
         }, 1600);
       }
 
@@ -287,6 +297,7 @@ class AudioManager {
 
       // Second oscillator (harmony layer)
       let osc2: OscillatorNode | null = null;
+      let lfo2: OscillatorNode | null = null;
       if (config.baseFreq2) {
         osc2 = ctx.createOscillator();
         osc2.type = config.type2 || "sine";
@@ -297,7 +308,7 @@ class AudioManager {
         osc2Gain.connect(filter);
 
         // Slow detune for movement
-        const lfo2 = ctx.createOscillator();
+        lfo2 = ctx.createOscillator();
         lfo2.type = "sine";
         lfo2.frequency.setValueAtTime(config.modFreq * 0.7, ctx.currentTime);
         const lfo2Gain = ctx.createGain();
@@ -327,7 +338,7 @@ class AudioManager {
       osc2?.start(ctx.currentTime);
       noiseSource.start(ctx.currentTime);
 
-      this.ambientNodes = { osc1, osc2, lfo, noiseSource, masterGain, filter };
+      this.ambientNodes = { osc1, osc2, lfo, lfo2, noiseSource, masterGain, filter };
     } catch {
       // Audio not available
     }
@@ -339,12 +350,7 @@ class AudioManager {
     const nodes = this.ambientNodes;
     nodes.masterGain.gain.linearRampToValueAtTime(0, ctx.currentTime + 1);
     setTimeout(() => {
-      try {
-        nodes.osc1.stop();
-        nodes.osc2?.stop();
-        nodes.lfo.stop();
-        nodes.noiseSource.stop();
-      } catch { /* already stopped */ }
+      this.stopAmbientNodes(nodes);
     }, 1100);
     this.ambientNodes = null;
     this.currentScene = null;

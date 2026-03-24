@@ -1,4 +1,4 @@
-import { useEffect, useCallback, useMemo, useRef } from "react";
+import { useEffect, useCallback, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { GameCanvas } from "./GameCanvas";
 import { StatsBar } from "./StatsBar";
@@ -12,28 +12,26 @@ import { InventoryBar } from "./InventoryBar";
 import { useObjectiveStore, getObjective } from "../../engine/objectives";
 import { FactionBar } from "./FactionBar";
 import { NPCPortraitDisplay } from "./NPCPortrait";
-import { NPCS } from "../../engine/npcs";
+import { getChoiceAvailability } from "../../engine/choice-availability";
+import { findNpcIdByMetFlag } from "../../engine/npc-met-flags";
 
 export function EncounterScreen() {
   const { state, encounter, result, pendingChain, makeChoice, continueSailing, mapState } = useGameStore();
   const t = useT();
   const objectiveId = useObjectiveStore(s => s.objectiveId);
   const objectiveDef = objectiveId ? getObjective(objectiveId) : null;
+  const [isChoosing, setIsChoosing] = useState(false);
 
   useEffect(() => {
     if (encounter?.scene) {
       audioManager.playAmbient(encounter.scene);
     }
-    // Reset choice guard when a new encounter loads
-    choosingRef.current = false;
   }, [encounter]);
 
-  const choosingRef = useRef(false);
-
   const handleChoice = useCallback((choice: Choice) => {
+    if (!state || isChoosing || !getChoiceAvailability(choice, state).selectable) return;
     // Guard against double-click / keyboard race condition
-    if (choosingRef.current) return;
-    choosingRef.current = true;
+    setIsChoosing(true);
 
     audioManager.playSFX("click");
 
@@ -46,9 +44,10 @@ export function EncounterScreen() {
     if (crewVal < 0) setTimeout(() => audioManager.playSFX("crewLoss"), 250);
 
     makeChoice(choice);
-  }, [makeChoice]);
+  }, [isChoosing, makeChoice, state]);
 
   const handleContinue = useCallback(() => {
+    setIsChoosing(false);
     audioManager.playSFX("splash");
     continueSailing();
   }, [continueSailing]);
@@ -63,16 +62,11 @@ export function EncounterScreen() {
         return;
       }
       if (!encounter || !state) return;
-      const available = encounter.choices.filter(ch => (!ch.requires_item || state.inventory.includes(ch.requires_item)) && (!ch.requires_flag || state.flags.has(ch.requires_flag)));
+      const available = encounter.choices.filter(ch => getChoiceAvailability(ch, state).visible);
       const idx = parseInt(e.key) - 1;
       if (idx >= 0 && idx < available.length) {
         const ch = available[idx];
-        // Calculate worst-case cost: fixed negative or max of negative range
-        const g = ch.eff.gold;
-        let cost = 0;
-        if (typeof g === "number" && g < 0) cost = Math.abs(g);
-        else if (Array.isArray(g) && g[0] < 0) cost = Math.abs(Math.min(g[0], g[1]));
-        if (cost <= state.gold) {
+        if (getChoiceAvailability(ch, state).selectable) {
           handleChoice(ch);
         }
       }
@@ -93,8 +87,8 @@ export function EncounterScreen() {
     // Check if any choice sets a flag matching an NPC metFlag
     for (const ch of encounter.choices) {
       if (typeof ch.flag === "string") {
-        const npc = Object.values(NPCS).find(n => n.metFlag === ch.flag);
-        if (npc) return npc.id;
+        const npcId = findNpcIdByMetFlag(ch.flag);
+        if (npcId) return npcId;
       }
     }
     return null;
@@ -120,7 +114,7 @@ export function EncounterScreen() {
         {!result ? (
           <div className="flex flex-col gap-2">
             {encounter.choices
-              .filter(ch => (!ch.requires_item || state.inventory.includes(ch.requires_item)) && (!ch.requires_flag || state.flags.has(ch.requires_flag)))
+              .filter(ch => getChoiceAvailability(ch, state).visible)
               .map((ch, i) => (
               <ChoiceCard
                 key={i}

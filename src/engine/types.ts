@@ -136,6 +136,7 @@ export interface Encounter {
 }
 
 export interface Ending {
+  id?: string;
   req: (state: GameState) => boolean;
   title: string;
   text: string | ((state: GameState) => string);

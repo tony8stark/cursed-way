@@ -1,22 +1,23 @@
-import { useEffect, useState, useCallback, useRef } from "react";
+import { lazy, Suspense, useEffect, useState, useCallback, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useGameStore } from "./engine/state";
-import { getCursedGalleon } from "./quests/cursed-galleon";
+import { loadCursedGalleon } from "./quests/cursed-galleon";
 import { checkAndUnlockAchievements, type Achievement } from "./engine/achievements";
 import { saveRun } from "./engine/history";
 import { TitleScreen } from "./ui/components/TitleScreen";
-import { MapScreen } from "./ui/components/MapScreen";
-import { EncounterScreen } from "./ui/components/EncounterScreen";
-import { EndingScreen } from "./ui/components/EndingScreen";
 import { AchievementToast } from "./ui/components/AchievementToast";
 import { ItemToast } from "./ui/components/ItemToast";
-import { AchievementsPanel } from "./ui/components/AchievementsPanel";
-import { HistoryPanel } from "./ui/components/HistoryPanel";
-import { NPCJournal } from "./ui/components/NPCJournal";
-import { SettingsModal } from "./ui/components/SettingsModal";
 import { audioManager } from "./audio/audio-manager";
 import { useLocaleStore } from "./i18n";
 import { useT } from "./i18n";
+
+const MapScreen = lazy(() => import("./ui/components/MapScreen").then((mod) => ({ default: mod.MapScreen })));
+const EncounterScreen = lazy(() => import("./ui/components/EncounterScreen").then((mod) => ({ default: mod.EncounterScreen })));
+const EndingScreen = lazy(() => import("./ui/components/EndingScreen").then((mod) => ({ default: mod.EndingScreen })));
+const AchievementsPanel = lazy(() => import("./ui/components/AchievementsPanel").then((mod) => ({ default: mod.AchievementsPanel })));
+const HistoryPanel = lazy(() => import("./ui/components/HistoryPanel").then((mod) => ({ default: mod.HistoryPanel })));
+const NPCJournal = lazy(() => import("./ui/components/NPCJournal").then((mod) => ({ default: mod.NPCJournal })));
+const SettingsModal = lazy(() => import("./ui/components/SettingsModal").then((mod) => ({ default: mod.SettingsModal })));
 
 function rand(a: number, b: number) {
   return Math.floor(Math.random() * (b - a + 1)) + a;
@@ -37,10 +38,31 @@ export default function App() {
   const endingSavedRef = useRef(false);
   const [itemToast, setItemToast] = useState<string | null>(null);
   const prevInventoryLenRef = useRef(0);
+  const [glitchStyle, setGlitchStyle] = useState({ angle: 0, x: 0, y: 0 });
+  const [loadedLocale, setLoadedLocale] = useState<typeof locale | null>(null);
+  const [failedLocale, setFailedLocale] = useState<typeof locale | null>(null);
+  const inventory = state?.inventory;
+  const curse = state?.curse ?? 0;
 
   // Load quest based on locale
   useEffect(() => {
-    setQuest(getCursedGalleon(locale));
+    let cancelled = false;
+
+    void loadCursedGalleon(locale)
+      .then((loadedQuest) => {
+        if (cancelled) return;
+        setQuest(loadedQuest);
+        setLoadedLocale(locale);
+        setFailedLocale(null);
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setFailedLocale(locale);
+      });
+
+    return () => {
+      cancelled = true;
+    };
   }, [setQuest, locale]);
 
   // Check achievements + save run when ending is reached
@@ -52,7 +74,8 @@ export default function App() {
 
       const newAch = checkAndUnlockAchievements(state);
       if (newAch.length > 0) {
-        setToastQueue(newAch);
+        const timer = setTimeout(() => setToastQueue(newAch), 0);
+        return () => clearTimeout(timer);
       }
     }
     if (screen !== "ending") {
@@ -63,39 +86,50 @@ export default function App() {
   // Process toast queue
   useEffect(() => {
     if (!currentToast && toastQueue.length > 0) {
-      setCurrentToast(toastQueue[0]);
-      setToastQueue(q => q.slice(1));
+      const timer = setTimeout(() => {
+        setCurrentToast(toastQueue[0]);
+        setToastQueue(q => q.slice(1));
+      }, 0);
+      return () => clearTimeout(timer);
     }
   }, [currentToast, toastQueue]);
 
   // Item acquisition toast (delayed if achievement toast is active to avoid overlap)
   useEffect(() => {
-    if (!state) return;
-    const len = state.inventory.length;
+    if (!inventory) return;
+    const len = inventory.length;
     if (len > prevInventoryLenRef.current && prevInventoryLenRef.current > 0) {
-      const newItem = state.inventory[len - 1];
+      const newItem = inventory[len - 1];
       if (currentToast) {
         // Delay item toast until achievement toast is done
         const timer = setTimeout(() => setItemToast(newItem), 3500);
         prevInventoryLenRef.current = len;
         return () => clearTimeout(timer);
       }
-      setItemToast(newItem);
+      const timer = setTimeout(() => setItemToast(newItem), 0);
+      prevInventoryLenRef.current = len;
+      return () => clearTimeout(timer);
     }
     prevInventoryLenRef.current = len;
-  }, [state?.inventory.length, currentToast]);
+  }, [inventory, currentToast]);
 
   // Glitch effect
   useEffect(() => {
-    if (state && state.curse >= 8) {
+    if (curse >= 8) {
       const iv = setInterval(() => {
+        setGlitchStyle({
+          angle: Math.random() * 360,
+          x: rand(-3, 3),
+          y: rand(-2, 2),
+        });
         setGlitch(true);
         setTimeout(() => setGlitch(false), 80 + Math.random() * 150);
       }, 1500 + Math.random() * 3000);
       return () => clearInterval(iv);
     }
-    setGlitch(false);
-  }, [state?.curse]);
+    const timer = setTimeout(() => setGlitch(false), 0);
+    return () => clearTimeout(timer);
+  }, [curse]);
 
   // Stop ambient on title
   useEffect(() => {
@@ -111,14 +145,35 @@ export default function App() {
     });
   }, []);
 
+  const shouldShowQuestLoader = failedLocale !== locale && (
+    !quest || (screen === "title" && loadedLocale !== locale)
+  );
+  const questLoadFailed = !quest && failedLocale === locale;
+
+  if (shouldShowQuestLoader) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#0a0a14] font-game text-[#c8c8d8]">
+        {locale === "uk" ? "Завантаження..." : "Loading..."}
+      </div>
+    );
+  }
+
+  if (!quest && questLoadFailed) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#0a0a14] font-game text-[#f0c040]">
+        {locale === "uk" ? "Не вдалося завантажити пригоду." : "Failed to load the adventure."}
+      </div>
+    );
+  }
+
   return (
     <div
       className="min-h-screen flex flex-col items-center px-6 py-4 font-game text-[#c8c8d8] transition-all duration-500 overflow-hidden relative"
       style={{
         background: glitch
-          ? `linear-gradient(${Math.random() * 360}deg, #1a0a2e, #0a1a1a)`
+          ? `linear-gradient(${glitchStyle.angle}deg, #1a0a2e, #0a1a1a)`
           : "linear-gradient(180deg, #0a0a14, #1a1a3e)",
-        transform: glitch ? `translate(${rand(-3, 3)}px, ${rand(-2, 2)}px)` : "none",
+        transform: glitch ? `translate(${glitchStyle.x}px, ${glitchStyle.y}px)` : "none",
       }}
     >
       {/* Scanline overlay */}
@@ -185,29 +240,33 @@ export default function App() {
       />
 
       {/* Modals */}
-      <AnimatePresence>
-        {showAchievements && <AchievementsPanel onClose={() => setShowAchievements(false)} />}
-        {showHistory && <HistoryPanel onClose={() => setShowHistory(false)} />}
-        {showNPCJournal && <NPCJournal onClose={() => setShowNPCJournal(false)} />}
-        {showSettings && <SettingsModal onClose={() => setShowSettings(false)} />}
-      </AnimatePresence>
+      <Suspense fallback={null}>
+        <AnimatePresence>
+          {showAchievements && <AchievementsPanel onClose={() => setShowAchievements(false)} />}
+          {showHistory && <HistoryPanel onClose={() => setShowHistory(false)} />}
+          {showNPCJournal && <NPCJournal onClose={() => setShowNPCJournal(false)} />}
+          {showSettings && <SettingsModal onClose={() => setShowSettings(false)} />}
+        </AnimatePresence>
+      </Suspense>
 
       {/* Game screens */}
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={screen}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.3 }}
-          className="w-full flex flex-col items-center"
-        >
-          {screen === "title" && <TitleScreen />}
-          {screen === "sailing" && <MapScreen />}
-          {screen === "encounter" && <EncounterScreen />}
-          {screen === "ending" && <EndingScreen />}
-        </motion.div>
-      </AnimatePresence>
+      <Suspense fallback={null}>
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={screen}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="w-full flex flex-col items-center"
+          >
+            {screen === "title" && <TitleScreen />}
+            {screen === "sailing" && <MapScreen />}
+            {screen === "encounter" && <EncounterScreen />}
+            {screen === "ending" && <EndingScreen />}
+          </motion.div>
+        </AnimatePresence>
+      </Suspense>
     </div>
   );
 }

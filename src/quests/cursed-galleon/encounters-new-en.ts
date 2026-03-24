@@ -46,7 +46,7 @@ export const newEncountersEn: Encounter[] = [
     text: "Plunder from five captured ships is laid out on the wharf. Captains bid for the choicest pieces.",
     choices: [
       { text: "💰 Bid (−20)", eff: { gold: -20, crew: 0, karma: 0, curse: 0, item: "trade_license" }, msg: "You snag a bundle of Dutch trading licenses. With these, you can pass any blockade." },
-      { text: "📢 Sell your own", eff: { gold: [20, 45], crew: 0, karma: 0, curse: 0 }, msg: "Decent price. Coin in your pocket." },
+      { text: "📢 Sell spare plunder", eff: { gold: [20, 45], crew: 0, karma: 0, curse: 0 }, msg: "Decent price. Coin in your pocket." },
       { text: "🗣️ Listen to the talk", eff: { gold: 0, crew: 0, karma: 0, curse: 0, rep: { brethren: 1 } }, msg: "A French privateer whispers about a convoy from Cartagena. Twelve galleons. Inca gold.", flag: "knows_cartagena_convoy" },
       { text: "🤝 Seek allies", eff: { gold: -5, crew: 0, karma: 0, curse: 0, rep: { brethren: 2 } }, msg: "Captain Duvall offers a joint raid. His brigantine is fast, and he knows these waters.", flag: "duvall_alliance" },
     ],

@@ -2,21 +2,37 @@ import { create } from "zustand";
 import type { GameState, Watch, Encounter, Choice, LogEntry, SerializedGameState, Quest } from "./types";
 import { resolveValue } from "./effects";
 import { pickEncounter, type PickerContext } from "./encounter-picker";
-import { type MapState, createMapState, revealAround, serializeMap, deserializeMap } from "../renderer/world-map";
-import { findNearestCell, getTerrainForScene, computeRoute, setActiveMap, getMapCells } from "../renderer/map-data";
-import { generateMap } from "../renderer/map-generator";
+import type { MapState, SerializedMapState } from "../renderer/world-map";
 import { ARTIFACTS } from "./items";
 import { useGameModeStore } from "./game-mode";
 import { useOriginStore, getOrigin } from "./origins";
 import { useObjectiveStore, getObjective } from "./objectives";
 import { defaultReps, originRepBonuses, applyRepChanges } from "./factions";
 import { checkLocationQuest } from "./location-quests";
-import { NPCS } from "./npcs";
+import { markObjectiveComplete, resolveQuestEndingIndex, shouldUseObjectiveSystem } from "./ending-resolution";
+import { getChoiceAvailability } from "./choice-availability";
+import { loadMapRuntime } from "./map-runtime";
+import { findNpcIdByMetFlag } from "./npc-met-flags";
 
 type Screen = "title" | "sailing" | "encounter" | "ending";
 
 /** How many recent encounters to track for diversity scoring */
 const RECENT_WINDOW = 5;
+
+interface SerializedRunContext {
+  recentFamilies?: string[];
+  recentTagsList?: string[][];
+  recentIds?: string[];
+  usedGroups?: string[];
+}
+
+interface SerializedSaveData {
+  questId: string;
+  state: SerializedGameState;
+  usedIds: string[];
+  runContext?: SerializedRunContext;
+  timestamp: number;
+}
 
 interface GameStore {
   screen: Screen;
@@ -37,17 +53,73 @@ interface GameStore {
   usedGroups: Set<string>;
 
   setQuest: (quest: Quest) => void;
-  startGame: () => void;
-  sail: () => void;
+  startGame: () => Promise<void>;
+  sail: () => Promise<void>;
   makeChoice: (choice: Choice) => void;
   continueSailing: () => void;
-  setDestination: (pos: [number, number]) => void;
+  setDestination: (pos: [number, number]) => Promise<void>;
   save: () => void;
-  load: () => boolean;
+  load: () => Promise<boolean>;
   clearSave: () => void;
 }
 
 const SAVE_KEY = "cursed-way-save";
+
+function createMapState(startPos: [number, number], width: number, height: number): MapState {
+  const revealed: boolean[][] = [];
+  for (let y = 0; y < height; y++) {
+    revealed.push(new Array(width).fill(false));
+  }
+  const state: MapState = {
+    playerPos: startPos,
+    revealed,
+    targetPos: null,
+    animProgress: 0,
+    currentRoute: null,
+    routeProgress: 0,
+    destination: null,
+  };
+  revealAround(state, startPos[0], startPos[1], 3);
+  return state;
+}
+
+function revealAround(map: MapState, cx: number, cy: number, radius: number) {
+  const width = map.revealed[0]?.length ?? 0;
+  const height = map.revealed.length;
+  for (let dy = -radius; dy <= radius; dy++) {
+    for (let dx = -radius; dx <= radius; dx++) {
+      const nx = cx + dx;
+      const ny = cy + dy;
+      if (nx >= 0 && nx < width && ny >= 0 && ny < height) {
+        if (Math.abs(dx) + Math.abs(dy) <= radius) {
+          map.revealed[ny][nx] = true;
+        }
+      }
+    }
+  }
+}
+
+function serializeMap(map: MapState): SerializedMapState {
+  return {
+    playerPos: map.playerPos,
+    revealed: map.revealed,
+    currentRoute: map.currentRoute,
+    routeProgress: map.routeProgress,
+    destination: map.destination,
+  };
+}
+
+function deserializeMap(data: SerializedMapState): MapState {
+  return {
+    playerPos: data.playerPos,
+    revealed: data.revealed,
+    targetPos: null,
+    animProgress: 0,
+    currentRoute: data.currentRoute ?? null,
+    routeProgress: data.routeProgress ?? 0,
+    destination: data.destination ?? null,
+  };
+}
 
 /** Advance watch by 1, rolling over to next day when all 4 watches are spent */
 function advanceWatch(state: { day: number; watch: Watch }): { day: number; watch: Watch; newDay: boolean } {
@@ -78,7 +150,7 @@ function serialize(state: GameState, mapState: MapState | null, mapSeed: number 
   };
 }
 
-function deserialize(data: SerializedGameState): { state: GameState; mapState: MapState | null; mapSeed: number | null } {
+async function deserialize(data: SerializedGameState): Promise<{ state: GameState; mapState: MapState | null; mapSeed: number | null }> {
   const { map: mapData, gameMode, mapSeed, objectiveId, ...rest } = data;
   // Restore game mode from save
   if (gameMode) {
@@ -90,6 +162,7 @@ function deserialize(data: SerializedGameState): { state: GameState; mapState: M
   }
   // Regenerate map terrain from seed (so renderer has the cells)
   if (mapSeed !== undefined) {
+    const { generateMap, setActiveMap } = await loadMapRuntime();
     const genMap = generateMap(mapSeed);
     setActiveMap(genMap);
   }
@@ -108,6 +181,32 @@ function deserialize(data: SerializedGameState): { state: GameState; mapState: M
     },
     mapState: mapData ? deserializeMap(mapData) : null,
     mapSeed: mapSeed ?? null,
+  };
+}
+
+function serializeRunContext(store: Pick<GameStore, "recentFamilies" | "recentTagsList" | "recentIds" | "usedGroups">): SerializedRunContext {
+  return {
+    recentFamilies: [...store.recentFamilies],
+    recentTagsList: store.recentTagsList.map((tags) => [...tags]),
+    recentIds: [...store.recentIds],
+    usedGroups: [...store.usedGroups],
+  };
+}
+
+function deserializeRunContext(context?: SerializedRunContext): Pick<GameStore, "recentFamilies" | "recentTags" | "recentTagsList" | "recentIds" | "usedGroups"> {
+  const recentTagsList = context?.recentTagsList?.map((tags) => [...tags]) ?? [];
+  const recentTags = new Set<string>();
+
+  for (const tags of recentTagsList) {
+    for (const tag of tags) recentTags.add(tag);
+  }
+
+  return {
+    recentFamilies: context?.recentFamilies ?? [],
+    recentTags,
+    recentTagsList,
+    recentIds: context?.recentIds ?? [],
+    usedGroups: new Set(context?.usedGroups ?? []),
   };
 }
 
@@ -130,9 +229,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
   setQuest: (quest) => set({ quest }),
 
-  startGame: () => {
+  startGame: async () => {
     const { quest } = get();
     if (!quest) return;
+    const { generateMap, setActiveMap } = await loadMapRuntime();
 
     // Generate procedural map for this run
     const genMap = generateMap();
@@ -171,7 +271,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       result: null,
       pendingChain: null,
       endingIndex: null,
-      mapState: createMapState(genMap.startPos),
+      mapState: createMapState(genMap.startPos, genMap.width, genMap.height),
       mapSeed: genMap.seed,
       recentFamilies: [],
       recentTags: new Set(),
@@ -181,9 +281,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
     });
   },
 
-  sail: () => {
+  sail: async () => {
     const { state, quest, usedIds } = get();
     if (!state || !quest) return;
+    const { findNearestCell, getTerrainForScene, getMapCells } = await loadMapRuntime();
 
     const gameMode = useGameModeStore.getState().mode;
 
@@ -195,21 +296,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // Auto-check objective completion before resolving ending
       const objectiveId = useObjectiveStore.getState().objectiveId;
       let finalState = state;
-      if (objectiveId && !state.flags.has("objective_complete")) {
+      if (shouldUseObjectiveSystem(gameMode, objectiveId) && !state.flags.has("objective_complete")) {
         const obj = getObjective(objectiveId);
         if (obj) {
           const { mapState } = get();
           const prog = obj.check(state, mapState);
           if (prog.complete) {
-            const newFlags = new Set(state.flags);
-            newFlags.add("objective_complete");
-            newFlags.add(`objective_${objectiveId}`);
-            finalState = { ...state, flags: newFlags };
+            finalState = markObjectiveComplete(state, objectiveId);
             set({ state: finalState });
           }
         }
       }
-      const idx = quest.endings.findIndex(e => e.req(finalState));
+      const idx = resolveQuestEndingIndex(quest.endings, finalState);
       set({ endingIndex: idx >= 0 ? idx : quest.endings.length - 1, screen: "ending" });
       get().clearSave();
       return;
@@ -297,7 +395,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const EMPTY_SAIL_CHANCE = 0.35; // 35% chance of calm seas while sailing
     if (isEnRoute && !currentLocationName && Math.random() < EMPTY_SAIL_CHANCE) {
       // Move ship forward without triggering an encounter
-      let newMapState = mapState ? { ...mapState } : null;
+      const newMapState = mapState ? { ...mapState } : null;
       if (newMapState?.currentRoute && newMapState.routeProgress < newMapState.currentRoute.length) {
         let revealRadius = 3;
         for (const itemId of state.inventory) {
@@ -398,7 +496,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const newRecentIds = [...recentIds, enc.id].slice(-20); // track last 20 encounter ids
 
     // Update map position (immutable copy)
-    let newMapState = mapState ? { ...mapState } : null;
+    const newMapState = mapState ? { ...mapState } : null;
     if (newMapState) {
       // Calculate reveal radius from base + artifact bonuses
       let revealRadius = 3;
@@ -513,6 +611,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   makeChoice: (choice) => {
     const { state, encounter } = get();
     if (!state || !encounter) return;
+    if (!getChoiceAvailability(choice, state).selectable) return;
 
     const gd = resolveValue(choice.eff.gold);
     const cd = resolveValue(choice.eff.crew);
@@ -572,12 +671,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
         ns.flags.add(f);
         // Auto-track NPC meeting when a metFlag is set
         if (!encounter.npc) {
-          const matchedNpc = Object.values(NPCS).find(n => n.metFlag === f);
-          if (matchedNpc && !state.flags.has(`met_npc_${matchedNpc.id}`)) {
-            ns.flags.add(`met_npc_${matchedNpc.id}`);
+          const matchedNpcId = findNpcIdByMetFlag(f);
+          if (matchedNpcId && !state.flags.has(`met_npc_${matchedNpcId}`)) {
+            ns.flags.add(`met_npc_${matchedNpcId}`);
             const encTitle = typeof encounter.title === "function" ? encounter.title(state) : encounter.title;
             ns.npcMeetings.push({
-              npcId: matchedNpc.id,
+              npcId: matchedNpcId,
               day: state.day,
               encounterId: encounter.id,
               encounterTitle: encTitle,
@@ -645,6 +744,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (choice.eff.chain) {
       set({ pendingChain: choice.eff.chain });
     }
+
+    setTimeout(() => get().save(), 0);
   },
 
   continueSailing: () => {
@@ -660,10 +761,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
     set({ screen: "sailing", encounter: null, result: null, pendingChain: null });
   },
 
-  setDestination: (pos) => {
+  setDestination: async (pos) => {
     const { mapState } = get();
     if (!mapState) return;
+    const { computeRoute } = await loadMapRuntime();
     const route = computeRoute(mapState.playerPos, pos);
+    if (route.length === 0) return;
     set({
       mapState: {
         ...mapState,
@@ -673,16 +776,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
       },
     });
     // Immediately start sailing
-    get().sail();
+    await get().sail();
   },
 
   save: () => {
     const { state, usedIds, quest, mapState, mapSeed } = get();
     if (!state || !quest) return;
-    const data = {
+    const data: SerializedSaveData = {
       questId: quest.id,
       state: serialize(state, mapState, mapSeed),
       usedIds: [...usedIds],
+      runContext: serializeRunContext(get()),
       timestamp: Date.now(),
     };
     try {
@@ -690,12 +794,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
     } catch { /* quota exceeded */ }
   },
 
-  load: () => {
+  load: async () => {
     try {
       const raw = localStorage.getItem(SAVE_KEY);
       if (!raw) return false;
-      const data = JSON.parse(raw);
-      const { state: loadedState, mapState: loadedMap, mapSeed: loadedSeed } = deserialize(data.state);
+      const data = JSON.parse(raw) as SerializedSaveData;
+      const { state: loadedState, mapState: loadedMap, mapSeed: loadedSeed } = await deserialize(data.state);
+      const runContext = deserializeRunContext(data.runContext);
       set({
         state: loadedState,
         mapState: loadedMap,
@@ -706,6 +811,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         result: null,
         pendingChain: null,
         endingIndex: null,
+        ...runContext,
       });
       return true;
     } catch {

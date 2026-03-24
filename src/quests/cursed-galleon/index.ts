@@ -1,16 +1,6 @@
 import type { Quest } from "../../engine/types";
 import type { Locale } from "../../i18n";
 import { defaultReps } from "../../engine/factions";
-import { encounters } from "./encounters";
-import { encountersEn } from "./encounters-en";
-import { questlineEncounters } from "./questlines";
-import { questlineEncountersEn } from "./questlines-en";
-import { newEncounters } from "./encounters-new";
-import { newEncountersEn } from "./encounters-new-en";
-import { locationQuestEncounters } from "./location-quest-encounters";
-import { locationQuestEncountersEn } from "./location-quest-encounters-en";
-import { endings } from "./endings";
-import { endingsEn } from "./endings-en";
 
 const questData: Record<Locale, { title: string; description: string }> = {
   uk: {
@@ -23,15 +13,11 @@ const questData: Record<Locale, { title: string; description: string }> = {
   },
 };
 
-export function getCursedGalleon(locale: Locale): Quest {
+function createBaseQuest(locale: Locale): Omit<Quest, "encounters" | "endings"> {
   return {
     id: "cursed-galleon",
     title: questData[locale].title,
     description: questData[locale].description,
-    encounters: locale === "en"
-      ? [...encountersEn, ...questlineEncountersEn, ...newEncountersEn, ...locationQuestEncountersEn]
-      : [...encounters, ...questlineEncounters, ...newEncounters, ...locationQuestEncounters],
-    endings: locale === "en" ? endingsEn : endings,
     initialState: {
       gold: 30,
       crew: 8,
@@ -52,5 +38,46 @@ export function getCursedGalleon(locale: Locale): Quest {
   };
 }
 
-// Default export for backwards compat
-export const cursedGalleon = getCursedGalleon("uk");
+export async function loadCursedGalleon(locale: Locale): Promise<Quest> {
+  if (locale === "en") {
+    const [
+      { encountersEn },
+      { questlineEncountersEn },
+      { newEncountersEn },
+      { locationQuestEncountersEn },
+      { endingsEn },
+    ] = await Promise.all([
+      import("./encounters-en"),
+      import("./questlines-en"),
+      import("./encounters-new-en"),
+      import("./location-quest-encounters-en"),
+      import("./endings-en"),
+    ]);
+
+    return {
+      ...createBaseQuest(locale),
+      encounters: [...encountersEn, ...questlineEncountersEn, ...newEncountersEn, ...locationQuestEncountersEn],
+      endings: endingsEn,
+    };
+  }
+
+  const [
+    { encounters },
+    { questlineEncounters },
+    { newEncounters },
+    { locationQuestEncounters },
+    { endings },
+  ] = await Promise.all([
+    import("./encounters"),
+    import("./questlines"),
+    import("./encounters-new"),
+    import("./location-quest-encounters"),
+    import("./endings"),
+  ]);
+
+  return {
+    ...createBaseQuest(locale),
+    encounters: [...encounters, ...questlineEncounters, ...newEncounters, ...locationQuestEncounters],
+    endings,
+  };
+}

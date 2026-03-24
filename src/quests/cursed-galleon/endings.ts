@@ -2,6 +2,7 @@ import type { Ending } from "../../engine/types";
 
 export const endings: Ending[] = [
   {
+    id: "between_worlds",
     req: s => s.curse >= 15,
     title: "М І Ж  С В І Т А М И",
     text: s => s.flags?.has("merged")
@@ -12,18 +13,21 @@ export const endings: Ending[] = [
     color: "#40f8a0",
   },
   {
+    id: "swallowed",
     req: s => s.curse >= 12 && s.crew <= 2,
     title: "П О Г Л И Н У Т И Й",
     text: () => "Прокляття забрало все. Порожня оболонка на безлюдному кораблі.",
     color: "#8020c0",
   },
   {
+    id: "last_one",
     req: s => s.crew <= 0,
     title: "О С Т А Н Н І Й",
     text: () => "Нікого. Лише хвилі та крик чайок. Дрейфуєте.",
     color: "#c02020",
   },
   {
+    id: "cursed_gold",
     req: s => s.gold >= 150 && s.curse >= 8,
     title: "П Р О К Л Я Т Е  З О Л О Т О",
     text: s => s.flags?.has("eldorado_knowledge")
@@ -32,6 +36,7 @@ export const endings: Ending[] = [
     color: "#f0c040",
   },
   {
+    id: "legend",
     req: s => s.karma >= 8,
     title: "Л Е Г Е Н Д А",
     text: s => s.flags?.has("siren_bond")
@@ -40,6 +45,7 @@ export const endings: Ending[] = [
     color: "#40c0f0",
   },
   {
+    id: "king",
     req: s => s.gold >= 200,
     title: "К О Р О Л Ь",
     text: s => s.flags?.has("barret_deal")
@@ -48,6 +54,7 @@ export const endings: Ending[] = [
     color: "#f0c040",
   },
   {
+    id: "objective_complete",
     req: s => s.flags?.has("objective_complete") === true,
     title: "М І С І Я  В И К О Н А Н А",
     text: s => {
@@ -62,6 +69,7 @@ export const endings: Ending[] = [
     color: "#40f8a0",
   },
   {
+    id: "survivor",
     req: () => true,
     title: "В И Ж И В",
     text: s => s.flags?.has("visited_phantom")
