@@ -16,13 +16,15 @@ export function ChoiceCard({ choice, index, state, onChoose }: Props) {
   const locale = useLocaleStore(s => s.locale);
   const availability = getChoiceAvailability(choice, state);
   const canChoose = availability.selectable;
-  const [missingFactionId, requiredRep] = Object.entries(availability.missingReputation)[0] as
+  const missingRepEntry = Object.entries(availability.missingReputation)[0] as
     | [FactionId, number]
-    | [undefined, undefined];
+    | undefined;
+  const missingFactionId = missingRepEntry?.[0];
+  const requiredRep = missingRepEntry?.[1];
   const repRequirementLabel = missingFactionId
     ? t("requiresRep").replace(
       "{0}",
-      `${FACTIONS[missingFactionId].name[locale]} ${requiredRep > 0 ? `+${requiredRep}` : requiredRep}`,
+      `${FACTIONS[missingFactionId].name[locale]} ${requiredRep! > 0 ? `+${requiredRep}` : requiredRep}`,
     )
     : "";
 
