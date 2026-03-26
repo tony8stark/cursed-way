@@ -4,6 +4,7 @@ import { drawShipVariant, type ShipVisualState } from "../ship-variants";
 import type { SceneId } from "../../engine/types";
 import type { AtmosphereState } from "../atmosphere";
 import { drawSceneBackground, shouldDrawSceneShip } from "../scene-backgrounds";
+import { getSceneShipLayout } from "../scene-ship-layout";
 
 export interface SceneOpts {
   curse?: number;
@@ -29,6 +30,19 @@ function ship(ctx: CanvasRenderingContext2D, x: number, y: number, scale: number
   } else {
     drawSprite(ctx, "ship", x, y, scale, alpha);
   }
+}
+
+function drawSceneShip(
+  ctx: CanvasRenderingContext2D,
+  scene: SceneId,
+  width: number,
+  height: number,
+  frame: number,
+  alpha: number,
+  opts?: SceneOpts,
+) {
+  const layout = getSceneShipLayout({ scene, width, height, frame });
+  ship(ctx, layout.x, layout.y, 3, alpha, opts);
 }
 
 /** Get atmosphere-aware colors or fallback to defaults */
@@ -112,8 +126,7 @@ function sceneOpenSea(ctx: CanvasRenderingContext2D, W: number, H: number, f: nu
   }
 
   // Ship centered, hull bottom on waterline
-  const bob = Math.sin(f * 0.04) * 3 + Math.sin(f * 0.07) * 1.5;
-  ship(ctx, W * 0.35, waterY + bob, 3, 1, opts);
+  drawSceneShip(ctx, "open_sea", W, H, f, 1, opts);
 }
 
 function sceneStorm(ctx: CanvasRenderingContext2D, W: number, H: number, f: number, ps: ParticleSystem, opts?: SceneOpts) {
@@ -153,7 +166,7 @@ function sceneStorm(ctx: CanvasRenderingContext2D, W: number, H: number, f: numb
     ps.emit(5, { x: 0, y: -5, w: W, h: 1, color: "rgba(150,180,220,0.5)", size: 1, life: 30, vxRange: [0.5, 1.5], vyRange: [4, 6] });
   }
 
-  ship(ctx, W * 0.35, waterY + Math.sin(f * 0.08) * 8, 3, 1, opts);
+  drawSceneShip(ctx, "storm", W, H, f, 1, opts);
 }
 
 function sceneIsland(ctx: CanvasRenderingContext2D, W: number, H: number, f: number, ps: ParticleSystem, opts?: SceneOpts) {
@@ -194,7 +207,7 @@ function sceneIsland(ctx: CanvasRenderingContext2D, W: number, H: number, f: num
   }
 
   // Ship hull sits on waterline
-  ship(ctx, W * 0.06, waterY + Math.sin(f * 0.04) * 2, 3, 1, opts);
+  drawSceneShip(ctx, "island", W, H, f, 1, opts);
 
   // Shore foam on waterline
   if (f % 30 === 0) {
@@ -276,7 +289,7 @@ function sceneCombat(ctx: CanvasRenderingContext2D, W: number, H: number, f: num
   }
 
   // Our ship: close (lower-left, full scale), hull bottom on waterline
-  ship(ctx, W * 0.06, waterY + Math.sin(f * 0.05) * 2, 3, 1, opts);
+  drawSceneShip(ctx, "combat", W, H, f, 1, opts);
 }
 
 function sceneEthereal(ctx: CanvasRenderingContext2D, W: number, H: number, f: number, ps: ParticleSystem, opts?: SceneOpts) {
@@ -313,7 +326,7 @@ function sceneEthereal(ctx: CanvasRenderingContext2D, W: number, H: number, f: n
     }
   }
 
-  ship(ctx, W * 0.35, H * WL + Math.sin(f * 0.04) * 4, 3, 0.8, opts);
+  drawSceneShip(ctx, "ethereal", W, H, f, 0.8, opts);
 }
 
 function scenePort(ctx: CanvasRenderingContext2D, W: number, H: number, f: number, ps: ParticleSystem, opts?: SceneOpts) {
@@ -361,7 +374,7 @@ function scenePort(ctx: CanvasRenderingContext2D, W: number, H: number, f: numbe
 
   // On fully-painted port backdrops, the sprite ship clashes with the art direction.
   if (shouldDrawSceneShip({ scene: "port", hasBackdrop })) {
-    ship(ctx, W * 0.06, waterY + Math.sin(f * 0.04) * 2, 3, 1, opts);
+    drawSceneShip(ctx, "port", W, H, f, 1, opts);
   }
 }
 
@@ -449,7 +462,7 @@ function sceneKraken(ctx: CanvasRenderingContext2D, W: number, H: number, f: num
   }
 
   // Ship hull bottom on waterline
-  ship(ctx, W * 0.35, waterY + Math.sin(f * 0.06) * 4, 3, 1, opts);
+  drawSceneShip(ctx, "kraken", W, H, f, 1, opts);
 }
 
 export const SCENES: Record<SceneId, SceneRenderer> = {
