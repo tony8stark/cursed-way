@@ -1,4 +1,5 @@
 import type { Ending } from "../../engine/types";
+import { applyEndingNotes } from "../../engine/ending-resolution";
 
 export const endingsEn: Ending[] = [
   {
@@ -39,18 +40,18 @@ export const endingsEn: Ending[] = [
     id: "legend",
     req: s => s.karma >= 8,
     title: "L E G E N D",
-    text: s => s.flags?.has("siren_bond")
+    text: s => applyEndingNotes(s.flags?.has("siren_bond")
       ? "The siren guides you to port. Land, sea, and the deep respect you."
-      : "Your name is a synonym for honor.",
+      : "Your name is a synonym for honor.", "en", s, { faction: true, relationship: true, legendaryQuest: true }),
     color: "#40c0f0",
   },
   {
     id: "king",
     req: s => s.gold >= 200,
     title: "K I N G",
-    text: s => s.flags?.has("barret_deal")
+    text: s => applyEndingNotes(s.flags?.has("barret_deal")
       ? "You and Barret split the Caribbean. It won't last."
-      : "More gold than you could ever spend.",
+      : "More gold than you could ever spend.", "en", s, { faction: true, relationship: true, legendaryQuest: true }),
     color: "#f0c040",
   },
   {
@@ -58,13 +59,14 @@ export const endingsEn: Ending[] = [
     req: s => s.flags?.has("objective_complete") === true,
     title: "M I S S I O N  C O M P L E T E",
     text: s => {
-      if (s.flags?.has("objective_treasure_hunter")) return "Five relics from five cursed corners of the world. Collectors and kings will fight over your haul.";
-      if (s.flags?.has("objective_curse_breaker")) return "You touched the abyss and pulled yourself back. Few can say the same. The sea owes you nothing now.";
-      if (s.flags?.has("objective_explorer")) return "Eight shores, a living crew, and the map in your head. You did not get lost at sea. You learned it.";
-      if (s.flags?.has("objective_trade_baron")) return "Your fortune came not only from fear, but from connections. The Guild speaks of you as one of its own.";
-      if (s.flags?.has("objective_redeemer")) return "The sea tested you. You chose mercy every time. Songs will be written about your voyage.";
-      if (s.flags?.has("objective_cartographer")) return "You charted nearly half the sea without letting the curse swallow you. That is the work of a master, not a drifter.";
-      return "You set out with a purpose and accomplished it. Not many can say that.";
+      let base = "You set out with a purpose and accomplished it. Not many can say that.";
+      if (s.flags?.has("objective_treasure_hunter")) base = "Five relics from five cursed corners of the world. Collectors and kings will fight over your haul.";
+      else if (s.flags?.has("objective_curse_breaker")) base = "You touched the abyss and pulled yourself back. Few can say the same. The sea owes you nothing now.";
+      else if (s.flags?.has("objective_explorer")) base = "Eight shores, a living crew, and the map in your head. You did not get lost at sea. You learned it.";
+      else if (s.flags?.has("objective_trade_baron")) base = "Your fortune came not only from fear, but from connections. The Guild speaks of you as one of its own.";
+      else if (s.flags?.has("objective_redeemer")) base = "The sea tested you. You chose mercy every time. Songs will be written about your voyage.";
+      else if (s.flags?.has("objective_cartographer")) base = "You charted nearly half the sea without letting the curse swallow you. That is the work of a master, not a drifter.";
+      return applyEndingNotes(base, "en", s, { faction: true, relationship: true, legendaryQuest: true });
     },
     color: "#40f8a0",
   },
@@ -72,9 +74,9 @@ export const endingsEn: Ending[] = [
     id: "survivor",
     req: () => true,
     title: "S U R V I V O R",
-    text: s => s.flags?.has("visited_phantom")
+    text: s => applyEndingNotes(s.flags?.has("visited_phantom")
       ? "You returned. But is this your world? Everything feels slightly off."
-      : "Not a hero, not a villain. A sailor who came back.",
+      : "Not a hero, not a villain. A sailor who came back.", "en", s, { faction: true, relationship: true, legendaryQuest: true }),
     color: "#c8c8d8",
   },
 ];

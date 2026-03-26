@@ -1,4 +1,5 @@
 import type { Ending } from "../../engine/types";
+import { applyEndingNotes } from "../../engine/ending-resolution";
 
 export const endings: Ending[] = [
   {
@@ -39,18 +40,18 @@ export const endings: Ending[] = [
     id: "legend",
     req: s => s.karma >= 8,
     title: "Л Е Г Е Н Д А",
-    text: s => s.flags?.has("siren_bond")
+    text: s => applyEndingNotes(s.flags?.has("siren_bond")
       ? "Сирена проводжає в порт. Вас поважає суша, море і глибина."
-      : "Ваше ім'я стало синонімом честі на цих водах.",
+      : "Ваше ім'я стало синонімом честі на цих водах.", "uk", s, { faction: true, relationship: true, legendaryQuest: true }),
     color: "#40c0f0",
   },
   {
     id: "king",
     req: s => s.gold >= 200,
     title: "К О Р О Л Ь",
-    text: s => s.flags?.has("barret_deal")
+    text: s => applyEndingNotes(s.flags?.has("barret_deal")
       ? "Ви і Баррет ділите Кариби. Довго не протримається."
-      : "Золота більше, ніж можна витратити за ціле життя.",
+      : "Золота більше, ніж можна витратити за ціле життя.", "uk", s, { faction: true, relationship: true, legendaryQuest: true }),
     color: "#f0c040",
   },
   {
@@ -58,13 +59,14 @@ export const endings: Ending[] = [
     req: s => s.flags?.has("objective_complete") === true,
     title: "М І С І Я  В И К О Н А Н А",
     text: s => {
-      if (s.flags?.has("objective_treasure_hunter")) return "П'ять реліквій з п'яти проклятих кутів світу. Колекціонери і королі б'ються за ваш здобуток.";
-      if (s.flags?.has("objective_curse_breaker")) return "Ви торкнулись безодні і повернулись. Мало хто може сказати те саме. Море вам більше нічого не винне.";
-      if (s.flags?.has("objective_explorer")) return "Вісім берегів, жива команда і карта в голові. Ви не заблукали в морі, ви його вивчили.";
-      if (s.flags?.has("objective_trade_baron")) return "Золото текло до вас не лише зі страху, а й через зв'язки. Гільдія називає вас одним із своїх.";
-      if (s.flags?.has("objective_redeemer")) return "Море випробовувало вас. Ви щоразу обирали милосердя. Про ваше плавання складуть пісні.";
-      if (s.flags?.has("objective_cartographer")) return "Ви відкрили майже половину моря й не дозволили прокляттю поглинути себе. Це робота майстра, а не авантюриста.";
-      return "Ви вирушили з метою і досягли її. Небагато хто може сказати те саме.";
+      let base = "Ви вирушили з метою і досягли її. Небагато хто може сказати те саме.";
+      if (s.flags?.has("objective_treasure_hunter")) base = "П'ять реліквій з п'яти проклятих кутів світу. Колекціонери і королі б'ються за ваш здобуток.";
+      else if (s.flags?.has("objective_curse_breaker")) base = "Ви торкнулись безодні і повернулись. Мало хто може сказати те саме. Море вам більше нічого не винне.";
+      else if (s.flags?.has("objective_explorer")) base = "Вісім берегів, жива команда і карта в голові. Ви не заблукали в морі, ви його вивчили.";
+      else if (s.flags?.has("objective_trade_baron")) base = "Золото текло до вас не лише зі страху, а й через зв'язки. Гільдія називає вас одним із своїх.";
+      else if (s.flags?.has("objective_redeemer")) base = "Море випробовувало вас. Ви щоразу обирали милосердя. Про ваше плавання складуть пісні.";
+      else if (s.flags?.has("objective_cartographer")) base = "Ви відкрили майже половину моря й не дозволили прокляттю поглинути себе. Це робота майстра, а не авантюриста.";
+      return applyEndingNotes(base, "uk", s, { faction: true, relationship: true, legendaryQuest: true });
     },
     color: "#40f8a0",
   },
@@ -72,9 +74,9 @@ export const endings: Ending[] = [
     id: "survivor",
     req: () => true,
     title: "В И Ж И В",
-    text: s => s.flags?.has("visited_phantom")
+    text: s => applyEndingNotes(s.flags?.has("visited_phantom")
       ? "Повернулись. Але чи це ваш світ? Все трохи інакше."
-      : "Не герой і не лиходій. Просто моряк, який повернувся живим.",
+      : "Не герой і не лиходій. Просто моряк, який повернувся живим.", "uk", s, { faction: true, relationship: true, legendaryQuest: true }),
     color: "#c8c8d8",
   },
 ];
