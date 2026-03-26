@@ -3,7 +3,7 @@ import { ParticleSystem } from "../particles";
 import { drawShipVariant, type ShipVisualState } from "../ship-variants";
 import type { SceneId } from "../../engine/types";
 import type { AtmosphereState } from "../atmosphere";
-import { drawSceneBackground } from "../scene-backgrounds";
+import { drawSceneBackground, shouldDrawSceneShip } from "../scene-backgrounds";
 
 export interface SceneOpts {
   curse?: number;
@@ -359,8 +359,10 @@ function scenePort(ctx: CanvasRenderingContext2D, W: number, H: number, f: numbe
     ps.emit(1, { x: W * 0.52, y: dockY - 35, w: 80, h: 1, color: "#f0c040", alpha: 0.3, size: 1, life: 20, vxRange: [-0.2, 0.2], vyRange: [-0.5, -0.2] });
   }
 
-  // Ship hull bottom on waterline
-  ship(ctx, W * 0.06, waterY + Math.sin(f * 0.04) * 2, 3, 1, opts);
+  // On fully-painted port backdrops, the sprite ship clashes with the art direction.
+  if (shouldDrawSceneShip({ scene: "port", hasBackdrop })) {
+    ship(ctx, W * 0.06, waterY + Math.sin(f * 0.04) * 2, 3, 1, opts);
+  }
 }
 
 function sceneUnderwater(ctx: CanvasRenderingContext2D, W: number, H: number, f: number, ps: ParticleSystem, opts?: SceneOpts) {

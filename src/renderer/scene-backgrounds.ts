@@ -49,6 +49,11 @@ export interface SceneBackgroundContext {
   enemyType?: string;
 }
 
+export interface SceneShipVisibilityContext {
+  scene: SceneId;
+  hasBackdrop: boolean;
+}
+
 const imageCache = new Map<string, HTMLImageElement>();
 
 function hasAny(text: string, needles: string[]): boolean {
@@ -133,6 +138,11 @@ export function resolveSceneBackgroundKey({
 
 export function getSceneBackgroundUrl(context: SceneBackgroundContext): string {
   return SCENE_BACKGROUND_URLS[resolveSceneBackgroundKey(context)];
+}
+
+export function shouldDrawSceneShip({ scene, hasBackdrop }: SceneShipVisibilityContext): boolean {
+  if (scene === "port" && hasBackdrop) return false;
+  return true;
 }
 
 export function drawSceneBackground(

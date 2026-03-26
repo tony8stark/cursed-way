@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { resolveSceneBackgroundKey } from "../scene-backgrounds";
+import { resolveSceneBackgroundKey, shouldDrawSceneShip } from "../scene-backgrounds";
 
 describe("scene background resolver", () => {
   it("uses time-of-day variants for open sea", () => {
@@ -63,5 +63,11 @@ describe("scene background resolver", () => {
       scene: "kraken",
       encounterId: "kraken_pact",
     })).toBe("leviathan_below");
+  });
+
+  it("hides the sprite ship on port backdrops but keeps it for non-port scenes", () => {
+    expect(shouldDrawSceneShip({ scene: "port", hasBackdrop: true })).toBe(false);
+    expect(shouldDrawSceneShip({ scene: "port", hasBackdrop: false })).toBe(true);
+    expect(shouldDrawSceneShip({ scene: "open_sea", hasBackdrop: true })).toBe(true);
   });
 });
