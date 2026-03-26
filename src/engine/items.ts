@@ -19,6 +19,7 @@ export const ARTIFACTS: Record<string, ArtifactDef> = {
     icon: "\u{1F9ED}",
     iconPath: "/icons/items/cursed_compass.png",
     rarity: "cursed",
+    passive: { stat: "curse", perDay: [0, 1] },
     revealRadius: 2,
   },
   siren_shell: {
@@ -35,7 +36,7 @@ export const ARTIFACTS: Record<string, ArtifactDef> = {
     iconPath: "/icons/items/ghost_lantern.png",
     rarity: "cursed",
     passive: { stat: "curse", perDay: [0, 1] },
-    revealRadius: 1,
+    revealRadius: 2,
     encounterUnlock: "ghost_fleet_contact",
   },
   map_fragment: {
@@ -73,7 +74,7 @@ export const ARTIFACTS: Record<string, ArtifactDef> = {
     icon: "\u{1FAC6}",
     iconPath: "/icons/items/voodoo_doll.png",
     rarity: "cursed",
-    passive: { stat: "karma", perDay: [-1, 0] },
+    passive: { stat: "curse", perDay: [-1, 1] },
     encounterUnlock: "voodoo_ritual_encounter",
   },
   trade_license: {
@@ -81,7 +82,7 @@ export const ARTIFACTS: Record<string, ArtifactDef> = {
     icon: "\u{1F4DC}",
     iconPath: "/icons/items/trade_license.png",
     rarity: "common",
-    passive: { stat: "gold", perDay: [4, 12] },
+    passive: { stat: "gold", perDay: [3, 8] },
   },
   ancient_key: {
     id: "ancient_key",

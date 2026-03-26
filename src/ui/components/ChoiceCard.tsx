@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
+import { FACTIONS, type FactionId } from "../../engine/factions";
 import type { Choice, GameState } from "../../engine/types";
-import { useT } from "../../i18n";
+import { useLocaleStore, useT } from "../../i18n";
 import { getChoiceAvailability } from "../../engine/choice-availability";
 
 interface Props {
@@ -12,8 +13,18 @@ interface Props {
 
 export function ChoiceCard({ choice, index, state, onChoose }: Props) {
   const t = useT();
+  const locale = useLocaleStore(s => s.locale);
   const availability = getChoiceAvailability(choice, state);
   const canChoose = availability.selectable;
+  const [missingFactionId, requiredRep] = Object.entries(availability.missingReputation)[0] as
+    | [FactionId, number]
+    | [undefined, undefined];
+  const repRequirementLabel = missingFactionId
+    ? t("requiresRep").replace(
+      "{0}",
+      `${FACTIONS[missingFactionId].name[locale]} ${requiredRep > 0 ? `+${requiredRep}` : requiredRep}`,
+    )
+    : "";
 
   return (
     <motion.button
@@ -36,6 +47,7 @@ export function ChoiceCard({ choice, index, state, onChoose }: Props) {
       {choice.text}
       {availability.cantAfford ? ` ${t("cantAfford")}` : ""}
       {availability.alreadyOwned ? ` ${t("alreadyOwned")}` : ""}
+      {repRequirementLabel ? ` ${repRequirementLabel}` : ""}
       <span className="text-white/20 ml-2 text-[8px]">[{index + 1}]</span>
     </motion.button>
   );

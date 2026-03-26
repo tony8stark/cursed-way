@@ -60,10 +60,10 @@ export const endingsEn: Ending[] = [
     text: s => {
       if (s.flags?.has("objective_treasure_hunter")) return "Five relics from five cursed corners of the world. Collectors and kings will fight over your haul.";
       if (s.flags?.has("objective_curse_breaker")) return "You touched the abyss and pulled yourself back. Few can say the same. The sea owes you nothing now.";
-      if (s.flags?.has("objective_explorer")) return "Ten ports, ten stories. You have seen more than most sailors see in a lifetime.";
-      if (s.flags?.has("objective_trade_baron")) return "Three hundred gold pieces. Enough to buy a fleet, a fortress, and the silence of every governor.";
+      if (s.flags?.has("objective_explorer")) return "Eight shores, a living crew, and the map in your head. You did not get lost at sea. You learned it.";
+      if (s.flags?.has("objective_trade_baron")) return "Your fortune came not only from fear, but from connections. The Guild speaks of you as one of its own.";
       if (s.flags?.has("objective_redeemer")) return "The sea tested you. You chose mercy every time. Songs will be written about your voyage.";
-      if (s.flags?.has("objective_cartographer")) return "The map is almost complete. Blank spaces filled, myths confirmed. Cartographers will study your charts for generations.";
+      if (s.flags?.has("objective_cartographer")) return "You charted nearly half the sea without letting the curse swallow you. That is the work of a master, not a drifter.";
       return "You set out with a purpose and accomplished it. Not many can say that.";
     },
     color: "#40f8a0",

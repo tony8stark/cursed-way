@@ -66,4 +66,22 @@ describe("choice availability", () => {
     expect(missingFlag.visible).toBe(false);
     expect(missingItem.visible).toBe(false);
   });
+
+  it("shows but blocks faction-gated choices until the required reputation is met", () => {
+    const lowRep = getChoiceAvailability(
+      createChoice({ requires_rep: { guild: 3 } }),
+      createState({ factionReps: { crown: 0, brethren: 0, guild: 2 } }),
+    );
+    const enoughRep = getChoiceAvailability(
+      createChoice({ requires_rep: { guild: 3 } }),
+      createState({ factionReps: { crown: 0, brethren: 0, guild: 3 } }),
+    );
+
+    expect(lowRep.visible).toBe(true);
+    expect(lowRep.selectable).toBe(false);
+    expect(lowRep.missingReputation).toEqual({ guild: 3 });
+
+    expect(enoughRep.selectable).toBe(true);
+    expect(enoughRep.missingReputation).toEqual({});
+  });
 });

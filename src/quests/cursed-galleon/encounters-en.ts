@@ -27,7 +27,7 @@ export const encountersEn: Encounter[] = [
     id: "merchant_silk", scene: "open_sea", phase: "early", enemyType: "merchant", title: "Chinese Junk",
     text: "A majestic ship with crimson sails. Silk, porcelain, tea.",
     choices: [
-      { text: "🤝 Trade fairly", eff: { gold: [5, 20], crew: 0, karma: 2, curse: 0, item: "cursed_compass", rep: { guild: 2 } }, msg: "The captain gifts a compass that 'points not north, but to what you seek'." },
+      { text: "🤝 Trade fairly", eff: { gold: [5, 20], crew: 0, karma: 2, curse: 0, item: "cursed_compass", rep: { guild: 2 } }, msg: "The captain gifts a compass that 'points not north, but to what you seek.' The needle trembles like something hungry. Gifts like this usually come with a price." },
       { text: "⚔️ Board them", eff: { gold: [40, 80], crew: [-3, -1], karma: -3, curse: 2, rep: { guild: -3, brethren: 1 } }, msg: "The junk burns. Among the silk — a scroll with unknown symbols. It pulses." },
       { text: "🍵 Tea with the captain", eff: { gold: 0, crew: 1, karma: 1, curse: 0 }, msg: "A former pirate. One of yours stays, but two of his crew ask to join you.", flag: "chinese_allies" },
       { text: "⚖️ [Merchant] Speak Mandarin", eff: { gold: [15, 40], crew: 2, karma: 2, curse: 0, rep: { guild: 3 } }, msg: "The captain invites you aboard. Turns out he knew your father. He gives you silk, two experienced sailors, and his blessing.", flag: "chinese_allies", requires_flag: "origin_merchant" },
@@ -536,6 +536,7 @@ export const encountersEn: Encounter[] = [
     text: "The pirate republic. One law here: might makes right.",
     choices: [
       { text: "🍺 Buy drinks for the crew (-15)", eff: { gold: -15, crew: 1, karma: 0, curse: 0 }, msg: "Morale soars. Two newcomers ask to join." },
+      { text: "☠️ [Brethren] Call in old friends (-5)", requires_rep: { brethren: 3 }, eff: { gold: -5, crew: 2, karma: 0, curse: 0, rep: { brethren: 1 } }, msg: "A black flag and the right names do the work. Two seasoned boarders sign on with you." },
       { text: "🖤 Buy the black pearl (-50)", eff: { gold: -50, crew: 0, karma: 0, curse: 1, item: "black_pearl" }, msg: "The trader vanishes the moment you touch the pearl. It's warm." },
       { text: "📖 Read the notice board", eff: { gold: 0, crew: 0, karma: 0, curse: 0 }, msg: "The bounty on your head has increased.", flag: "wanted_nassau" },
     ],
@@ -560,6 +561,7 @@ export const encountersEn: Encounter[] = [
     text: "British fortress. Risky, but the best goods are here.",
     choices: [
       { text: "💊 Buy medicine (-35)", eff: { gold: -35, crew: 0, karma: 0, curse: 0, item: "medicine_chest" }, msg: "Proper English medicine. The crew will stay healthier." },
+      { text: "👑 [Crown] Quartermaster rate (-18)", requires_rep: { crown: 3 }, eff: { gold: -18, crew: 0, karma: 1, curse: 0, item: "medicine_chest", rep: { crown: 1 } }, msg: "The quartermaster recognizes you as one of theirs. Crates of medicine and bandages at service price.", flag: "british_contact" },
       { text: "🤝 Offer peace", eff: { gold: 0, crew: 0, karma: 2, curse: 0 }, msg: "The governor listens. Doesn't believe you, but listens.", flag: "british_contact" },
       { text: "⚔️ Raid the warehouse", eff: { gold: [40, 70], crew: [-2, 0], karma: -3, curse: 0 }, msg: "Gold secured. But now the entire fleet hunts you.", flag: "port_royal_enemy" },
     ],
@@ -583,8 +585,8 @@ export const encountersEn: Encounter[] = [
     locationName: "Shadow Cave",
     text: "Firelight on the walls. A shaman in a bone mask waits.",
     choices: [
-      { text: "🪆 Accept the gift", eff: { gold: 0, crew: 0, karma: 0, curse: 3, item: "voodoo_doll" }, msg: "A doll made with your hair. You feel a connection to something ancient." },
-      { text: "🏮 Take the lantern", eff: { gold: 0, crew: 0, karma: 0, curse: 2, item: "ghost_lantern" }, msg: "It glows without fire. Shows what is hidden." },
+      { text: "🪆 Accept the gift", eff: { gold: 0, crew: 0, karma: 0, curse: 3, item: "voodoo_doll" }, msg: "A doll made with your hair. The shaman whispers: 'Some nights it takes part of the curse for you. Some nights it remembers and gives it back. If it gets too dark, burn it first.'" },
+      { text: "🏮 Take the lantern", eff: { gold: 0, crew: 0, karma: 0, curse: 2, item: "ghost_lantern" }, msg: "It glows without flame. In its light you can make out drowned masts and ships that do not exist by day." },
       { text: "🚶 Leave", eff: { gold: 0, crew: 0, karma: 0, curse: 0 }, msg: "Some doors are best left closed." },
     ],
   },

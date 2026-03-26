@@ -188,7 +188,7 @@ export const locationQuestEncountersEn: Encounter[] = [
       {
         text: "🧭 Ask for knowledge",
         eff: { gold: 0, crew: 0, karma: 0, curse: 1, item: "cursed_compass" },
-        msg: "'A dead captain's compass. It doesn't point north; it points to what you fear most. Or desire. Sometimes they're the same thing.'",
+        msg: "'A dead captain's compass. It doesn't point north; it points to what you fear most. Or desire. Sometimes they're the same thing. Every dawn it asks a small price for that honesty.'",
         flag: "lq_ghost_compass",
       },
       {

@@ -165,6 +165,11 @@ export function MapScreen() {
                     <span className="text-[#40f8a0] ml-2">✓</span>
                   )}
                 </div>
+                <div className="font-game text-[7px] text-white/25 mt-1 leading-[1.6]">
+                  {objectiveProgress.complete
+                    ? objectiveDef.completedDesc[locale]
+                    : objectiveProgress.note?.[locale] ?? objectiveDef.focus[locale]}
+                </div>
               </div>
             </div>
             {objectiveProgress.complete && (

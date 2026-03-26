@@ -400,6 +400,9 @@ function ModeStep({
                   <div className={`text-[7px] mt-1 ${objectiveId === obj.id ? "opacity-60" : "opacity-30"}`}>
                     {obj.desc[locale]}
                   </div>
+                  <div className={`text-[7px] mt-1 ${objectiveId === obj.id ? "text-[#f0c040]/70" : "text-white/25"}`}>
+                    {obj.focus[locale]}
+                  </div>
                 </button>
               ))}
             </div>

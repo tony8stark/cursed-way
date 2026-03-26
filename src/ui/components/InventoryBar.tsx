@@ -1,5 +1,5 @@
 import { ARTIFACTS } from "../../engine/items";
-import { ITEM_NAMES, ITEM_DESCRIPTIONS } from "../../engine/items-i18n";
+import { ITEM_NAMES, ITEM_DESCRIPTIONS, ITEM_HINTS } from "../../engine/items-i18n";
 import { useLocaleStore, useT } from "../../i18n";
 import type { ArtifactLog } from "../../engine/types";
 
@@ -51,12 +51,14 @@ export function InventoryBar({ inventory, artifactLog }: InventoryBarProps) {
         const def = ARTIFACTS[id];
         const name = ITEM_NAMES[id]?.[locale] ?? id;
         const desc = ITEM_DESCRIPTIONS[id]?.[locale];
+        const hint = ITEM_HINTS[id]?.[locale];
         const effect = def ? formatEffect(def, t) : null;
         const logEntry = artifactLog?.find(l => l.itemId === id);
 
         // Build multi-line tooltip
         const lines: string[] = [name];
         if (desc) lines.push(desc);
+        if (hint) lines.push(hint);
         if (effect) lines.push(effect);
         if (logEntry) lines.push(`${t("day")} ${logEntry.day}: ${logEntry.encounterTitle}`);
         const tooltip = lines.join("\n");

@@ -105,6 +105,7 @@ export interface Choice {
   flag?: string | ((state: GameState) => string | null);
   requires_item?: string;  // only show if player has this item
   requires_flag?: string;  // only show if player has this flag (e.g. origin flags)
+  requires_rep?: Partial<Record<import("./factions").FactionId, number>>; // visible, but locked until rep is met
   hidden?: boolean;         // don't show stat changes in log
 }
 

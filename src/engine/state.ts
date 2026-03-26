@@ -13,6 +13,7 @@ import { markObjectiveComplete, resolveQuestEndingIndex, shouldUseObjectiveSyste
 import { getChoiceAvailability } from "./choice-availability";
 import { loadMapRuntime } from "./map-runtime";
 import { findNpcIdByMetFlag } from "./npc-met-flags";
+import { shouldTriggerEmptySailing } from "./pacing";
 
 type Screen = "title" | "sailing" | "encounter" | "ending";
 
@@ -392,8 +393,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // Empty sailing: when en route (not at a named location), there's a chance
     // nothing happens and the ship just moves forward without an encounter.
     // This makes voyages feel more realistic with stretches of open sea.
-    const EMPTY_SAIL_CHANCE = 0.35; // 35% chance of calm seas while sailing
-    if (isEnRoute && !currentLocationName && Math.random() < EMPTY_SAIL_CHANCE) {
+    if (shouldTriggerEmptySailing({
+      mode: gameMode,
+      isEnRoute,
+      currentLocationName,
+      roll: Math.random(),
+    })) {
       // Move ship forward without triggering an encounter
       const newMapState = mapState ? { ...mapState } : null;
       if (newMapState?.currentRoute && newMapState.routeProgress < newMapState.currentRoute.length) {

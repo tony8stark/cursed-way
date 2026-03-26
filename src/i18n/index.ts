@@ -66,6 +66,7 @@ const translations = {
     continueChain: "ДАЛІ →",
     cantAfford: "(замало 💰)",
     alreadyOwned: "(вже є)",
+    requiresRep: "(потрібно {0})",
     itemFound: "ЗНАХІДКА",
     // Ending
     journal: "ЖУРНАЛ",
@@ -152,6 +153,7 @@ const translations = {
     continueChain: "CONTINUE →",
     cantAfford: "(not enough 💰)",
     alreadyOwned: "(already owned)",
+    requiresRep: "(need {0})",
     itemFound: "ITEM FOUND",
     journal: "LOG",
     dayPrefix: "D",

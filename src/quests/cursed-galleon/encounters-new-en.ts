@@ -17,6 +17,7 @@ export const newEncountersEn: Encounter[] = [
     text: "Litvak, the best carpenter in the Caribbean. He inspects your hull and grimaces: 'Another month, and the bottom falls off.'",
     choices: [
       { text: "🔧 Full repair (−30)", eff: { gold: -30, crew: 0, karma: 0, curse: 0, rep: { guild: 1 } }, msg: "Three days of work. Hull like new. Litvak says: 'She'll hold through any storm.' Adds copper sheathing.", flag: "hull_reinforced" },
+      { text: "⚖️ [Guild] Contract rate (−18)", requires_rep: { guild: 3 }, eff: { gold: -18, crew: 0, karma: 0, curse: 0, rep: { guild: 1 } }, msg: "Litvak recognizes the Guild seal and calls his crew over at once. Same full repair, partner pricing.", flag: "hull_reinforced" },
       { text: "🔧 Patch job (−10)", eff: { gold: -10, crew: 0, karma: 0, curse: 0 }, msg: "It'll hold. Not long, but it'll hold." },
       { text: "🤝 Offer a share", eff: { gold: 0, crew: 1, karma: 0, curse: 0 }, msg: "Litvak stares at the sea. 'Haven't sailed in years. I'm in.' Now you have a shipwright aboard.", flag: "has_shipwright" },
     ],
@@ -37,7 +38,7 @@ export const newEncountersEn: Encounter[] = [
     text: "A dark-skinned woman with white eyes blocks your path. 'I see your future. It is wet.'",
     choices: [
       { text: "🔮 Listen (−5)", eff: { gold: -5, crew: 0, karma: 0, curse: 1 }, msg: s => s.curse >= 5 ? "'The Sea King has already set his eyes on you. You need kraken blood.' She produces a dried tooth." : "'Three choices ahead will change everything. The first will seem easy.'", flag: s => s.curse >= 5 ? "kraken_cure_hint" : null },
-      { text: "🧿 Ask for protection (−15)", eff: { gold: -15, crew: 0, karma: 0, curse: -2, item: "voodoo_doll" }, msg: "'Keep it. But know this: every healing has a price. The doll takes the pain, but remembers it.'", flag: "voodoo_protection" },
+      { text: "🧿 Ask for protection (−15)", eff: { gold: -15, crew: 0, karma: 0, curse: -2, item: "voodoo_doll" }, msg: "'Keep it. But know this: some nights the doll takes the pain, and some nights it gives it back. If the shadow grows too thick, burn it first.'", flag: "voodoo_protection" },
       { text: "🚶 Walk around her", eff: { gold: 0, crew: 0, karma: 0, curse: 0 }, msg: "'You'll come back,' she says to your back. 'They always do.'" },
     ],
   },

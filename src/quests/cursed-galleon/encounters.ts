@@ -27,7 +27,7 @@ export const encounters: Encounter[] = [
     id: "merchant_silk", scene: "open_sea", phase: "early", enemyType: "merchant", title: "Китайська джонка",
     text: "Величний корабель під багряними вітрилами. На борту: шовк, порцеляна, чай.",
     choices: [
-      { text: "🤝 Торгувати чесно", eff: { gold: [5, 20], crew: 0, karma: 2, curse: 0, item: "cursed_compass", rep: { guild: 2 } }, msg: "Капітан дарує компас, що 'вказує не на північ, а на те, чого найдужче прагнеш'." },
+      { text: "🤝 Торгувати чесно", eff: { gold: [5, 20], crew: 0, karma: 2, curse: 0, item: "cursed_compass", rep: { guild: 2 } }, msg: "Капітан дарує компас, що 'вказує не на північ, а на те, чого найдужче прагнеш'. Голка тремтить, ніби голодна. За такі дари море зазвичай бере плату." },
       { text: "⚔️ Абордаж", eff: { gold: [40, 80], crew: [-3, -1], karma: -3, curse: 2, rep: { guild: -3, brethren: 1 } }, msg: "Джонка горить. Серед шовку — сувій з невідомими символами. Він пульсує." },
       { text: "🍵 Чай з капітаном", eff: { gold: 0, crew: 1, karma: 1, curse: 0 }, msg: "Колишній пірат. Один з ваших лишається на джонці, зате двоє його людей просяться до вас.", flag: "chinese_allies" },
       { text: "⚖️ [Торговиця] Говорити мандаринською", eff: { gold: [15, 40], crew: 2, karma: 2, curse: 0, rep: { guild: 3 } }, msg: "Капітан впускає вас. Виявляється, він знав вашого батька. Дає вам шовк, двох досвідчених моряків і благословення.", flag: "chinese_allies", requires_flag: "origin_merchant" },
@@ -536,6 +536,7 @@ export const encounters: Encounter[] = [
     text: "Піратська республіка. Тут закон один: хто сильніший, той правий.",
     choices: [
       { text: "🍺 Напоїти команду (−15)", eff: { gold: -15, crew: 1, karma: 0, curse: 0 }, msg: "Мораль на висоті. Двоє нових просяться на борт." },
+      { text: "☠️ [Братство] Покликати старих друзів (−5)", requires_rep: { brethren: 3 }, eff: { gold: -5, crew: 2, karma: 0, curse: 0, rep: { brethren: 1 } }, msg: "Чорний прапор і кілька правильних імен роблять свою справу. До вас приєднуються двоє перевірених абордажників." },
       { text: "🖤 Купити чорну перлину (−50)", eff: { gold: -50, crew: 0, karma: 0, curse: 1, item: "black_pearl" }, msg: "Торговець зникає, щойно ви торкаєтесь перлини. Вона тепла." },
       { text: "📖 Читати оголошення", eff: { gold: 0, crew: 0, karma: 0, curse: 0 }, msg: "Нагорода за вашу голову зросла.", flag: "wanted_nassau" },
     ],
@@ -560,6 +561,7 @@ export const encounters: Encounter[] = [
     text: "Британська фортеця. Ризиковано, але тут найкращі товари.",
     choices: [
       { text: "💊 Купити ліки (−35)", eff: { gold: -35, crew: 0, karma: 0, curse: 0, item: "medicine_chest" }, msg: "Справжні англійські ліки. Команда буде здоровішою." },
+      { text: "👑 [Корона] Інтендантський пайок (−18)", requires_rep: { crown: 3 }, eff: { gold: -18, crew: 0, karma: 1, curse: 0, item: "medicine_chest", rep: { crown: 1 } }, msg: "Інтендант визнає вас своїм. Ящик ліків і бинтів відпускають за службовою ціною.", flag: "british_contact" },
       { text: "🤝 Запропонувати мир", eff: { gold: 0, crew: 0, karma: 2, curse: 0 }, msg: "Губернатор слухає. Не вірить, але слухає.", flag: "british_contact" },
       { text: "⚔️ Пограбувати склад", eff: { gold: [40, 70], crew: [-2, 0], karma: -3, curse: 0 }, msg: "Золото є. Але тепер увесь флот шукає вас.", flag: "port_royal_enemy" },
     ],
@@ -583,8 +585,8 @@ export const encounters: Encounter[] = [
     locationName: "Shadow Cave",
     text: "Вогні на стінах. Шаман із кістяною маскою чекає.",
     choices: [
-      { text: "🪆 Прийняти дар", eff: { gold: 0, crew: 0, karma: 0, curse: 3, item: "voodoo_doll" }, msg: "Лялька з вашим волоссям. Відчуваєте зв'язок з чимось давнім." },
-      { text: "🏮 Взяти ліхтар", eff: { gold: 0, crew: 0, karma: 0, curse: 2, item: "ghost_lantern" }, msg: "Світить без вогню. Показує те, що сховано." },
+      { text: "🪆 Прийняти дар", eff: { gold: 0, crew: 0, karma: 0, curse: 3, item: "voodoo_doll" }, msg: "Лялька з вашим волоссям. Шаман шепоче: 'Іноді вона бере прокляття на себе. Іноді згадує про нього вночі. Якщо стане надто темно, спали її першою.'" },
+      { text: "🏮 Взяти ліхтар", eff: { gold: 0, crew: 0, karma: 0, curse: 2, item: "ghost_lantern" }, msg: "Світить без вогню. У його сяйві проступають потонулі щогли й тіні кораблів, яких удень не існує." },
       { text: "🚶 Піти", eff: { gold: 0, crew: 0, karma: 0, curse: 0 }, msg: "Деякі двері краще не відчиняти." },
     ],
   },

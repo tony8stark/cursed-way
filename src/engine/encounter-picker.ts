@@ -2,6 +2,7 @@ import type { Encounter, GameState, RunPhase } from "./types";
 import { ARTIFACTS } from "./items";
 import { useGameModeStore } from "./game-mode";
 import { enrichEncounter } from "./storylet-tagger";
+import { getCandidatePoolSize, getFamilyPacingMultiplier } from "./pacing";
 
 /** Determine current run phase based on day and game mode */
 function getRunPhase(state: GameState): RunPhase {
@@ -78,6 +79,7 @@ export function pickEncounter(
   currentLocationName?: string | null,
 ): Encounter {
   const phase = getRunPhase(state);
+  const mode = useGameModeStore.getState().mode;
   const recentFamilies = context?.recentFamilies ?? [];
   const recentTags = context?.recentTags ?? new Set<string>();
   const usedGroups = context?.usedGroups ?? new Set<string>();
@@ -145,14 +147,15 @@ export function pickEncounter(
     const pf = phaseFit(e, phase);
     const ff = familyFit(e, recentFamilies);
     const nv = noveltyScore(e, recentTags);
-    const score = base * pf * ff * nv;
+    const pacing = getFamilyPacingMultiplier(mode, e.family ?? "ambient");
+    const score = base * pf * ff * nv * pacing;
     return { encounter: e, score: Math.max(0.01, score) };
   });
 
   // Sort by score descending, pick from top candidates with weighted random
   scored.sort((a, b) => b.score - a.score);
-  // Take top 40% or at least 3 candidates for weighted pick (adds variety)
-  const topN = Math.max(3, Math.ceil(scored.length * 0.4));
+  // Expedition runs use a tighter pool to keep the run denser.
+  const topN = getCandidatePoolSize(mode, scored.length);
   const candidates = scored.slice(0, topN);
 
   return weightedPick(candidates).encounter;
