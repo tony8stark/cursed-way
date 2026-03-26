@@ -14,9 +14,10 @@ interface Props {
   curse?: number;
   day?: number;
   enemyType?: string;
+  encounterId?: string;
 }
 
-export function GameCanvas({ scene, curse = 0, day = 0, enemyType }: Props) {
+export function GameCanvas({ scene, curse = 0, day = 0, enemyType, encounterId }: Props) {
   const locale = useLocaleStore(s => s.locale);
   const state = useGameStore(s => s.state);
   const ref = useRef<HTMLCanvasElement>(null);
@@ -34,7 +35,7 @@ export function GameCanvas({ scene, curse = 0, day = 0, enemyType }: Props) {
     let id: number;
 
     // Build scene opts - always use enhanced visuals
-    const opts: SceneOpts = { curse, enemyType };
+    const opts: SceneOpts = { curse, enemyType, encounterId };
     if (state) {
       opts.shipVisual = getShipVisualState(state);
       opts.atmosphere = getAtmosphere(day, state.watch);
@@ -79,7 +80,7 @@ export function GameCanvas({ scene, curse = 0, day = 0, enemyType }: Props) {
 
     draw();
     return () => cancelAnimationFrame(id);
-  }, [scene, curse, day, enemyType, locale, state]);
+  }, [scene, curse, day, enemyType, encounterId, locale, state]);
 
   return (
     <canvas

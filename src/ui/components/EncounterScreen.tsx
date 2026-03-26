@@ -108,7 +108,13 @@ export function EncounterScreen() {
     >
       {/* Left: Scene canvas */}
       <div className="flex-1 min-w-0 flex flex-col gap-3">
-        <GameCanvas scene={scene} curse={state.curse} day={state.day} enemyType={encounter.enemyType} />
+        <GameCanvas
+          scene={scene}
+          curse={state.curse}
+          day={state.day}
+          enemyType={encounter.enemyType}
+          encounterId={encounter.id}
+        />
 
         {/* Choices below canvas */}
         {!result ? (
