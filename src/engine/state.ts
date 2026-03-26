@@ -424,7 +424,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
             const visits = (state.locationVisits[locName] ?? 0) + 1;
             const newLocationVisits = { ...state.locationVisits, [locName]: visits };
 
-            const lq = checkLocationQuest(locName, visits, usedIds);
+            const exploredLocationCount = Object.keys(newLocationVisits).length;
+            const lq = checkLocationQuest(locName, visits, usedIds, { exploredLocationCount });
             if (lq) {
               const questEnc = quest.encounters.find(e => e.id === lq.encounterId);
               if (questEnc) {
@@ -529,7 +530,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
             const visits = (state.locationVisits[locName] ?? 0) + 1;
             const newLocationVisits = { ...state.locationVisits, [locName]: visits };
 
-            const lq = checkLocationQuest(locName, visits, usedIds);
+            const exploredLocationCount = Object.keys(newLocationVisits).length;
+            const lq = checkLocationQuest(locName, visits, usedIds, { exploredLocationCount });
             if (lq) {
               const questEnc = quest.encounters.find(e => e.id === lq.encounterId);
               if (questEnc) {

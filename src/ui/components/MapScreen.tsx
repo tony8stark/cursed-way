@@ -12,9 +12,10 @@ import { FactionBar } from "./FactionBar";
 import { WorldMapModal } from "./WorldMapModal";
 import { useGameModeStore } from "../../engine/game-mode";
 import { markObjectiveComplete, resolveQuestEndingIndex, shouldUseObjectiveSystem } from "../../engine/ending-resolution";
+import { DIFFICULTY_CONFIG, getLocationQuestPreview } from "../../engine/location-quests";
 
 export function MapScreen() {
-  const { state, sail, setDestination, mapState } = useGameStore();
+  const { state, sail, setDestination, mapState, usedIds } = useGameStore();
   const t = useT();
   const locale = useLocaleStore(s => s.locale);
   const mode = useGameModeStore(s => s.mode);
@@ -222,33 +223,64 @@ export function MapScreen() {
                 {t("chooseDestination")}
               </div>
               {destinations.map(d => (
-                <motion.button
-                  key={`${d.pos[0]},${d.pos[1]}`}
-                  whileHover={{ scale: 1.03 }}
-                  whileTap={{ scale: 0.97 }}
-                  onClick={() => handleSetDestination(d.pos)}
-                  className="game-btn font-game text-[9px] px-3 py-2 border bg-transparent cursor-pointer transition-all duration-200 text-left"
-                  style={{ color: "#40c0f0", borderColor: "#40c0f0" }}
-                  onMouseOver={e => {
-                    e.currentTarget.style.background = "#40c0f0";
-                    e.currentTarget.style.color = "#0a0a1a";
-                    if (mapState) {
-                      setPreviewRoute(computeRoute(mapState.playerPos, d.pos));
-                    }
-                  }}
-                  onMouseOut={e => {
-                    e.currentTarget.style.background = "transparent";
-                    e.currentTarget.style.color = "#40c0f0";
-                    setPreviewRoute(null);
-                  }}
-                >
-                  <span>{d.icon} {d.name[locale]}</span>
-                  {mapState && (
-                    <span className="text-[7px] opacity-50 ml-1">
-                      {t("routeSteps").replace("{0}", String(computeRoute(mapState.playerPos, d.pos).length))}
-                    </span>
-                  )}
-                </motion.button>
+                (() => {
+                  const nextVisitCount = (state.locationVisits[d.name.en] ?? 0) + 1;
+                  const nextExploredCount = Object.keys(state.locationVisits).length
+                    + (state.locationVisits[d.name.en] ? 0 : 1);
+                  const questPreview = getLocationQuestPreview(
+                    d.name.en,
+                    nextVisitCount,
+                    usedIds,
+                    nextExploredCount,
+                  );
+
+                  return (
+                    <motion.button
+                      key={`${d.pos[0]},${d.pos[1]}`}
+                      whileHover={{ scale: 1.03 }}
+                      whileTap={{ scale: 0.97 }}
+                      onClick={() => handleSetDestination(d.pos)}
+                      className="game-btn font-game text-[9px] px-3 py-2 border bg-transparent cursor-pointer transition-all duration-200 text-left"
+                      style={{ color: "#40c0f0", borderColor: "#40c0f0" }}
+                      onMouseOver={e => {
+                        e.currentTarget.style.background = "#40c0f0";
+                        e.currentTarget.style.color = "#0a0a1a";
+                        if (mapState) {
+                          setPreviewRoute(computeRoute(mapState.playerPos, d.pos));
+                        }
+                      }}
+                      onMouseOut={e => {
+                        e.currentTarget.style.background = "transparent";
+                        e.currentTarget.style.color = "#40c0f0";
+                        setPreviewRoute(null);
+                      }}
+                    >
+                      <div>
+                        <span>{d.icon} {d.name[locale]}</span>
+                        {mapState && (
+                          <span className="text-[7px] opacity-50 ml-1">
+                            {t("routeSteps").replace("{0}", String(computeRoute(mapState.playerPos, d.pos).length))}
+                          </span>
+                        )}
+                      </div>
+                      {questPreview && (
+                        <div className="mt-1 leading-[1.5]">
+                          <div
+                            className="text-[7px]"
+                            style={{ color: DIFFICULTY_CONFIG[questPreview.quest.difficulty].color }}
+                          >
+                            {DIFFICULTY_CONFIG[questPreview.quest.difficulty].label[locale]}: {questPreview.quest.rewardHint[locale]}
+                          </div>
+                          <div className="text-[7px] opacity-70">
+                            {questPreview.status === "ready"
+                              ? questPreview.quest.hint[locale]
+                              : questPreview.note[locale]}
+                          </div>
+                        </div>
+                      )}
+                    </motion.button>
+                  );
+                })()
               ))}
             </div>
           ) : (
